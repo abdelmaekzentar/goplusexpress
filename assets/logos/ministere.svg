@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Background -->
+  <rect x="0" y="0" width="200" height="80" rx="4" fill="#FFFFFF"/>
+
+  <!-- Bande vert Maroc haut -->
+  <rect x="0" y="0" width="200" height="5" fill="#006233"/>
+  <!-- Bande rouge bas -->
+  <rect x="0" y="75" width="200" height="5" fill="#C1272D"/>
+
+  <!-- Étoile marocaine centrale gauche -->
+  <g transform="translate(24,40) scale(1.1)">
+    <polygon points="0,-14 3.5,-4.5 14,-4.5 5.5,2 9,12 0,6 -9,12 -5.5,2 -14,-4.5 -3.5,-4.5"
+             fill="#006233"/>
+  </g>
+
+  <!-- Texte Ministère -->
+  <text x="113" y="22"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="700"
+        font-size="7.5"
+        fill="#555555"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="0.3">ROYAUME DU MAROC</text>
+
+  <text x="113" y="36"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900"
+        font-size="9"
+        fill="#C1272D"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="0.2">MINISTÈRE DE L'INDUSTRIE</text>
+
+  <text x="113" y="48"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900"
+        font-size="9"
+        fill="#C1272D"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="0.2">ET DU COMMERCE</text>
+
+  <text x="113" y="62"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="400"
+        font-size="7.5"
+        fill="#006233"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="0.3">وزارة الصناعة والتجارة</text>
+</svg>

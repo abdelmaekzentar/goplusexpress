@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 80" width="200" height="80">
+  <!-- Background blanc -->
+  <rect x="0" y="0" width="200" height="80" rx="4" fill="#FFFFFF"/>
+  <!-- Bande verte haut -->
+  <rect x="0" y="0" width="200" height="8" fill="#006233"/>
+  <!-- Bande rouge bas -->
+  <rect x="0" y="72" width="200" height="8" fill="#C1272D"/>
+
+  <!-- Croissant étoile marocaine simplifié -->
+  <g transform="translate(30,40)">
+    <!-- Étoile de David verte (étoile du drapeau marocain) -->
+    <polygon points="0,-14 3.5,-4.5 14,-4.5 5.5,2 9,12 0,6 -9,12 -5.5,2 -14,-4.5 -3.5,-4.5"
+             fill="none" stroke="#006233" stroke-width="2.5"/>
+  </g>
+
+  <!-- Texte principal -->
+  <text x="112" y="30"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900"
+        font-size="13"
+        fill="#C1272D"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="1">DOUANE MAROCAINE</text>
+
+  <!-- Texte arabe simplifié -->
+  <text x="112" y="50"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="700"
+        font-size="11"
+        fill="#006233"
+        text-anchor="middle"
+        dominant-baseline="middle">الجمارك المغربية</text>
+
+  <!-- Sous-titre -->
+  <text x="112" y="65"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="400"
+        font-size="8"
+        fill="#555555"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="0.5">Dédouanement Simplifié Agréé</text>
+</svg>

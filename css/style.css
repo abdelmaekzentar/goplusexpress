@@ -303,6 +303,8 @@ footer{background:var(--dark);color:#fff;padding:60px 5% 24px}
 .certif-item{display:flex;align-items:center;gap:14px;padding:22px 36px;transition:var(--transition)}
 .certif-item:hover{background:rgba(0,169,157,.08)}
 .certif-icon{width:52px;height:52px;background:linear-gradient(135deg,var(--teal),var(--teal-d));border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;flex-shrink:0}
+.certif-icon-logo{width:88px;height:44px;background:#fff;border-radius:10px;padding:4px 6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.certif-icon-logo img{width:100%;height:100%;object-fit:contain}
 .certif-text{display:flex;flex-direction:column}
 .certif-text strong{color:#fff;font-size:.95rem;font-weight:700}
 .certif-text span{color:rgba(255,255,255,.5);font-size:.78rem;margin-top:2px}
