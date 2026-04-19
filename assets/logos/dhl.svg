@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 80" width="220" height="80">
+
+  <!-- ── Bloc jaune supérieur ── -->
+  <rect x="0" y="0" width="220" height="50" fill="#FFCC00"/>
+
+  <!-- ── Lignes de vitesse gauche (rouge) ── -->
+  <rect x="0" y="34" width="18" height="3.5" fill="#D40511"/>
+  <rect x="0" y="39" width="18" height="3.5" fill="#D40511"/>
+  <rect x="0" y="44" width="18" height="3.5" fill="#D40511"/>
+
+  <!-- ── Lignes de vitesse droite (rouge) ── -->
+  <rect x="202" y="34" width="18" height="3.5" fill="#D40511"/>
+  <rect x="202" y="39" width="18" height="3.5" fill="#D40511"/>
+  <rect x="202" y="44" width="18" height="3.5" fill="#D40511"/>
+
+  <!-- ── Texte DHL ── -->
+  <text x="110" y="38"
+        font-family="Arial Black, Impact, Arial, sans-serif"
+        font-weight="900"
+        font-style="italic"
+        font-size="36"
+        fill="#D40511"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="-1">DHL</text>
+
+  <!-- ── Zone blanche EXPRESS ── -->
+  <rect x="0" y="50" width="220" height="30" fill="#FFFFFF"/>
+
+  <!-- ── Lignes jaunes encadrant EXPRESS ── -->
+  <rect x="0"   y="53" width="220" height="2.5" fill="#FFCC00"/>
+  <rect x="0"   y="74" width="220" height="2.5" fill="#FFCC00"/>
+
+  <!-- ── Texte EXPRESS ── -->
+  <text x="110" y="65"
+        font-family="Arial, Helvetica, sans-serif"
+        font-weight="700"
+        font-style="italic"
+        font-size="14"
+        fill="#D40511"
+        text-anchor="middle"
+        dominant-baseline="middle"
+        letter-spacing="3">EXPRESS</text>
+
+</svg>

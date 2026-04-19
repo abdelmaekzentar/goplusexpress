@@ -1,0 +1,22 @@
+# Netlify
+.netlify/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Fichiers sensibles / config Claude
+.claude/
+"code accesss.txt"
+code\ accesss.txt
+netlify.toml

@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Espace Client — GO PLUS EXPRESS</title>
+<meta name="robots" content="noindex"/>
+<link rel="stylesheet" href="css/style.css?v=20260419d"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260419d"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="ec-body">
+
+<!-- ══════════════ NAVBAR ══════════════ -->
+<nav id="navbar" class="scrolled">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <img src="assets/logo.png" alt="GO PLUS EXPRESS" class="brand-logo"/>
+    </a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html#services">Services</a></li>
+      <li><a href="index.html#simulators">Simulateurs</a></li>
+      <li><a href="index.html#tracking">Tracking</a></li>
+      <li><a href="espace-client.html" class="active">Espace Client</a></li>
+    </ul>
+    <div class="nav-right">
+      <div id="ec-user-nav" class="ec-user-nav hidden">
+        <span class="ec-avatar" id="ec-avatar-nav">U</span>
+        <span class="ec-username" id="ec-username-nav"></span>
+        <button class="ec-logout-btn" onclick="ecLogout()"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+      <button class="hamburger" id="menu-toggle">&#9776;</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════ LOGIN OVERLAY ══════════════ -->
+<div id="ec-login-overlay" class="ec-login-overlay">
+  <div class="ec-login-box">
+    <div class="ec-login-logo">
+      <img src="assets/logo.png" alt="GO PLUS EXPRESS"/>
+    </div>
+    <h2>Espace Client</h2>
+    <p class="ec-login-sub">Accédez à vos outils logistiques professionnels</p>
+
+    <div class="ec-tabs">
+      <button class="ec-tab active" onclick="ecShowTab('login')">Connexion</button>
+      <button class="ec-tab" onclick="ecShowTab('register')">Créer un compte</button>
+    </div>
+
+    <!-- Login -->
+    <div id="ec-tab-login" class="ec-tab-panel active">
+      <div class="ec-form-group">
+        <label><i class="fa-solid fa-envelope"></i> Email</label>
+        <input type="email" id="ec-login-email" placeholder="votre@email.com"/>
+      </div>
+      <div class="ec-form-group">
+        <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
+        <input type="password" id="ec-login-pass" placeholder="••••••••"/>
+      </div>
+      <div id="ec-login-error" class="ec-msg-error hidden"></div>
+      <button class="btn btn-primary ec-btn-full" onclick="ecLogin()">
+        <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+      </button>
+      <p class="ec-demo-hint">
+        <i class="fa-solid fa-circle-info"></i>
+        Accès démo disponible — contactez <strong>support@goplusexpress.ma</strong>
+      </p>
+    </div>
+
+    <!-- Register -->
+    <div id="ec-tab-register" class="ec-tab-panel">
+      <div class="ec-form-row">
+        <div class="ec-form-group">
+          <label>Prénom</label>
+          <input type="text" id="ec-reg-first" placeholder="Prénom"/>
+        </div>
+        <div class="ec-form-group">
+          <label>Nom</label>
+          <input type="text" id="ec-reg-last" placeholder="Nom"/>
+        </div>
+      </div>
+      <div class="ec-form-group">
+        <label>Société</label>
+        <input type="text" id="ec-reg-company" placeholder="Nom de votre société"/>
+      </div>
+      <div class="ec-form-group">
+        <label>Email professionnel</label>
+        <input type="email" id="ec-reg-email" placeholder="votre@societe.ma"/>
+      </div>
+      <div class="ec-form-group">
+        <label>Mot de passe</label>
+        <input type="password" id="ec-reg-pass" placeholder="Min. 6 caractères"/>
+      </div>
+      <div id="ec-reg-error" class="ec-msg-error hidden"></div>
+      <div id="ec-reg-success" class="ec-msg-success hidden"></div>
+      <button class="btn btn-primary ec-btn-full" onclick="ecRegister()">
+        <i class="fa-solid fa-user-plus"></i> Créer mon compte
+      </button>
+    </div>
+
+    <a href="index.html" class="ec-back-link"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+  </div>
+</div>
+
+<!-- ══════════════ DASHBOARD ══════════════ -->
+<div id="ec-dashboard" class="ec-dashboard hidden">
+
+  <!-- Sidebar -->
+  <aside class="ec-sidebar">
+    <div class="ec-sidebar-header">
+      <div class="ec-avatar-lg" id="ec-avatar-side">U</div>
+      <div>
+        <div class="ec-fullname" id="ec-fullname-side">Utilisateur</div>
+        <div class="ec-company-side" id="ec-company-side">GO PLUS EXPRESS</div>
+      </div>
+    </div>
+    <nav class="ec-sidenav">
+      <button class="ec-nav-item active" onclick="ecShowModule('accueil')" id="ecnav-accueil">
+        <i class="fa-solid fa-house"></i> Tableau de bord
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('ocr')" id="ecnav-ocr">
+        <i class="fa-solid fa-file-invoice"></i> OCR Facture Commerciale
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('transport')" id="ecnav-transport">
+        <i class="fa-solid fa-truck-fast"></i> Factures Transport
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('codes')" id="ecnav-codes">
+        <i class="fa-solid fa-location-dot"></i> Codes Aéroports &amp; Ports
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('simulation')" id="ecnav-simulation">
+        <i class="fa-solid fa-calculator"></i> Simulation de Prix
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('conteneur')" id="ecnav-conteneur">
+        <i class="fa-solid fa-box"></i> Guide Conteneurs &amp; Remorques
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('avion')" id="ecnav-avion">
+        <i class="fa-solid fa-plane-up"></i> Appareils Cargo
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('hscode')" id="ecnav-hscode">
+        <i class="fa-solid fa-barcode"></i> Codes SH / HS
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('express')" id="ecnav-express">
+        <i class="fa-solid fa-bolt"></i> Tarifs Express
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('expedition')" id="ecnav-expedition">
+        <i class="fa-solid fa-tag"></i> Nouvelle Expédition
+      </button>
+    </nav>
+    <div class="ec-sidebar-footer">
+      <a href="index.html" class="ec-sidebar-link"><i class="fa-solid fa-globe"></i> Site principal</a>
+      <button class="ec-sidebar-link" onclick="ecLogout()"><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="ec-main">
+
+    <!-- ── Module: Accueil ── -->
+    <div class="ec-module active" id="ecmod-accueil">
+      <div class="ec-module-header">
+        <h1>Tableau de bord</h1>
+        <p id="ec-welcome-msg">Bienvenue !</p>
+      </div>
+      <div class="ec-cards-grid">
+        <div class="ec-dash-card" onclick="ecShowModule('ocr')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#667eea,#764ba2)">
+            <i class="fa-solid fa-file-invoice"></i>
+          </div>
+          <div>
+            <strong>OCR Facture Commerciale</strong>
+            <span>Extraire automatiquement les données d'une facture</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('transport')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
+            <i class="fa-solid fa-truck-fast"></i>
+          </div>
+          <div>
+            <strong>Factures Transport</strong>
+            <span>Générer et gérer vos factures de transport</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('codes')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#4facfe,#00f2fe)">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+          <div>
+            <strong>Codes Aéroports &amp; Ports</strong>
+            <span>Base mondiale IATA + codes ports ONU</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('simulation')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#43e97b,#38f9d7)">
+            <i class="fa-solid fa-calculator"></i>
+          </div>
+          <div>
+            <strong>Simulation de Prix</strong>
+            <span>Tarifs express, maritime, routier en temps réel</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('conteneur')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#fa709a,#fee140)">
+            <i class="fa-solid fa-box"></i>
+          </div>
+          <div>
+            <strong>Guide Conteneurs &amp; Remorques</strong>
+            <span>Dimensions, capacités, types standardisés</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('avion')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#0f0c29,#302b63,#24243e)">
+            <i class="fa-solid fa-plane-up"></i>
+          </div>
+          <div>
+            <strong>Appareils Cargo</strong>
+            <span>Référentiel technique avions cargo mondiaux</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Module: OCR ── -->
+    <div class="ec-module" id="ecmod-ocr">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-file-invoice"></i> OCR Facture Commerciale</h1>
+        <p>Extraction automatique &middot; Calcul CIF par incoterm &middot; Droits de douane &middot; Autorisations Maroc</p>
+      </div>
+
+      <!-- ── Options ── -->
+      <div class="ocr-options-bar">
+        <label class="ocr-option-check">
+          <input type="checkbox" id="ocr-calc-duties" checked onchange="ocrUpdateHint()"/>
+          <span>Calculer les droits &amp; taxes automatiquement</span>
+        </label>
+        <span class="ocr-cost-hint" id="ocr-cost-hint">
+          <i class="fa-solid fa-circle-info"></i>
+          Traitement 100% local — données confidentielles
+        </span>
+      </div>
+
+      <!-- ── Transport & Incoterm ── -->
+      <div class="ocr-transport-card">
+        <div class="ocr-transport-title">
+          <i class="fa-solid fa-truck-fast"></i>
+          <strong>Transport &amp; Incoterm</strong>
+          <span>— nécessaire pour calculer la valeur CIF</span>
+        </div>
+        <div class="ocr-transport-grid">
+          <div class="ec-form-group" style="margin:0">
+            <label>Incoterm</label>
+            <select id="ocr-incoterm" onchange="ocrUpdateIncoterm()">
+              <option value="CIF">CIF — Cost, Insurance &amp; Freight</option>
+              <option value="FOB" selected>FOB — Free On Board</option>
+              <option value="EXW">EXW — Ex Works</option>
+              <option value="DAP">DAP — Delivered at Place</option>
+              <option value="DDP">DDP — Delivered Duty Paid</option>
+              <option value="FCA">FCA — Free Carrier</option>
+              <option value="CPT">CPT — Carriage Paid To</option>
+              <option value="CFR">CFR — Cost and Freight</option>
+            </select>
+            <small id="ocr-cif-formula" class="ocr-formula-hint">
+              <i class="fa-solid fa-equals"></i> CIF = Facture + Fret + Assurance
+            </small>
+          </div>
+          <div class="ec-form-group" style="margin:0">
+            <label>Assurance <span style="font-weight:400;color:#a0aec0">(0,5% auto si vide)</span></label>
+            <input type="number" id="ocr-insurance" placeholder="0.00" step="0.01" min="0" oninput="ocrRecalcIfDone()"/>
+          </div>
+          <div class="ec-form-group" style="margin:0">
+            <label>Devise</label>
+            <select id="ocr-currency">
+              <option value="USD">USD — Dollar américain</option>
+              <option value="EUR">EUR — Euro</option>
+              <option value="CNY">CNY — Yuan chinois</option>
+              <option value="MAD">MAD — Dirham marocain</option>
+              <option value="GBP">GBP — Livre sterling</option>
+              <option value="AED">AED — Dirham EAU</option>
+              <option value="SAR">SAR — Riyal saoudien</option>
+              <option value="TRY">TRY — Livre turque</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Fret section — affiché pour FOB, EXW, FCA -->
+        <div id="ocr-fret-section" class="ocr-fret-section">
+          <div class="ocr-fret-header">
+            <i class="fa-solid fa-plane-up"></i>
+            <span>Facture de transport (fret) — requise pour incoterm FOB</span>
+          </div>
+          <div class="ocr-fret-grid">
+            <div class="ec-form-group" style="margin:0">
+              <label>Coût fret total (tous articles)</label>
+              <input type="number" id="ocr-fret-cost" placeholder="0.00" step="0.01" min="0" oninput="ocrRecalcIfDone()"/>
+              <small style="color:#888;font-size:.78rem">Sera distribué proportionnellement par article</small>
+            </div>
+            <div class="ocr-fret-upload-mini" onclick="document.getElementById('ocr-fret-file').click()">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span>Glissez la facture de transport (PDF/image)<br/>ou cliquez pour choisir</span>
+              <input type="file" id="ocr-fret-file" accept=".jpg,.jpeg,.png,.pdf" style="display:none"/>
+            </div>
+          </div>
+          <p class="ocr-fret-warn">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Sans fret, le CIF sera calculé comme prix facture + assurance estimée uniquement
+          </p>
+        </div>
+      </div>
+
+      <!-- ── Drop zone ── -->
+      <div class="ocr2-dropzone" id="ocr-drop-zone" onclick="document.getElementById('ocr-file').click()">
+        <input type="file" id="ocr-file" accept=".jpg,.jpeg,.png,.pdf" style="display:none" onchange="ocrLoadFile(this)"/>
+        <i class="fa-solid fa-file-lines ocr2-drop-icon"></i>
+        <strong id="ocr-drop-label">Glissez votre facture commerciale</strong>
+        <span id="ocr-drop-sub">PDF, JPG, PNG — max 15 MB</span>
+        <small>Fonctionne avec toutes les factures : chinoise, française, anglaise, arabe…</small>
+        <div class="ocr2-progress" id="ocr-progress" style="display:none">
+          <div class="ocr2-progress-bar" id="ocr-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- ── Résultats ── -->
+      <div id="ocr-results" style="display:none">
+
+        <!-- En-tête facture -->
+        <div class="ocr2-card" id="ocr-invoice-header">
+          <div class="ocr2-card-title">
+            <i class="fa-solid fa-circle-check" style="color:#22c55e"></i>
+            Facture analysée
+            <div style="margin-left:auto;display:flex;gap:8px">
+              <button class="ocr2-btn-sm" onclick="ocrExportCSV()"><i class="fa-solid fa-file-csv"></i> CSV</button>
+              <button class="ocr2-btn-sm" onclick="ocrCopyJSON()"><i class="fa-solid fa-copy"></i> JSON</button>
+              <button class="ocr2-btn-sm ocr2-btn-gray" onclick="ocrReset()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+            </div>
+          </div>
+          <div class="ocr2-info-grid" id="ocr-info-grid"></div>
+        </div>
+
+        <!-- Récapitulatif taxes (3 cards) -->
+        <div class="ocr2-summary-grid" id="ocr-summary-grid" style="display:none"></div>
+
+        <!-- Liste articles (accordion) -->
+        <div id="ocr-articles-wrap">
+          <h3 class="ocr2-section-title">
+            <i class="fa-solid fa-list-check"></i>
+            <span id="ocr-art-count">0</span> article(s) détecté(s)
+            <button class="ocr2-btn-sm" onclick="ocrAddManualOpen()" style="margin-left:auto">
+              <i class="fa-solid fa-plus"></i> Ajouter manuellement
+            </button>
+          </h3>
+          <div id="ocr-articles-list" class="ocr2-articles-list"></div>
+        </div>
+
+        <!-- Ajout manuel (collapsible) -->
+        <div id="ocr-manual-panel" class="ocr2-card" style="display:none">
+          <div class="ocr2-card-title"><i class="fa-solid fa-plus-circle"></i> Ajouter un article pour analyse</div>
+          <div class="ocr-manual-form">
+            <input type="text" id="ocr-manual-desc" placeholder="Description (ex: Smartphone Samsung Galaxy)" style="flex:2"/>
+            <input type="text" id="ocr-manual-hs" placeholder="Code SH (ex: 8517)" style="flex:1;max-width:150px"/>
+            <input type="text" id="ocr-manual-pays" placeholder="Pays origine" style="flex:1;max-width:140px"/>
+            <input type="number" id="ocr-manual-price" placeholder="Prix total (USD)" style="flex:1;max-width:140px" step="0.01"/>
+            <button class="btn btn-primary" onclick="ocrAddManualArticle()" style="white-space:nowrap">
+              <i class="fa-solid fa-magnifying-glass"></i> Analyser
+            </button>
+          </div>
+        </div>
+
+        <!-- Autorisations Maroc -->
+        <div id="ocr-auth-panel" style="display:none">
+          <div class="auth-panel-header">
+            <div class="auth-panel-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <div>
+              <h2>Autorisations d'Importation — Maroc</h2>
+              <p>Réglementation douanière marocaine (ADIL 2024) — ANRT, DMP, ONSSA, IMANOR</p>
+            </div>
+          </div>
+          <div id="ocr-auth-body"></div>
+          <div class="auth-panel-footer">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Informations indicatives. Consultez la
+              <a href="https://www.douane.gov.ma/adil" target="_blank" rel="noopener noreferrer">base ADIL de la Douane Maroc</a>
+              pour confirmation officielle.</span>
+          </div>
+        </div>
+
+      </div><!-- /ocr-results -->
+
+      <div class="ocr-note" style="margin-top:16px">
+        <i class="fa-solid fa-lock"></i>
+        <span>Traitement 100% local (Tesseract.js) — vos documents ne quittent jamais votre navigateur.</span>
+      </div>
+    </div>
+
+    <!-- ── Module: Factures Transport ── -->
+    <div class="ec-module" id="ecmod-transport">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-truck-fast"></i> Factures de Transport</h1>
+        <p>Générez des factures de transport professionnelles au format PDF.</p>
+      </div>
+      <div class="invoice-layout">
+        <div class="invoice-form">
+          <h3>Informations de l'envoi</h3>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>N° de facture</label>
+              <input type="text" id="inv-num" value="GPE-2024-001"/>
+            </div>
+            <div class="ec-form-group">
+              <label>Date</label>
+              <input type="date" id="inv-date"/>
+            </div>
+          </div>
+          <h4 style="margin:16px 0 8px;color:var(--teal)">Expéditeur</h4>
+          <div class="ec-form-group">
+            <label>Nom / Société</label>
+            <input type="text" id="inv-from-name" placeholder="Nom de l'expéditeur"/>
+          </div>
+          <div class="ec-form-group">
+            <label>Adresse</label>
+            <input type="text" id="inv-from-addr" placeholder="Adresse complète"/>
+          </div>
+          <h4 style="margin:16px 0 8px;color:var(--teal)">Destinataire</h4>
+          <div class="ec-form-group">
+            <label>Nom / Société</label>
+            <input type="text" id="inv-to-name" placeholder="Nom du destinataire"/>
+          </div>
+          <div class="ec-form-group">
+            <label>Adresse</label>
+            <input type="text" id="inv-to-addr" placeholder="Adresse complète"/>
+          </div>
+          <h4 style="margin:16px 0 8px;color:var(--teal)">Détails du transport</h4>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Mode</label>
+              <select id="inv-mode">
+                <option>Aérien</option>
+                <option>Maritime</option>
+                <option>Routier</option>
+                <option>Express</option>
+              </select>
+            </div>
+            <div class="ec-form-group">
+              <label>AWB / BL / Référence</label>
+              <input type="text" id="inv-ref" placeholder="Ex: 057-12345678"/>
+            </div>
+          </div>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Poids (kg)</label>
+              <input type="number" id="inv-weight" placeholder="0" oninput="invCalc()"/>
+            </div>
+            <div class="ec-form-group">
+              <label>Tarif (MAD/kg)</label>
+              <input type="number" id="inv-rate" placeholder="0" oninput="invCalc()"/>
+            </div>
+          </div>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Frais annexes (MAD)</label>
+              <input type="number" id="inv-extra" value="0" oninput="invCalc()"/>
+            </div>
+            <div class="ec-form-group">
+              <label>TVA (%)</label>
+              <select id="inv-tva" onchange="invCalc()">
+                <option value="20">20%</option>
+                <option value="0">0% (exonéré)</option>
+                <option value="7">7%</option>
+                <option value="10">10%</option>
+                <option value="14">14%</option>
+              </select>
+            </div>
+          </div>
+          <div class="inv-total-bar">
+            <span>Total HT : <strong id="inv-ht">0,00 MAD</strong></span>
+            <span>TVA : <strong id="inv-tva-amt">0,00 MAD</strong></span>
+            <span class="inv-ttc">Total TTC : <strong id="inv-ttc">0,00 MAD</strong></span>
+          </div>
+          <button class="btn btn-primary ec-btn-full" onclick="invPrint()">
+            <i class="fa-solid fa-print"></i> Générer PDF / Imprimer
+          </button>
+        </div>
+        <div class="invoice-preview" id="inv-preview">
+          <div class="inv-doc" id="inv-doc">
+            <div class="inv-head">
+              <div class="inv-logo-area">
+                <img src="assets/logo.png" alt="GO PLUS EXPRESS" style="height:60px"/>
+                <div>
+                  <strong>GO PLUS EXPRESS</strong>
+                  <span>Transitaire Agréé IATA</span>
+                  <span>Casablanca, Maroc</span>
+                  <span>+212 669 142 211</span>
+                </div>
+              </div>
+              <div class="inv-ref-area">
+                <h2>FACTURE DE TRANSPORT</h2>
+                <table>
+                  <tr><td>N° Facture :</td><td id="idoc-num">GPE-2024-001</td></tr>
+                  <tr><td>Date :</td><td id="idoc-date">—</td></tr>
+                  <tr><td>Référence :</td><td id="idoc-ref">—</td></tr>
+                </table>
+              </div>
+            </div>
+            <div class="inv-parties">
+              <div class="inv-party">
+                <h4>EXPÉDITEUR</h4>
+                <p id="idoc-from-name">—</p>
+                <p id="idoc-from-addr"></p>
+              </div>
+              <div class="inv-party">
+                <h4>DESTINATAIRE</h4>
+                <p id="idoc-to-name">—</p>
+                <p id="idoc-to-addr"></p>
+              </div>
+            </div>
+            <table class="inv-lines-table">
+              <thead><tr><th>Description</th><th>Qté</th><th>P.U.</th><th>Montant</th></tr></thead>
+              <tbody id="idoc-lines">
+                <tr><td>Frais de transport (aérien)</td><td id="idoc-qty">0 kg</td><td id="idoc-pu">0,00</td><td id="idoc-line1">0,00 MAD</td></tr>
+                <tr><td>Frais annexes &amp; manutention</td><td>1</td><td id="idoc-extra">0,00</td><td id="idoc-extra2">0,00 MAD</td></tr>
+              </tbody>
+            </table>
+            <div class="inv-totals">
+              <div><span>Sous-total HT</span><strong id="idoc-ht">0,00 MAD</strong></div>
+              <div><span id="idoc-tva-lbl">TVA 20%</span><strong id="idoc-tva">0,00 MAD</strong></div>
+              <div class="inv-total-ttc"><span>TOTAL TTC</span><strong id="idoc-ttc">0,00 MAD</strong></div>
+            </div>
+            <div class="inv-footer-note">
+              Règlement : virement bancaire — IBAN MA… | Conditions : net 30 jours<br/>
+              GO PLUS EXPRESS SARL — ICE : XXXXXXXXXX — RC : XXXXXXXXXX<br/>
+              Agréé IATA · Expressiste Agréé · MEAD · BADR
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Module: Codes Aéroports & Ports ── -->
+    <div class="ec-module" id="ecmod-codes">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-location-dot"></i> Codes Aéroports &amp; Ports</h1>
+        <p>Base de données mondiale — codes IATA aéroports et codes UN/LOCODE ports maritimes.</p>
+      </div>
+      <div class="codes-search-bar">
+        <div class="codes-tabs">
+          <button class="codes-tab active" id="ctab-airports" onclick="codesSwitchTab('airports')">
+            <i class="fa-solid fa-plane"></i> Aéroports IATA
+          </button>
+          <button class="codes-tab" id="ctab-ports" onclick="codesSwitchTab('ports')">
+            <i class="fa-solid fa-anchor"></i> Ports Maritimes
+          </button>
+        </div>
+        <div class="codes-input-row">
+          <input type="text" id="codes-search" placeholder="Rechercher par code, ville ou pays…" oninput="codesSearch()"/>
+          <select id="codes-region" onchange="codesSearch()">
+            <option value="">Toutes régions</option>
+            <option value="AF">Afrique</option>
+            <option value="EU">Europe</option>
+            <option value="AS">Asie</option>
+            <option value="NA">Amérique du Nord</option>
+            <option value="SA">Amérique du Sud</option>
+            <option value="OC">Océanie</option>
+            <option value="ME">Moyen-Orient</option>
+          </select>
+        </div>
+      </div>
+      <div class="codes-table-wrap">
+        <table class="codes-table" id="codes-table">
+          <thead id="codes-thead"></thead>
+          <tbody id="codes-tbody"></tbody>
+        </table>
+        <div class="codes-count" id="codes-count"></div>
+      </div>
+    </div>
+
+    <!-- ── Module: Simulation Prix ── -->
+    <div class="ec-module" id="ecmod-simulation">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-calculator"></i> Simulation de Prix</h1>
+        <p>Estimez votre tarif de transport selon le mode, le poids, la destination et les options.</p>
+      </div>
+      <div class="sim-pro-layout">
+        <div class="sim-pro-form">
+          <div class="ec-form-group">
+            <label>Mode de transport</label>
+            <select id="simpr-mode" onchange="simProCalc()">
+              <option value="express">Express (DHL/FedEx/Aramex)</option>
+              <option value="air">Fret Aérien</option>
+              <option value="sea_fcl">Maritime FCL (conteneur complet)</option>
+              <option value="sea_lcl">Maritime LCL (groupage)</option>
+              <option value="road">Routier Europe-Maroc</option>
+            </select>
+          </div>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Pays d'origine</label>
+              <select id="simpr-from" onchange="simProCalc()">
+                <option value="FR">France</option>
+                <option value="DE">Allemagne</option>
+                <option value="ES">Espagne</option>
+                <option value="IT">Italie</option>
+                <option value="UK">Royaume-Uni</option>
+                <option value="CN">Chine</option>
+                <option value="US">États-Unis</option>
+                <option value="AE">Émirats Arabes</option>
+                <option value="TR">Turquie</option>
+                <option value="BE">Belgique</option>
+                <option value="NL">Pays-Bas</option>
+              </select>
+            </div>
+            <div class="ec-form-group">
+              <label>Destination (Maroc)</label>
+              <select id="simpr-to" onchange="simProCalc()">
+                <option value="CASA">Casablanca</option>
+                <option value="RABAT">Rabat</option>
+                <option value="TANGER">Tanger</option>
+                <option value="AGADIR">Agadir</option>
+                <option value="MARRAKECH">Marrakech</option>
+                <option value="FES">Fès</option>
+                <option value="OUJDA">Oujda</option>
+              </select>
+            </div>
+          </div>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Poids réel (kg)</label>
+              <input type="number" id="simpr-weight" value="10" min="0.1" step="0.1" oninput="simProCalc()"/>
+            </div>
+            <div class="ec-form-group">
+              <label>Dimensions (cm) L × l × H</label>
+              <div style="display:flex;gap:6px">
+                <input type="number" id="simpr-l" value="40" placeholder="L" style="width:60px" oninput="simProCalc()"/>
+                <input type="number" id="simpr-w" value="30" placeholder="l" style="width:60px" oninput="simProCalc()"/>
+                <input type="number" id="simpr-h" value="30" placeholder="H" style="width:60px" oninput="simProCalc()"/>
+              </div>
+            </div>
+          </div>
+          <div class="ec-form-row">
+            <div class="ec-form-group">
+              <label>Valeur marchandise (MAD)</label>
+              <input type="number" id="simpr-value" value="5000" oninput="simProCalc()"/>
+            </div>
+            <div class="ec-form-group">
+              <label>Options</label>
+              <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+                <label style="font-weight:400;font-size:.88rem"><input type="checkbox" id="simpr-ins" onchange="simProCalc()"/> Assurance marchandise</label>
+                <label style="font-weight:400;font-size:.88rem"><input type="checkbox" id="simpr-cust" onchange="simProCalc()"/> Dédouanement inclus</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="sim-pro-result" id="simpr-result">
+          <div class="simpr-card">
+            <div class="simpr-header">
+              <i class="fa-solid fa-receipt"></i>
+              <h3>Estimation tarifaire</h3>
+            </div>
+            <div class="simpr-lines" id="simpr-lines"></div>
+            <div class="simpr-total">
+              <span>TOTAL ESTIMÉ</span>
+              <strong id="simpr-total-val">0,00 MAD</strong>
+            </div>
+            <div class="simpr-transit" id="simpr-transit"></div>
+            <p class="simpr-note">⚠ Tarif indicatif. Contactez-nous pour un devis précis.</p>
+            <a href="index.html#contact" class="btn btn-primary" style="width:100%;justify-content:center;display:flex">
+              <i class="fa-solid fa-envelope"></i>&nbsp; Demander un devis officiel
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Module: Conteneurs & Remorques ── -->
+    <div class="ec-module" id="ecmod-conteneur">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-box"></i> Guide Conteneurs &amp; Remorques</h1>
+        <p>Dimensions, capacités et caractéristiques des équipements de transport standardisés.</p>
+      </div>
+
+      <div class="guide-tabs">
+        <button class="guide-tab active" onclick="guideSwitch('cont')" id="gtab-cont">Conteneurs ISO</button>
+        <button class="guide-tab" onclick="guideSwitch('rem')" id="gtab-rem">Remorques &amp; Semi</button>
+        <button class="guide-tab" onclick="guideSwitch('swap')" id="gtab-swap">Caisses Mobiles</button>
+      </div>
+
+      <!-- Conteneurs -->
+      <div class="guide-panel active" id="gpanel-cont">
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0f4c81">
+              <i class="fa-solid fa-cube"></i>
+              <strong>20' Standard (DC)</strong>
+              <span>ISO 668 — Type 1CC</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>5,898 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,352 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,393 m</strong></td></tr>
+              <tr><td>Volume intérieur</td><td><strong>33,2 m³</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>21 780 kg</strong></td></tr>
+              <tr><td>Tare</td><td><strong>2 220 kg</strong></td></tr>
+              <tr><td>Poids brut max</td><td><strong>24 000 kg</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Général — marchandises sèches, palettes, cartons</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a6b3a">
+              <i class="fa-solid fa-cube"></i>
+              <strong>40' Standard (DC)</strong>
+              <span>ISO 668 — Type 1AA</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>12,032 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,352 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,393 m</strong></td></tr>
+              <tr><td>Volume intérieur</td><td><strong>67,7 m³</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>26 680 kg</strong></td></tr>
+              <tr><td>Tare</td><td><strong>3 780 kg</strong></td></tr>
+              <tr><td>Poids brut max</td><td><strong>30 480 kg</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Général — volume important, groupage, marchandises légères</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#5a2e8a">
+              <i class="fa-solid fa-maximize"></i>
+              <strong>40' High Cube (HC)</strong>
+              <span>ISO 668 — Type 1AAA</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>12,032 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,352 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,698 m</strong></td></tr>
+              <tr><td>Volume intérieur</td><td><strong>76,3 m³</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>26 460 kg</strong></td></tr>
+              <tr><td>Tare</td><td><strong>4 020 kg</strong></td></tr>
+              <tr><td>Poids brut max</td><td><strong>30 480 kg</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Mobilier, textiles, articles volumineux</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#c0392b">
+              <i class="fa-solid fa-temperature-low"></i>
+              <strong>40' Reefer (RF)</strong>
+              <span>Conteneur frigorifique</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>11,583 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,286 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,260 m</strong></td></tr>
+              <tr><td>Volume intérieur</td><td><strong>59,8 m³</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>27 700 kg</strong></td></tr>
+              <tr><td>Température</td><td><strong>-30°C à +30°C</strong></td></tr>
+              <tr><td>Consommation</td><td><strong>~6 kW</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Produits alimentaires, pharmaceutiques, fleurs</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#d35400">
+              <i class="fa-solid fa-arrows-up-down"></i>
+              <strong>Open Top (OT)</strong>
+              <span>Toit ouvert / bâché</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>5,893 m / 12,025 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,350 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,345 m</strong></td></tr>
+              <tr><td>Volume intérieur</td><td><strong>31,4 / 66,7 m³</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>20 000 – 26 000 kg</strong></td></tr>
+              <tr><td>Surhauteur</td><td><strong>Possible via le toit</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Machines, acier, granit, marchandises surhaussées</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a252f">
+              <i class="fa-solid fa-droplet"></i>
+              <strong>Tank (Citerne)</strong>
+              <span>Transport liquides/gaz</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Capacité</td><td><strong>17 500 – 26 000 L</strong></td></tr>
+              <tr><td>Pression max</td><td><strong>4 bar (standard)</strong></td></tr>
+              <tr><td>Charge utile max</td><td><strong>26 000 kg</strong></td></tr>
+              <tr><td>Matériau</td><td><strong>Acier inox 316L</strong></td></tr>
+              <tr><td>Homologation</td><td><strong>IMDG / ADR</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Produits chimiques, huiles, vins, produits alimentaires liquides</div>
+          </div>
+        </div>
+        <div class="cont-palettes">
+          <h3><i class="fa-solid fa-pallet"></i> Capacité en palettes Europe (80×120 cm)</h3>
+          <div class="palette-table-wrap">
+            <table class="codes-table">
+              <thead><tr><th>Type</th><th>Palettes</th><th>Volume</th><th>Charge utile</th></tr></thead>
+              <tbody>
+                <tr><td>20' DC</td><td><strong>11 palettes</strong></td><td>33,2 m³</td><td>21 780 kg</td></tr>
+                <tr><td>40' DC</td><td><strong>23 palettes</strong></td><td>67,7 m³</td><td>26 680 kg</td></tr>
+                <tr><td>40' HC</td><td><strong>25 palettes</strong></td><td>76,3 m³</td><td>26 460 kg</td></tr>
+                <tr><td>40' Reefer</td><td><strong>20 palettes</strong></td><td>59,8 m³</td><td>27 700 kg</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Remorques -->
+      <div class="guide-panel" id="gpanel-rem">
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0f4c81">
+              <i class="fa-solid fa-truck"></i>
+              <strong>Semi-remorque tautliner</strong>
+              <span>Bâché / ridelles coulissantes</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur utile</td><td><strong>2,45 m</strong></td></tr>
+              <tr><td>Hauteur utile</td><td><strong>2,70 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>90 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 kg</strong></td></tr>
+              <tr><td>Palettes (80×120)</td><td><strong>33 palettes</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Marchandises générales — Europe-Maroc (passage Tanger Med)</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a6b3a">
+              <i class="fa-solid fa-snowflake"></i>
+              <strong>Frigorifique (Frigo)</strong>
+              <span>ATP — Accord Transport Périssables</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur utile</td><td><strong>2,40 m</strong></td></tr>
+              <tr><td>Hauteur utile</td><td><strong>2,50 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>82 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>22 000 kg</strong></td></tr>
+              <tr><td>Température</td><td><strong>-25°C à +12°C</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Produits frais, viandes, produits laitiers, pharmaceutiques</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#5a2e8a">
+              <i class="fa-solid fa-layer-group"></i>
+              <strong>Porte-autos</strong>
+              <span>2 ou 3 niveaux</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur</td><td><strong>18,75 m</strong></td></tr>
+              <tr><td>Capacité</td><td><strong>6 à 9 véhicules</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>2,10 m / niveau</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>18 000 kg</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Véhicules neufs, motos, engins agricoles</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#c0392b">
+              <i class="fa-solid fa-compress-arrows-alt"></i>
+              <strong>Plateau (Flat Bed)</strong>
+              <span>Porte-engins / hors gabarit</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur</td><td><strong>2,55 m</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 – 27 000 kg</strong></td></tr>
+              <tr><td>Hauteur chargement</td><td><strong>illimitée (escorte si besoin)</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Machines industrielles, pièces hors gabarit, métaux</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#d35400">
+              <i class="fa-solid fa-oil-can"></i>
+              <strong>Citerne (Tanker)</strong>
+              <span>ADR / Matières dangereuses</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Capacité</td><td><strong>24 000 – 34 000 L</strong></td></tr>
+              <tr><td>Matériau</td><td><strong>Acier / Aluminium / Inox</strong></td></tr>
+              <tr><td>Classes ADR</td><td><strong>1 à 9</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>20 000 – 26 000 kg</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Carburants, huiles, produits chimiques, alimentaires liquides</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a252f">
+              <i class="fa-solid fa-boxes-stacked"></i>
+              <strong>Mega / Jumbo</strong>
+              <span>Haute capacité volume</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur utile</td><td><strong>2,48 m</strong></td></tr>
+              <tr><td>Hauteur utile</td><td><strong>3,00 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>100 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 kg</strong></td></tr>
+              <tr><td>Palettes</td><td><strong>36 palettes</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Articles volumineux légers : meubles, matelas, électroménager</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Caisses mobiles -->
+      <div class="guide-panel" id="gpanel-swap">
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0f4c81">
+              <i class="fa-solid fa-box-open"></i>
+              <strong>Caisse mobile C715</strong>
+              <span>Norme EN 284 — 7,15 m</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>7,150 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,440 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,670 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>~46 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>11 000 kg</strong></td></tr>
+              <tr><td>Palettes</td><td><strong>14 palettes</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Livraisons urbaines, messagerie, distribution</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a6b3a">
+              <i class="fa-solid fa-box-open"></i>
+              <strong>Caisse mobile C745</strong>
+              <span>Norme EN 284 — 7,45 m</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur int.</td><td><strong>7,450 m</strong></td></tr>
+              <tr><td>Largeur int.</td><td><strong>2,440 m</strong></td></tr>
+              <tr><td>Hauteur int.</td><td><strong>2,670 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>~50 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>12 000 kg</strong></td></tr>
+              <tr><td>Palettes</td><td><strong>15 palettes</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Multi-modal rail/route — Europe-Maroc</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Module: Appareils Cargo ── -->
+    <div class="ec-module" id="ecmod-avion">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-plane-up"></i> Appareils Cargo — Référentiel Technique</h1>
+        <p>Capacités, dimensions et caractéristiques des principaux avions cargo utilisés sur les lignes Maroc.</p>
+      </div>
+      <div class="aircraft-filter">
+        <input type="text" id="ac-search" placeholder="Rechercher un appareil…" oninput="acFilter()"/>
+        <select id="ac-type" onchange="acFilter()">
+          <option value="">Tous types</option>
+          <option value="full">Full Freighter</option>
+          <option value="combi">Combi</option>
+          <option value="belly">Belly (soute passagers)</option>
+        </select>
+      </div>
+      <div class="aircraft-grid" id="ac-grid"></div>
+    </div>
+
+    <!-- ── Module: HS Codes ── -->
+    <div class="ec-module" id="ecmod-hscode">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-barcode"></i> Codes SH / HS — Base Douane Maroc</h1>
+        <p>Recherchez parmi les 13 135 codes SH marocains · Droits · Documents · Normes · Accords préférentiels (source : <strong>ADIL — douane.gov.ma</strong>)</p>
+      </div>
+
+      <!-- Barre de recherche -->
+      <div class="hs-search-wrap" style="max-width:720px;position:relative">
+        <div class="ai-search-box">
+          <div class="ai-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+          <input type="text" id="ec-hsSearchInput"
+            placeholder="Tapez un produit (ex: téléphone, tissu coton…) ou un code SH direct"
+            oninput="ecHSInput(this.value)" autocomplete="off"/>
+        </div>
+        <div id="ec-hsDropdown" class="hs-dropdown hidden"></div>
+      </div>
+
+      <!-- Panneau résultats ADIL (caché par défaut) -->
+      <div id="ec-hs-panel" style="display:none;margin-top:24px">
+
+        <!-- En-tête code sélectionné -->
+        <div class="adil-header-card">
+          <div class="adil-code-badge" id="ec-hs-code">—</div>
+          <div class="adil-header-info">
+            <div class="adil-header-desc" id="ec-hs-desc">—</div>
+            <div class="adil-header-sub">
+              <i class="fa-solid fa-globe"></i> Tarif Douanier Marocain 2024 &nbsp;·&nbsp;
+              <i class="fa-solid fa-database"></i> Source : ADIL — douane.gov.ma
+            </div>
+          </div>
+          <button class="adil-close-btn" onclick="ecHSClose()" title="Fermer">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Onglets ADIL -->
+        <div class="adil-tabs-bar">
+          <button class="adil-tab active" id="adil-btn-tarif"   onclick="adilSwitchTab('tarif')">
+            <i class="fa-solid fa-percent"></i> Tarif &amp; Droits
+          </button>
+          <button class="adil-tab" id="adil-btn-docs"    onclick="adilSwitchTab('docs')">
+            <i class="fa-solid fa-file-lines"></i> Documents requis
+            <span class="adil-tab-badge" id="adil-badge-docs">0</span>
+          </button>
+          <button class="adil-tab" id="adil-btn-normes"  onclick="adilSwitchTab('normes')">
+            <i class="fa-solid fa-certificate"></i> Normes
+            <span class="adil-tab-badge" id="adil-badge-normes">0</span>
+          </button>
+          <button class="adil-tab" id="adil-btn-accords" onclick="adilSwitchTab('accords')">
+            <i class="fa-solid fa-handshake"></i> Accords &amp; Conventions
+          </button>
+        </div>
+
+        <!-- ── Panneau : Tarif & Droits ── -->
+        <div class="adil-panel" id="adil-tarif-panel">
+          <div class="adil-tarif-grid" id="adil-tarif-grid">
+            <!-- Rempli par JS -->
+          </div>
+          <div class="adil-tarif-calc" id="adil-tarif-calc">
+            <!-- Simulateur rapide DI+TVA -->
+          </div>
+        </div>
+
+        <!-- ── Panneau : Documents requis ── -->
+        <div class="adil-panel" id="adil-docs-panel" style="display:none">
+          <div id="adil-docs-content"><!-- Rempli par JS --></div>
+        </div>
+
+        <!-- ── Panneau : Normes ── -->
+        <div class="adil-panel" id="adil-normes-panel" style="display:none">
+          <div id="adil-normes-content"><!-- Rempli par JS --></div>
+        </div>
+
+        <!-- ── Panneau : Accords & Conventions ── -->
+        <div class="adil-panel" id="adil-accords-panel" style="display:none">
+          <div id="adil-accords-content"><!-- Rempli par JS --></div>
+        </div>
+
+      </div><!-- /#ec-hs-panel -->
+    </div>
+
+    <!-- ══════════════ MODULE : TARIFS EXPRESS ══════════════ -->
+    <div class="ec-module" id="ecmod-express">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-bolt"></i> Simulateur Tarifs Express B2B</h1>
+        <p>Comparez DHL, FedEx et Aramex · Prix en MAD · Fuel inclus · Document / Colis / Palette</p>
+      </div>
+
+      <!-- Formulaire -->
+      <div class="exp-form-card">
+        <div class="exp-form-grid">
+          <!-- Direction -->
+          <div class="exp-form-group">
+            <label><i class="fa-solid fa-arrows-left-right"></i> Direction</label>
+            <select id="exp-direction">
+              <option value="export">Export (Maroc → Monde)</option>
+              <option value="import">Import (Monde → Maroc)</option>
+            </select>
+          </div>
+          <!-- Type d'envoi -->
+          <div class="exp-form-group">
+            <label><i class="fa-solid fa-box"></i> Type d'envoi</label>
+            <select id="exp-type" onchange="expToggleDims()">
+              <option value="document">Document</option>
+              <option value="colis" selected>Colis</option>
+              <option value="palette">Palette</option>
+            </select>
+          </div>
+          <!-- Pays -->
+          <div class="exp-form-group">
+            <label><i class="fa-solid fa-globe"></i> Pays de destination / origine</label>
+            <select id="exp-country">
+              <option value="">— Sélectionner un pays —</option>
+            </select>
+          </div>
+          <!-- Poids net -->
+          <div class="exp-form-group">
+            <label><i class="fa-solid fa-weight-hanging"></i> Poids net (kg)</label>
+            <input type="number" id="exp-weight" min="0.1" step="0.5" value="1" placeholder="ex: 5.5">
+          </div>
+          <!-- Dimensions (masqué si Document) -->
+          <div class="exp-form-group" id="exp-dims-group" style="grid-column:span 2">
+            <label><i class="fa-solid fa-ruler-combined"></i> Dimensions en cm (L × l × H) — poids volumétrique = L×l×H/5000</label>
+            <div class="exp-dims-row">
+              <input type="number" id="exp-l" min="0" step="1" value="30" placeholder="Longueur (cm)">
+              <input type="number" id="exp-w" min="0" step="1" value="20" placeholder="Largeur (cm)">
+              <input type="number" id="exp-h" min="0" step="1" value="15" placeholder="Hauteur (cm)">
+            </div>
+          </div>
+        </div>
+        <button class="exp-calc-btn" onclick="runExpSim()">
+          <i class="fa-solid fa-calculator"></i> &nbsp;Calculer & Comparer
+        </button>
+      </div>
+
+      <!-- Résultats -->
+      <div id="exp-result-wrap" style="display:none"></div>
+    </div><!-- /#ecmod-express -->
+
+    <!-- ══════════════════════════════════════════════════════
+         Module: Nouvelle Expédition — Génération étiquette
+         ══════════════════════════════════════════════════════ -->
+    <div class="ec-module" id="ecmod-expedition">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-tag"></i> Nouvelle Expédition</h1>
+        <p>Créez une expédition et générez votre étiquette de transport DHL / FedEx / Aramex</p>
+      </div>
+
+      <!-- STEPPER -->
+      <div class="shp-stepper" id="shp-stepper">
+        <div class="shp-step active" id="shp-step-dot-1"><span>1</span><small>Expéditeur</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-2"><span>2</span><small>Destinataire</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-3"><span>3</span><small>Colis</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-4"><span>4</span><small>Douanes</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-5"><span>5</span><small>Transporteur</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-6"><span>6</span><small>Paiement</small></div>
+        <div class="shp-step-line"></div>
+        <div class="shp-step" id="shp-step-dot-7"><span>7</span><small>Confirmation</small></div>
+      </div>
+
+      <!-- RÉSUMÉ LATÉRAL -->
+      <div class="shp-layout">
+        <div class="shp-form-col">
+
+          <!-- ── ÉTAPE 1 : Expéditeur ── -->
+          <div class="shp-panel active" id="shp-panel-1">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-location-dot"></i> Expéditeur</h3>
+            <div class="shp-grid-2">
+              <div class="shp-field span2">
+                <label>Pays d'envoi *</label>
+                <select id="shp-from-country" onchange="shpUpdateSummary()">
+                  <option value="MA" selected>🇲🇦 Maroc</option>
+                  <option value="FR">🇫🇷 France</option>
+                  <option value="ES">🇪🇸 Espagne</option>
+                  <option value="DE">🇩🇪 Allemagne</option>
+                  <option value="GB">🇬🇧 Royaume-Uni</option>
+                  <option value="BE">🇧🇪 Belgique</option>
+                  <option value="NL">🇳🇱 Pays-Bas</option>
+                  <option value="IT">🇮🇹 Italie</option>
+                  <option value="US">🇺🇸 USA</option>
+                  <option value="AE">🇦🇪 Émirats Arabes Unis</option>
+                  <option value="OTHER">Autre...</option>
+                </select>
+              </div>
+              <div class="shp-field">
+                <label>Prénom *</label>
+                <input type="text" id="shp-from-firstname" placeholder="Prénom" oninput="shpUpdateSummary()">
+              </div>
+              <div class="shp-field">
+                <label>Nom *</label>
+                <input type="text" id="shp-from-lastname" placeholder="Nom de famille" oninput="shpUpdateSummary()">
+              </div>
+              <div class="shp-field span2">
+                <label>Société</label>
+                <input type="text" id="shp-from-company" placeholder="Nom de l'entreprise (optionnel)">
+              </div>
+              <div class="shp-field span2">
+                <label>Adresse *</label>
+                <input type="text" id="shp-from-addr1" placeholder="Rue, numéro...">
+              </div>
+              <div class="shp-field">
+                <label>Code postal *</label>
+                <div class="shp-ac-wrap">
+                  <input type="text" id="shp-from-zip" placeholder="ex: 20000" autocomplete="off"
+                         oninput="pcZipInput('from');shpUpdateSummary()">
+                  <span class="pc-zip-status pc-status-idle" id="shp-from-zip-status"></span>
+                </div>
+              </div>
+              <div class="shp-field">
+                <label>Ville *</label>
+                <div class="shp-ac-wrap">
+                  <input type="text" id="shp-from-city" placeholder="ex: Casablanca" autocomplete="off"
+                         oninput="pcCityInput('from');shpUpdateSummary()">
+                </div>
+              </div>
+              <div class="shp-field">
+                <label>Email *</label>
+                <input type="email" id="shp-from-email" placeholder="email@exemple.com">
+              </div>
+              <div class="shp-field">
+                <label>Téléphone *</label>
+                <input type="tel" id="shp-from-phone" placeholder="+212 6XX XXX XXX">
+              </div>
+            </div>
+            <div class="shp-nav-btns">
+              <div></div>
+              <button class="shp-btn-next" onclick="shpNext(1)">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 2 : Destinataire ── -->
+          <div class="shp-panel" id="shp-panel-2">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-location-dot"></i> Destinataire</h3>
+            <div class="shp-grid-2">
+              <div class="shp-field span2">
+                <label>Pays de destination *</label>
+                <select id="shp-to-country" onchange="shpUpdateSummary()">
+                  <option value="FR">🇫🇷 France</option>
+                  <option value="MA">🇲🇦 Maroc</option>
+                  <option value="ES">🇪🇸 Espagne</option>
+                  <option value="DE">🇩🇪 Allemagne</option>
+                  <option value="GB">🇬🇧 Royaume-Uni</option>
+                  <option value="BE">🇧🇪 Belgique</option>
+                  <option value="NL">🇳🇱 Pays-Bas</option>
+                  <option value="IT">🇮🇹 Italie</option>
+                  <option value="US">🇺🇸 USA</option>
+                  <option value="AE">🇦🇪 Émirats Arabes Unis</option>
+                  <option value="SA">🇸🇦 Arabie Saoudite</option>
+                  <option value="CN">🇨🇳 Chine</option>
+                  <option value="JP">🇯🇵 Japon</option>
+                  <option value="CA">🇨🇦 Canada</option>
+                  <option value="AU">🇦🇺 Australie</option>
+                  <option value="OTHER">Autre...</option>
+                </select>
+              </div>
+              <div class="shp-field" id="shp-to-country-other-wrap" style="display:none;grid-column:span 2">
+                <label>Précisez le pays</label>
+                <input type="text" id="shp-to-country-other" placeholder="Nom du pays en anglais">
+              </div>
+              <div class="shp-field">
+                <label>Prénom *</label>
+                <input type="text" id="shp-to-firstname" placeholder="Prénom" oninput="shpUpdateSummary()">
+              </div>
+              <div class="shp-field">
+                <label>Nom *</label>
+                <input type="text" id="shp-to-lastname" placeholder="Nom de famille" oninput="shpUpdateSummary()">
+              </div>
+              <div class="shp-field span2">
+                <label>Société</label>
+                <input type="text" id="shp-to-company" placeholder="Nom de l'entreprise (optionnel)">
+              </div>
+              <div class="shp-field span2">
+                <label>Adresse ligne 1 *</label>
+                <input type="text" id="shp-to-addr1" placeholder="Rue, numéro...">
+              </div>
+              <div class="shp-field span2">
+                <label>Adresse ligne 2</label>
+                <input type="text" id="shp-to-addr2" placeholder="Bâtiment, appartement... (optionnel)">
+              </div>
+              <div class="shp-field">
+                <label>Code postal *</label>
+                <div class="shp-ac-wrap">
+                  <input type="text" id="shp-to-zip" placeholder="ex: 75001" autocomplete="off"
+                         oninput="pcZipInput('to');shpUpdateSummary()">
+                  <span class="pc-zip-status pc-status-idle" id="shp-to-zip-status"></span>
+                </div>
+              </div>
+              <div class="shp-field">
+                <label>Ville *</label>
+                <div class="shp-ac-wrap">
+                  <input type="text" id="shp-to-city" placeholder="ex: Paris" autocomplete="off"
+                         oninput="pcCityInput('to');shpUpdateSummary()">
+                </div>
+              </div>
+              <div class="shp-field">
+                <label>Email *</label>
+                <input type="email" id="shp-to-email" placeholder="email@exemple.com">
+              </div>
+              <div class="shp-field">
+                <label>Téléphone *</label>
+                <input type="tel" id="shp-to-phone" placeholder="+33 6XX XXX XXX">
+              </div>
+            </div>
+            <div class="shp-nav-btns">
+              <button class="shp-btn-prev" onclick="shpPrev(2)"><i class="fa-solid fa-arrow-left"></i> Précédent</button>
+              <button class="shp-btn-next" onclick="shpNext(2)">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 3 : Colis + Enlèvement ── -->
+          <div class="shp-panel" id="shp-panel-3">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-boxes-stacked"></i> Détails du/des colis</h3>
+            <div id="shp-packages-list"></div>
+            <button class="shp-add-pkg-btn" onclick="shpAddPackage()">
+              <i class="fa-solid fa-plus-circle"></i> Ajouter un colis
+            </button>
+            <!-- Date & heure d'enlèvement -->
+            <div class="shp-pickup-section">
+              <h4 class="shp-pickup-title"><i class="fa-solid fa-calendar-check"></i> Date &amp; heure d'enlèvement</h4>
+              <div class="shp-grid-2" style="max-width:560px">
+                <div class="shp-field">
+                  <label>Date d'enlèvement *</label>
+                  <input type="date" id="shp-pickup-date">
+                </div>
+                <div class="shp-field">
+                  <label>Créneau horaire</label>
+                  <select id="shp-pickup-time">
+                    <option value="09:00-18:00">09:00 – 18:00 (standard)</option>
+                    <option value="09:00-12:00">09:00 – 12:00 (matin)</option>
+                    <option value="14:00-18:00">14:00 – 18:00 (après-midi)</option>
+                    <option value="18:00-21:00">18:00 – 21:00 (soir, DHL only)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="shp-nav-btns">
+              <button class="shp-btn-prev" onclick="shpPrev(3)"><i class="fa-solid fa-arrow-left"></i> Précédent</button>
+              <button class="shp-btn-next" onclick="shpNext(3)">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 4 : Douanes ── -->
+          <div class="shp-panel" id="shp-panel-4">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-stamp"></i> Déclaration en douane</h3>
+            <div class="shp-customs-notice">
+              <i class="fa-solid fa-circle-info"></i>
+              Ce formulaire est requis pour les expéditions internationales. Remplissez-le avec soin pour éviter tout blocage en douane.
+            </div>
+
+            <!-- Expéditeur douane -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-user"></i> Informations douanières — Expéditeur</h4>
+              <div class="shp-grid-2">
+                <div class="shp-field">
+                  <label>Régime TVA expéditeur</label>
+                  <select id="shp-cust-from-vat">
+                    <option value="individual">Particulier / Individuel</option>
+                    <option value="company">Entreprise</option>
+                  </select>
+                </div>
+                <div class="shp-field">
+                  <label>Motif d'exportation</label>
+                  <select id="shp-cust-reason">
+                    <option value="sale">Vente / Achat ou vente</option>
+                    <option value="gift">Cadeau personnel</option>
+                    <option value="documents">Documents commerciaux</option>
+                    <option value="return">Retour marchandise</option>
+                    <option value="repair">Réparation / SAV</option>
+                    <option value="sample">Échantillon commercial</option>
+                    <option value="other">Autre</option>
+                  </select>
+                </div>
+                <div class="shp-field">
+                  <label>CIN / Passeport ou N° SIRET *</label>
+                  <input type="text" id="shp-cust-from-id" placeholder="Numéro d'identification">
+                </div>
+                <div class="shp-field">
+                  <label>Numéro de facture</label>
+                  <input type="text" id="shp-cust-invoice" placeholder="ex: FAC-2025-001 (optionnel)">
+                </div>
+              </div>
+            </div>
+
+            <!-- Destinataire douane -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-building"></i> Informations douanières — Destinataire</h4>
+              <div class="shp-grid-2">
+                <div class="shp-field">
+                  <label>Régime TVA destinataire</label>
+                  <select id="shp-cust-to-vat">
+                    <option value="individual">Particulier / Individuel</option>
+                    <option value="company">Entreprise</option>
+                  </select>
+                </div>
+                <div class="shp-field">
+                  <label>Numéro TVA destinataire</label>
+                  <input type="text" id="shp-cust-to-taxid" placeholder="ex: FR12345678901 (si entreprise)">
+                </div>
+                <div class="shp-field span2">
+                  <label>Numéro EORI (optionnel — UE)</label>
+                  <input type="text" id="shp-cust-eori" placeholder="ex: FR123456789012345">
+                </div>
+              </div>
+            </div>
+
+            <!-- Articles -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-list-check"></i> Description des articles</h4>
+              <p style="font-size:.82rem;color:#64748b;margin:0 0 14px">
+                Les autorités douanières exigent le code tarifaire SH et une description en <strong>anglais</strong> pour chaque type d'article.
+              </p>
+              <div id="shp-customs-articles"></div>
+              <button class="shp-add-pkg-btn" onclick="shpAddArticle()" style="margin-top:8px">
+                <i class="fa-solid fa-plus-circle"></i> Ajouter un article
+              </button>
+            </div>
+
+            <!-- Déclarations légales -->
+            <div class="shp-customs-section" style="background:#f7f9fc;border-radius:10px;padding:16px">
+              <h4 class="shp-customs-subtitle" style="margin-bottom:12px"><i class="fa-solid fa-gavel"></i> Déclarations légales</h4>
+              <label class="shp-checkbox-label" style="margin-bottom:8px">
+                <input type="checkbox" id="shp-cust-decl1" required>
+                Je certifie que les informations fournies sont complètes et exactes, et que les marchandises respectent la réglementation douanière applicable.
+              </label>
+              <label class="shp-checkbox-label">
+                <input type="checkbox" id="shp-cust-decl2" required>
+                J'autorise le transporteur à soumettre cette déclaration en douane par voie électronique.
+              </label>
+            </div>
+
+            <div class="shp-nav-btns">
+              <button class="shp-btn-prev" onclick="shpPrev(4)"><i class="fa-solid fa-arrow-left"></i> Précédent</button>
+              <button class="shp-btn-next" onclick="shpNext(4)">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 5 : Transporteur ── -->
+          <div class="shp-panel" id="shp-panel-5">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-truck-fast"></i> Choisissez votre transporteur</h3>
+            <div id="shp-carrier-list" class="shp-carrier-grid">
+              <!-- DHL -->
+              <div class="shp-carrier-card" id="shp-carrier-DHL" onclick="shpSelectCarrier('DHL')">
+                <div class="shp-carrier-logo"><img src="assets/logos/dhl.svg" alt="DHL" class="shp-carrier-logo-img"/></div>
+                <div class="shp-carrier-info">
+                  <div class="shp-carrier-name">DHL Express Worldwide</div>
+                  <div class="shp-carrier-services">
+                    <select id="shp-dhl-service" onclick="event.stopPropagation()">
+                      <option value="EXPRESS_WORLDWIDE">Express Worldwide</option>
+                      <option value="EXPRESS_1200">Express 12:00</option>
+                      <option value="EXPRESS_900">Express 9:00</option>
+                      <option value="EXPRESS_EASY">Express Easy</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="shp-carrier-transit"><i class="fa-solid fa-clock"></i> 24–48h</div>
+                <div class="shp-carrier-check"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+              <!-- FedEx -->
+              <div class="shp-carrier-card" id="shp-carrier-FEDEX" onclick="shpSelectCarrier('FEDEX')">
+                <div class="shp-carrier-logo"><img src="assets/logos/fedex.svg" alt="FedEx" class="shp-carrier-logo-img"/></div>
+                <div class="shp-carrier-info">
+                  <div class="shp-carrier-name">FedEx International</div>
+                  <div class="shp-carrier-services">
+                    <select id="shp-fedex-service" onclick="event.stopPropagation()">
+                      <option value="INTERNATIONAL_PRIORITY">International Priority</option>
+                      <option value="INTERNATIONAL_ECONOMY">International Economy</option>
+                      <option value="INTERNATIONAL_FIRST">International First</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="shp-carrier-transit"><i class="fa-solid fa-clock"></i> 24–72h</div>
+                <div class="shp-carrier-check"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+              <!-- Aramex -->
+              <div class="shp-carrier-card" id="shp-carrier-ARAMEX" onclick="shpSelectCarrier('ARAMEX')">
+                <div class="shp-carrier-logo"><img src="assets/logos/aramex.svg" alt="Aramex" class="shp-carrier-logo-img"/></div>
+                <div class="shp-carrier-info">
+                  <div class="shp-carrier-name">Aramex Express</div>
+                  <div class="shp-carrier-services">
+                    <select id="shp-aramex-service" onclick="event.stopPropagation()">
+                      <option value="PPX">Priority Parcel Express</option>
+                      <option value="PDX">Priority Document Express</option>
+                      <option value="GPP">Ground Parcel Prepaid</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="shp-carrier-transit"><i class="fa-solid fa-clock"></i> 48–96h</div>
+                <div class="shp-carrier-check"><i class="fa-solid fa-circle-check"></i></div>
+              </div>
+            </div>
+            <!-- Options complémentaires -->
+            <div class="shp-options-row">
+              <label class="shp-checkbox-label">
+                <input type="checkbox" id="shp-opt-insurance"> Assurance marchandises (valeur déclarée)
+              </label>
+              <label class="shp-checkbox-label">
+                <input type="checkbox" id="shp-opt-signature" checked> Signature à la livraison
+              </label>
+              <label class="shp-checkbox-label">
+                <input type="checkbox" id="shp-opt-saturday"> Livraison le samedi
+              </label>
+            </div>
+            <div class="shp-nav-btns">
+              <button class="shp-btn-prev" onclick="shpPrev(5)"><i class="fa-solid fa-arrow-left"></i> Précédent</button>
+              <button class="shp-btn-next" onclick="shpNext(5)">Suivant <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 6 : Paiement ── -->
+          <div class="shp-panel" id="shp-panel-6">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-credit-card"></i> Informations de paiement</h3>
+
+            <!-- Mode de paiement principal -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-wallet"></i> Mode de paiement</h4>
+              <div class="shp-payment-modes">
+                <!-- Carte bancaire -->
+                <label class="shp-pay-option" id="shp-pay-opt-card" onclick="shpSelectPayment('card')">
+                  <input type="radio" name="shp-payment-mode" value="card" id="shp-pay-card">
+                  <div class="shp-pay-icon"><i class="fa-solid fa-credit-card" style="color:#1a56db"></i></div>
+                  <div class="shp-pay-label">
+                    <strong>Paiement en ligne — Carte bancaire</strong>
+                    <span>Visa, Mastercard, CMI, CIB</span>
+                  </div>
+                  <div class="shp-pay-badges">
+                    <span class="shp-pay-badge" style="background:#1a56db">VISA</span>
+                    <span class="shp-pay-badge" style="background:#eb001b">MC</span>
+                    <span class="shp-pay-badge" style="background:#00857a">CMI</span>
+                  </div>
+                </label>
+
+                <!-- Compte client -->
+                <label class="shp-pay-option" id="shp-pay-opt-account" onclick="shpSelectPayment('account')">
+                  <input type="radio" name="shp-payment-mode" value="account" id="shp-pay-account">
+                  <div class="shp-pay-icon"><i class="fa-solid fa-building-columns" style="color:#0a8f85"></i></div>
+                  <div class="shp-pay-label">
+                    <strong>Compte client — Facturation différée</strong>
+                    <span>Pour les entreprises disposant d'un compte ouvert chez GO PLUS EXPRESS</span>
+                  </div>
+                  <div class="shp-pay-badges">
+                    <span class="shp-pay-badge" style="background:#0a8f85">B2B</span>
+                  </div>
+                </label>
+              </div>
+
+              <!-- Zone carte bancaire (cachée par défaut) -->
+              <div id="shp-card-section" style="display:none" class="shp-pay-detail-box">
+                <div class="shp-card-notice">
+                  <i class="fa-solid fa-lock"></i>
+                  Le paiement par carte sera traité de façon sécurisée à la génération de l'étiquette.
+                  Vos coordonnées bancaires ne sont pas stockées sur nos serveurs.
+                </div>
+              </div>
+
+              <!-- Zone compte client (cachée par défaut) -->
+              <div id="shp-account-section" style="display:none" class="shp-pay-detail-box">
+                <div class="shp-grid-2" style="max-width:560px">
+                  <div class="shp-field span2">
+                    <label>Numéro de compte client *</label>
+                    <input type="text" id="shp-account-number" placeholder="ex: GPE-2025-XXXXX"
+                      oninput="shpValidateAccountNumber(this)">
+                    <small id="shp-account-status" style="margin-top:4px;font-size:.78rem"></small>
+                  </div>
+                  <div class="shp-field span2">
+                    <label>Nom de la société (sur le compte)</label>
+                    <input type="text" id="shp-account-company" placeholder="Raison sociale">
+                  </div>
+                </div>
+                <div class="shp-account-notice">
+                  <i class="fa-solid fa-circle-info"></i>
+                  Si vous n'avez pas encore de compte client, contactez-nous :
+                  <a href="mailto:commercial@goplusexpress.ma">commercial@goplusexpress.ma</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Informations de facturation -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-file-invoice"></i> Informations de facturation</h4>
+              <div class="shp-billing-type">
+                <label class="shp-billing-radio">
+                  <input type="radio" name="shp-billing-type" value="individual" checked
+                    onchange="shpToggleBillingType(this.value)"> Particulier
+                </label>
+                <label class="shp-billing-radio">
+                  <input type="radio" name="shp-billing-type" value="company"
+                    onchange="shpToggleBillingType(this.value)"> Entreprise
+                </label>
+              </div>
+              <div class="shp-grid-2">
+                <div class="shp-field">
+                  <label>Prénom *</label>
+                  <input type="text" id="shp-bill-firstname" placeholder="Prénom">
+                </div>
+                <div class="shp-field">
+                  <label>Nom *</label>
+                  <input type="text" id="shp-bill-lastname" placeholder="Nom">
+                </div>
+                <div class="shp-field span2" id="shp-bill-company-wrap" style="display:none">
+                  <label>Société *</label>
+                  <input type="text" id="shp-bill-company" placeholder="Raison sociale">
+                </div>
+                <div class="shp-field span2" id="shp-bill-taxid-wrap" style="display:none">
+                  <label>N° TVA / ICE</label>
+                  <input type="text" id="shp-bill-taxid" placeholder="ex: ICE123456789">
+                </div>
+                <div class="shp-field">
+                  <label>Email *</label>
+                  <input type="email" id="shp-bill-email" placeholder="email@exemple.com">
+                </div>
+                <div class="shp-field">
+                  <label>Téléphone</label>
+                  <input type="tel" id="shp-bill-phone" placeholder="+212 6XX XXX XXX">
+                </div>
+                <div class="shp-field span2">
+                  <label>Adresse de facturation *</label>
+                  <input type="text" id="shp-bill-address" placeholder="Rue, numéro, ville, pays">
+                </div>
+              </div>
+            </div>
+
+            <!-- Code promo -->
+            <div class="shp-customs-section">
+              <h4 class="shp-customs-subtitle"><i class="fa-solid fa-tag"></i> Code promotionnel</h4>
+              <div class="shp-promo-row">
+                <input type="text" id="shp-promo-code" placeholder="Entrez votre code promo">
+                <button class="shp-promo-btn" onclick="shpApplyPromo()">Appliquer</button>
+              </div>
+              <small id="shp-promo-result" style="font-size:.8rem;margin-top:4px;display:block"></small>
+            </div>
+
+            <!-- CGV -->
+            <div class="shp-customs-section" style="background:#f7f9fc;border-radius:10px;padding:16px">
+              <label class="shp-checkbox-label" style="align-items:flex-start;gap:10px">
+                <input type="checkbox" id="shp-cgv" style="margin-top:2px;flex-shrink:0">
+                <span>J'accepte les <a href="#" style="color:var(--teal)">conditions générales de vente</a>
+                de GO PLUS EXPRESS et les conditions générales du transporteur sélectionné.</span>
+              </label>
+            </div>
+
+            <div class="shp-nav-btns">
+              <button class="shp-btn-prev" onclick="shpPrev(6)"><i class="fa-solid fa-arrow-left"></i> Précédent</button>
+              <button class="shp-btn-next" onclick="shpNext(6)">Récapitulatif <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+          </div>
+
+          <!-- ── ÉTAPE 7 : Confirmation ── -->
+          <div class="shp-panel" id="shp-panel-7">
+            <h3 class="shp-panel-title"><i class="fa-solid fa-file-check"></i> Récapitulatif &amp; Génération de l'étiquette</h3>
+            <div id="shp-confirm-body"></div>
+            <div class="shp-nav-btns" style="margin-top:24px">
+              <button class="shp-btn-prev" onclick="shpPrev(7)"><i class="fa-solid fa-arrow-left"></i> Modifier</button>
+              <button class="shp-btn-generate" onclick="shpGenerateLabel()">
+                <i class="fa-solid fa-print"></i> &nbsp;Confirmer &amp; Générer l'étiquette
+              </button>
+            </div>
+            <!-- Résultat de l'API -->
+            <div id="shp-label-result" style="display:none;margin-top:24px"></div>
+          </div>
+
+        </div><!-- /.shp-form-col -->
+
+        <!-- Résumé en direct -->
+        <div class="shp-summary-col">
+          <div class="shp-summary-card">
+            <div class="shp-summary-title"><i class="fa-solid fa-file-lines"></i> Résumé</div>
+            <div id="shp-summary-content">
+              <div class="shp-summary-row muted">Remplissez le formulaire...</div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /.shp-layout -->
+
+    </div><!-- /#ecmod-expedition -->
+
+  </main>
+</div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="hscodes_data.js?v=20260419d"></script>
+<script src="js/i18n.js?v=20260419d"></script>
+<script src="js/maroc-authorizations.js?v=20260419d"></script>
+<script src="js/express-tarifs.js?v=20260419d"></script>
+<script src="js/postal-lookup.js?v=20260419d"></script>
+<script src="js/espace-client.js?v=20260419d"></script>
+</body>
+</html>
