@@ -1610,7 +1610,7 @@ function renderExpResult(res, direction, country, type, weightNet, l, w, h){
   // Trier les transporteurs par total croissant
   const carriers = [];
   if(res.carriers.dhl)    carriers.push({name:'DHL',    ...res.carriers.dhl,    color:'#d40511', logoSrc:'assets/logos/dhl.png'});
-  if(res.carriers.fedex)  carriers.push({name:'FedEx',  ...res.carriers.fedex,  color:'#4d148c', logoSrc:'assets/logos/fedex.svg'});
+  if(res.carriers.fedex)  carriers.push({name:'FedEx',  ...res.carriers.fedex,  color:'#4d148c', logoSrc:'assets/logos/fedex.png'});
   if(res.carriers.aramex) carriers.push({name:'Aramex', ...res.carriers.aramex, color:'#e87722', logoSrc:'assets/logos/aramex.svg'});
   carriers.sort((a,b) => a.total - b.total);
 
