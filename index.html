@@ -448,9 +448,9 @@
         <div class="carrier-select">
           <label data-i18n="lbl_carrier">Transporteur</label>
           <div class="carrier-btns">
-            <button class="carrier-btn active" id="cb-dhl"    onclick="selectCarrier('dhl')"   >DHL</button>
-            <button class="carrier-btn"        id="cb-fedex"  onclick="selectCarrier('fedex')" >FedEx</button>
-            <button class="carrier-btn"        id="cb-aramex" onclick="selectCarrier('aramex')">Aramex</button>
+            <button class="carrier-btn active" id="cb-dhl"    onclick="selectCarrier('dhl')"   ><img src="assets/logos/dhl.png"    alt="DHL"    style="height:22px;object-fit:contain;vertical-align:middle"></button>
+            <button class="carrier-btn"        id="cb-fedex"  onclick="selectCarrier('fedex')" ><img src="assets/logos/fedex.png"  alt="FedEx"  style="height:22px;object-fit:contain;vertical-align:middle"></button>
+            <button class="carrier-btn"        id="cb-aramex" onclick="selectCarrier('aramex')"><img src="assets/logos/aramex.png" alt="Aramex" style="height:22px;object-fit:contain;vertical-align:middle"></button>
           </div>
         </div>
 
@@ -517,7 +517,7 @@
             <span data-i18n="exp_res_title">Estimation Tarifaire</span>
           </div>
           <div class="carrier-logo-display" id="carrierLogo">
-            <span class="carrier-tag dhl">DHL</span>
+            <img src="assets/logos/dhl.png" alt="DHL" style="height:36px;object-fit:contain">
           </div>
           <div class="tax-breakdown">
             <div class="tax-row"><span data-i18n="exp_real_w">Poids réel</span><span id="e_real">1,0 kg</span></div>
@@ -706,9 +706,9 @@
         <div class="carrier-select">
           <label>Transporteur</label>
           <div class="carrier-btns">
-            <button class="carrier-btn active" id="ecb-dhl"    onclick="selectExportCarrier('dhl')"   >DHL</button>
-            <button class="carrier-btn"        id="ecb-fedex"  onclick="selectExportCarrier('fedex')" >FedEx</button>
-            <button class="carrier-btn"        id="ecb-aramex" onclick="selectExportCarrier('aramex')">Aramex</button>
+            <button class="carrier-btn active" id="ecb-dhl"    onclick="selectExportCarrier('dhl')"   ><img src="assets/logos/dhl.png"    alt="DHL"    style="height:22px;object-fit:contain;vertical-align:middle"></button>
+            <button class="carrier-btn"        id="ecb-fedex"  onclick="selectExportCarrier('fedex')" ><img src="assets/logos/fedex.png"  alt="FedEx"  style="height:22px;object-fit:contain;vertical-align:middle"></button>
+            <button class="carrier-btn"        id="ecb-aramex" onclick="selectExportCarrier('aramex')"><img src="assets/logos/aramex.png" alt="Aramex" style="height:22px;object-fit:contain;vertical-align:middle"></button>
           </div>
         </div>
 
@@ -790,7 +790,7 @@
             <span>Estimation Export Express</span>
           </div>
           <div class="carrier-logo-display" id="exportCarrierLogo">
-            <span class="carrier-tag dhl">DHL</span>
+            <img src="assets/logos/dhl.png" alt="DHL" style="height:36px;object-fit:contain">
           </div>
           <div class="tax-breakdown">
             <div class="tax-row"><span>Poids réel</span><span id="ex_real">1,0 kg</span></div>
@@ -1203,23 +1203,13 @@
     <div class="track-panel active" id="tpanel-parcel">
       <div class="track-carrier-logos">
         <button class="carrier-logo-btn" onclick="setCarrier('dhl')" id="clogo-dhl" title="DHL Express">
-          <svg viewBox="0 0 95 30" xmlns="http://www.w3.org/2000/svg" height="28">
-            <rect width="95" height="30" fill="#D40511" rx="4"/>
-            <text x="47" y="22" font-family="Arial Black,sans-serif" font-size="18" font-weight="900" fill="#FFCC00" text-anchor="middle">DHL</text>
-          </svg>
+          <img src="assets/logos/dhl.png" alt="DHL" style="height:28px;object-fit:contain">
         </button>
         <button class="carrier-logo-btn" onclick="setCarrier('fedex')" id="clogo-fedex" title="FedEx">
-          <svg viewBox="0 0 120 30" xmlns="http://www.w3.org/2000/svg" height="28">
-            <rect width="120" height="30" fill="#fff" rx="4" stroke="#e2e8f0" stroke-width="1.5"/>
-            <text x="10" y="23" font-family="Arial,sans-serif" font-size="19" font-weight="900" fill="#4D148C">Fed</text>
-            <text x="54" y="23" font-family="Arial,sans-serif" font-size="19" font-weight="900" fill="#FF6600">Ex</text>
-          </svg>
+          <img src="assets/logos/fedex.png" alt="FedEx" style="height:28px;object-fit:contain">
         </button>
         <button class="carrier-logo-btn" onclick="setCarrier('aramex')" id="clogo-aramex" title="Aramex">
-          <svg viewBox="0 0 110 30" xmlns="http://www.w3.org/2000/svg" height="28">
-            <rect width="110" height="30" fill="#fff" rx="4" stroke="#e2e8f0" stroke-width="1.5"/>
-            <text x="55" y="22" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#CC0000" text-anchor="middle">ARAMEX</text>
-          </svg>
+          <img src="assets/logos/aramex.png" alt="Aramex" style="height:28px;object-fit:contain">
         </button>
       </div>
       <div class="track-input-row">

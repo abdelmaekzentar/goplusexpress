@@ -56,7 +56,7 @@ function selectCarrier(c){
     el('cb-'+x)?.classList.toggle('active', x===c);
   });
   const logo = el('carrierLogo');
-  if(logo) logo.innerHTML = `<span class="carrier-tag ${c}">${c.toUpperCase()}</span>`;
+  if(logo) logo.innerHTML = `<img src="assets/logos/${c}.png" alt="${c.toUpperCase()}" style="height:36px;object-fit:contain">`;
   calcExpress();
 }
 
@@ -574,7 +574,7 @@ function selectExportCarrier(c) {
     if (btn) btn.classList.toggle('active', x === c);
   });
   const logo = el('exportCarrierLogo');
-  if (logo) logo.innerHTML = `<span class="carrier-tag ${c}">${c.toUpperCase()}</span>`;
+  if (logo) logo.innerHTML = `<img src="assets/logos/${c}.png" alt="${c.toUpperCase()}" style="height:36px;object-fit:contain">`;
   calcExport();
 }
 

@@ -1611,7 +1611,7 @@ function renderExpResult(res, direction, country, type, weightNet, l, w, h){
   const carriers = [];
   if(res.carriers.dhl)    carriers.push({name:'DHL',    ...res.carriers.dhl,    color:'#d40511', logoSrc:'assets/logos/dhl.png'});
   if(res.carriers.fedex)  carriers.push({name:'FedEx',  ...res.carriers.fedex,  color:'#4d148c', logoSrc:'assets/logos/fedex.png'});
-  if(res.carriers.aramex) carriers.push({name:'Aramex', ...res.carriers.aramex, color:'#e87722', logoSrc:'assets/logos/aramex.svg'});
+  if(res.carriers.aramex) carriers.push({name:'Aramex', ...res.carriers.aramex, color:'#e87722', logoSrc:'assets/logos/aramex.png'});
   carriers.sort((a,b) => a.total - b.total);
 
   const volPoids = type !== 'document' ? Math.round(l*w*h/5000*100)/100 : '—';
