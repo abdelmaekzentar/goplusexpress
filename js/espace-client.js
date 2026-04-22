@@ -1695,6 +1695,68 @@ function ocrExtractArticles(text, globalCountry, currency){
 }
 
 /* ── Render résultats style HSCodeFinder ────────────────────── */
+/**
+ * Construit le tableau détaillé des taux ADIL par article :
+ * DI, TPI, TVA, FDS, Recouvrement, Accord préférentiel
+ */
+function ocrBuildTarifTable(articles, currency){
+  const rows = articles.filter(a => a.ngp_code_maroc).map((a, i) => {
+    const tarif  = typeof getTarifBase     === 'function' ? getTarifBase(a.ngp_code_maroc)       : null;
+    const accord = typeof getAccord        === 'function' ? getAccord(a.origin_country||'—')      : null;
+    const auths  = typeof getAuthorizations === 'function' ? getAuthorizations(a.ngp_code_maroc)  : [];
+    if(!tarif) return '';
+
+    const di  = parseFloat(tarif.di)||0;
+    const tpi = parseFloat(tarif.tpi)||0;
+    const tva = parseFloat(tarif.tva)||20;
+    const authBadges = auths.map(au => {
+      const bc = au.badge==='danger'?'#dc2626':au.badge==='warning'?'#d97706':'#0891b2';
+      return `<span style="background:${bc};color:#fff;border-radius:4px;padding:1px 7px;font-size:.68rem;font-weight:700;margin:1px">${escapeHTML(au.type)}</span>`;
+    }).join('');
+
+    return `<tr>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem;font-weight:600">${escapeHTML(a.description.substring(0,45))}${a.description.length>45?'…':''}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-family:monospace;font-size:.8rem;color:#4f46e5">${escapeHTML(a.ngp_code_maroc)}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem;text-align:center;font-weight:700;color:#16a34a">${di}%</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem;text-align:center">${tpi>0?tpi+'%':'—'}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem;text-align:center">${tva}%</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem;text-align:center">${tarif.fds?'200 MAD':'—'}</td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9;font-size:.78rem">
+        ${accord ? `<span style="color:#1d4ed8;font-weight:600"><i class="fa-solid fa-handshake"></i> ${escapeHTML(accord.name)}</span><br><span style="color:#64748b;font-size:.72rem">${escapeHTML(accord.reduction||'')} · Doc: ${escapeHTML(accord.document||'')}</span>` : '<span style="color:#94a3b8">—</span>'}
+      </td>
+      <td style="padding:7px 10px;border-bottom:1px solid #f1f5f9">${authBadges || '<span style="color:#16a34a;font-size:.78rem">✓ Libre</span>'}</td>
+    </tr>`;
+  }).filter(r=>r!=='').join('');
+
+  if(!rows) return '';
+
+  return `<div class="ocr2-tarif-table-wrap" style="grid-column:1/-1;margin-top:6px">
+    <div style="font-size:.8rem;font-weight:700;color:#374151;margin-bottom:8px;display:flex;align-items:center;gap:6px">
+      <i class="fa-solid fa-table" style="color:#4f46e5"></i>
+      Taux ADIL par article — Source: Douane Maroc
+      <span style="font-size:.72rem;color:#94a3b8;font-weight:400">Recouvrement 6% applicable sur l'ensemble des taxes</span>
+    </div>
+    <div style="overflow-x:auto;border-radius:8px;border:1px solid #e2e8f0">
+      <table style="width:100%;border-collapse:collapse;min-width:700px">
+        <thead>
+          <tr style="background:#f8fafc">
+            <th style="padding:8px 10px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">Article</th>
+            <th style="padding:8px 10px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">Code NGP</th>
+            <th style="padding:8px 10px;text-align:center;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">DI</th>
+            <th style="padding:8px 10px;text-align:center;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">TPI</th>
+            <th style="padding:8px 10px;text-align:center;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">TVA</th>
+            <th style="padding:8px 10px;text-align:center;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">FDS</th>
+            <th style="padding:8px 10px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">Accord commercial</th>
+            <th style="padding:8px 10px;text-align:left;font-size:.75rem;color:#64748b;font-weight:600;border-bottom:2px solid #e2e8f0">Autorisations</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+/* ── Résultats OCR ───────────────────────────────────────────── */
 function ocrRenderResults(info, articles, filename, currency, totalValue){
   // En-tête facture
   const infoGrid = document.getElementById('ocr-info-grid');
@@ -1714,25 +1776,73 @@ function ocrRenderResults(info, articles, filename, currency, totalValue){
       <div class="ocr2-info-value">${f.value ? escapeHTML(f.value) : '<span style="color:#aaa">—</span>'}</div>
     </div>`).join('');
 
-  // Résumé taxes (si calcul activé)
+  // ── Résumé droits & taxes ────────────────────────────────────
   const summaryGrid = document.getElementById('ocr-summary-grid');
-  const totalTaxes  = articles.reduce((s,a)=>s+((a.duty_calc||{}).totalTaxes||0),0);
-  const totalLanded = articles.reduce((s,a)=>s+((a.duty_calc||{}).landedCost||0),0);
-  const totalCIF    = articles.reduce((s,a)=>s+((a.duty_calc||{}).cifMAD||0),0);
-  const hasDuty     = articles.some(a=>a.duty_calc);
+  if(summaryGrid){
+    const hasDutyCalc = articles.some(a => a.duty_calc);
+    const hasAnyCode  = articles.some(a => a.ngp_code_maroc);
 
-  if(hasDuty && summaryGrid){
-    summaryGrid.innerHTML = [
-      {label:'Valeur CIF totale (MAD)',    value:totalCIF.toFixed(2)+' MAD',    cls:'ocr2-sum-blue'},
-      {label:'Taxes totales estimées',     value:totalTaxes.toFixed(2)+' MAD',  cls:'ocr2-sum-orange'},
-      {label:'Landed Cost total (MAD)',    value:totalLanded.toFixed(2)+' MAD', cls:'ocr2-sum-green'},
-    ].map(c=>`<div class="ocr2-sum-card ${c.cls}">
-      <div class="ocr2-sum-label">${c.label}</div>
-      <div class="ocr2-sum-value">${c.value}</div>
-    </div>`).join('');
-    summaryGrid.style.display = 'grid';
-  } else if(summaryGrid){
-    summaryGrid.style.display = 'none';
+    if(hasDutyCalc){
+      // ── Mode A : calcul CIF complet disponible ──
+      const totalTaxes  = articles.reduce((s,a)=>s+((a.duty_calc||{}).totalTaxes||0),0);
+      const totalLanded = articles.reduce((s,a)=>s+((a.duty_calc||{}).landedCost||0),0);
+      const totalCIF    = articles.reduce((s,a)=>s+((a.duty_calc||{}).cifMAD||0),0);
+      summaryGrid.innerHTML = [
+        {label:'Valeur CIF (MAD)',       value:totalCIF.toFixed(2)+' MAD',    cls:'ocr2-sum-blue'},
+        {label:'Taxes totales (MAD)',    value:totalTaxes.toFixed(2)+' MAD',  cls:'ocr2-sum-orange'},
+        {label:'Landed Cost (MAD)',      value:totalLanded.toFixed(2)+' MAD', cls:'ocr2-sum-green'},
+      ].map(c=>`<div class="ocr2-sum-card ${c.cls}">
+        <div class="ocr2-sum-label">${c.label}</div>
+        <div class="ocr2-sum-value">${c.value}</div>
+      </div>`).join('') + ocrBuildTarifTable(articles, currency);
+      summaryGrid.style.display = 'grid';
+
+    } else if(hasAnyCode){
+      // ── Mode B : codes détectés mais pas de calcul CIF (pas de fret saisi) ──
+      // On estime à partir de la valeur déclarée en facture
+      const cur      = currency || (document.getElementById('ocr-currency')||{}).value || 'USD';
+      const rate     = FX_TO_MAD[cur] || 9.95;
+      const invTotal = articles.reduce((s,a) => s + (a._rawPrice||0), 0);
+      const invMAD   = invTotal * rate;
+      // Assurance auto 0.5% + fret 0 (inconnu)
+      const insMAD   = invMAD * 0.005;
+      const estCIF   = invMAD + insMAD;
+      // Calcul estimé agrégé depuis taux ADIL de chaque article
+      let estDI=0, estTPI=0, estTVA=0, estFDS=0;
+      articles.forEach(a => {
+        if(!a.ngp_code_maroc) return;
+        const tarif = typeof getTarifBase === 'function' ? getTarifBase(a.ngp_code_maroc) : null;
+        if(!tarif) return;
+        const ratio   = invTotal > 0 && a._rawPrice > 0 ? a._rawPrice / invTotal : 1 / articles.length;
+        const cifPart = estCIF * ratio;
+        const di  = cifPart * (tarif.di  / 100);
+        const tpi = cifPart * ((tarif.tpi||0) / 100);
+        const fds = tarif.fds ? 200 : 0;
+        const tva = (cifPart + di + tpi + fds) * (tarif.tva / 100);
+        estDI  += di;
+        estTPI += tpi;
+        estFDS += fds;
+        estTVA += tva;
+      });
+      const recouv    = (estDI + estTPI + estFDS + estTVA) * 0.06;
+      const estTaxes  = estDI + estTPI + estFDS + estTVA + recouv;
+      const estLanded = estCIF + estTaxes;
+      const note = invTotal > 0
+        ? `<div class="ocr2-sum-note"><i class="fa-solid fa-triangle-exclamation"></i> Estimation basée sur valeur facture ${invTotal.toFixed(2)} ${cur} — entrez le fret pour un calcul exact</div>`
+        : `<div class="ocr2-sum-note"><i class="fa-solid fa-triangle-exclamation"></i> Valeur facture non extraite — renseignez le fret pour calculer</div>`;
+      summaryGrid.innerHTML = [
+        {label:'Valeur CIF estimée (MAD)', value: invTotal>0 ? estCIF.toFixed(2)+' MAD' : '—', cls:'ocr2-sum-blue'},
+        {label:'Taxes estimées (MAD)',     value: invTotal>0 ? estTaxes.toFixed(2)+' MAD' : '—', cls:'ocr2-sum-orange'},
+        {label:'Landed Cost estimé (MAD)', value: invTotal>0 ? estLanded.toFixed(2)+' MAD' : '—', cls:'ocr2-sum-green'},
+      ].map(c=>`<div class="ocr2-sum-card ${c.cls}">
+        <div class="ocr2-sum-label">${c.label}</div>
+        <div class="ocr2-sum-value">${c.value}</div>
+      </div>`).join('') + note + ocrBuildTarifTable(articles, currency);
+      summaryGrid.style.display = 'grid';
+
+    } else {
+      summaryGrid.style.display = 'none';
+    }
   }
 
   // Liste articles (accordion)
