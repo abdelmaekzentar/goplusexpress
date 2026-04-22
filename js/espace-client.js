@@ -1059,8 +1059,7 @@ function ocrLoadFile(input){
   ocrDone = false;
   document.getElementById('ocr-results').style.display = 'none';
 
-  // UI loading state
-  const lbl = document.getElementById('ocr-drop-label');
+  const lbl  = document.getElementById('ocr-drop-label');
   const sub  = document.getElementById('ocr-drop-sub');
   const prog = document.getElementById('ocr-progress');
   const bar  = document.getElementById('ocr-progress-bar');
@@ -1068,22 +1067,115 @@ function ocrLoadFile(input){
   if(sub) sub.textContent = 'Extraction du texte · Classification NGP · Calcul taxes';
   if(prog){ prog.style.display = 'block'; bar.style.width = '5%'; }
 
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById('ocr-preview-img');
-    img.src = e.target.result;
-    img.style.display = 'block';
+  const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
-    if(!window.Tesseract){
+  if(isPDF){
+    // ── PDF : convertir page 1 en image via PDF.js avant Tesseract ──
+    if(sub) sub.textContent = 'Conversion PDF → image…';
+    const loadPdfJs = (cb) => {
+      if(window.pdfjsLib){ cb(); return; }
       const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-      s.onload = ()=>ocrRun(e.target.result, file);
+      s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.min.mjs';
+      s.type = 'module';
+      // fallback non-module
+      s.onerror = () => {
+        const s2 = document.createElement('script');
+        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs';
+        s2.type = 'module';
+        s2.onload = cb;
+        document.head.appendChild(s2);
+      };
+      s.onload = cb;
       document.head.appendChild(s);
-    } else {
-      ocrRun(e.target.result, file);
-    }
-  };
-  reader.readAsDataURL(file);
+    };
+
+    const arrayBufReader = new FileReader();
+    arrayBufReader.onload = async (e) => {
+      try {
+        // Chargement PDF.js dynamique si besoin
+        if(!window.pdfjsLib){
+          await new Promise((res, rej) => {
+            // Utiliser importmap-compatible CDN
+            import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.min.mjs').then(mod => {
+              window.pdfjsLib = mod;
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                'https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.worker.min.mjs';
+              res();
+            }).catch(async () => {
+              // Fallback: version UMD
+              await new Promise((r2, rej2) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+                s.onload = () => {
+                  window.pdfjsLib = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+                  if(window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                  r2();
+                };
+                s.onerror = rej2;
+                document.head.appendChild(s);
+              });
+              res();
+            });
+          });
+        }
+
+        if(bar) bar.style.width = '20%';
+        if(sub) sub.textContent = 'Rendu PDF page 1…';
+
+        const pdf  = await window.pdfjsLib.getDocument({ data: e.target.result }).promise;
+        const page = await pdf.getPage(1);
+        const scale    = 2.5; // haute résolution pour meilleur OCR
+        const viewport = page.getViewport({ scale });
+        const canvas   = document.createElement('canvas');
+        canvas.width   = viewport.width;
+        canvas.height  = viewport.height;
+        const ctx = canvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport }).promise;
+
+        const dataUrl = canvas.toDataURL('image/png');
+
+        // Afficher preview
+        const img = document.getElementById('ocr-preview-img');
+        if(img){ img.src = dataUrl; img.style.display = 'block'; }
+
+        if(bar) bar.style.width = '35%';
+        if(sub) sub.textContent = 'Reconnaissance OCR en cours…';
+
+        if(!window.Tesseract){
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+          s.onload = () => ocrRun(dataUrl, file);
+          document.head.appendChild(s);
+        } else {
+          ocrRun(dataUrl, file);
+        }
+      } catch(err){
+        console.error('PDF render error:', err);
+        if(lbl) lbl.textContent = '⚠️ Impossible de lire ce PDF. Essaie une image JPG/PNG.';
+        if(sub) sub.textContent = '';
+        if(prog) prog.style.display = 'none';
+      }
+    };
+    arrayBufReader.readAsArrayBuffer(file);
+
+  } else {
+    // ── Image (JPG / PNG) : traitement direct ──
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.getElementById('ocr-preview-img');
+      if(img){ img.src = e.target.result; img.style.display = 'block'; }
+      if(!window.Tesseract){
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = () => ocrRun(e.target.result, file);
+        document.head.appendChild(s);
+      } else {
+        ocrRun(e.target.result, file);
+      }
+    };
+    reader.readAsDataURL(file);
+  }
 }
 
 /* ── OCR Engine (Tesseract) ─────────────────────────────────── */
