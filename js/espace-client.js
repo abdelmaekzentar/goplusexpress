@@ -1018,6 +1018,68 @@ function ocrCalcDuty(hsCode, cifMAD, currency){
 }
 
 /* ── Classification HS depuis la base locale ─────────────────── */
+/* ── Dictionnaire anglais/chinois → code SH (pour factures importées) ── */
+const OCR_EN_KEYWORDS = [
+  // Audio
+  [/earphone|earbud|earpiece|tws|headphone|headset|casque\s*audio|écouteur|inear|in-ear|bluetooth\s*audio|wireless\s*audio|translation\s*ear/i, '851830'],
+  [/speaker|enceinte|haut.parleur|soundbar|subwoofer/i, '851840'],
+  [/microphone|micro\b/i, '851810'],
+  // Téléphonie & mobile
+  [/smartphone|mobile\s*phone|cellphone|téléphone\s*portable|iphone|android\s*phone/i, '851712'],
+  [/phone\s*case|coque\s*téléphone|phone\s*cover/i, '392690'],
+  [/charger|chargeur|power\s*adapter|adaptateur/i, '850440'],
+  [/power\s*bank|batterie\s*externe|portable\s*battery/i, '850720'],
+  [/cable|câble|usb\s*cable|charging\s*cable/i, '854430'],
+  // Informatique
+  [/laptop|notebook|ordinateur\s*portable/i, '847130'],
+  [/tablet|tablette\s*numérique/i, '847190'],
+  [/keyboard|clavier/i, '847330'],
+  [/mouse|souris\s*informatique/i, '847160'],
+  [/hard\s*disk|ssd|disque\s*dur/i, '847170'],
+  [/monitor|écran\s*pc/i, '852852'],
+  [/printer|imprimante/i, '844351'],
+  [/router|modem|wifi\s*router/i, '851762'],
+  // Textile & vêtements
+  [/t.?shirt|polo|tee.shirt/i, '610910'],
+  [/jeans|denim\s*trouser/i, '620342'],
+  [/jacket|veste|blouson/i, '620190'],
+  [/shoes|sneakers|chaussures/i, '640299'],
+  [/socks|chaussettes/i, '611592'],
+  [/underwear|sous.vêtement/i, '620711'],
+  // Jouets & sport
+  [/toy|jouet/i, '950390'],
+  [/bicycle|vélo|bike\b/i, '871200'],
+  [/scooter\s*electr|trottinette/i, '871160'],
+  // Beauté & cosmétique
+  [/lipstick|rouge\s*à\s*lèvres/i, '330410'],
+  [/perfume|parfum/i, '330300'],
+  [/shampoo|shampooing/i, '330510'],
+  [/cream|crème\s*soin/i, '330499'],
+  // Alimentaire
+  [/olive\s*oil|huile\s*d.olive/i, '150910'],
+  [/argan\s*oil|huile\s*d.argan/i, '151590'],
+  [/date\s*palm|datte/i, '080410'],
+  // Maison
+  [/carpet|tapis/i, '570110'],
+  [/ceramic\s*tile|carrelage/i, '690721'],
+  [/led\s*lamp|led\s*light|ampoule\s*led/i, '940540'],
+  // Médical
+  [/mask|masque\s*chirurgical|face\s*mask/i, '630790'],
+  [/glove|gant\s*médical/i, '401511'],
+  // Véhicules & pièces
+  [/car\s*part|auto\s*part|spare\s*part\s*auto|pièce\s*automobile/i, '870899'],
+  [/tire|tyre|pneu\b/i, '401110'],
+  // Autres électroniques
+  [/smartwatch|montre\s*connect|smart\s*watch/i, '910219'],
+  [/drone\b|quadcopter/i, '880211'],
+  [/camera|appareil\s*photo|webcam/i, '852580'],
+  [/led\s*strip|ruban\s*led/i, '854140'],
+  [/electric\s*kettle|bouilloire/i, '851610'],
+  [/air\s*fryer|friteuse\s*sans/i, '851640'],
+  [/solar\s*panel|panneau\s*solaire/i, '854140'],
+  [/watch|montre\b(?!\s*connect)/i, '910211'],
+];
+
 function ocrClassifyHS(description, declaredHS){
   if(declaredHS && /^\d{4,10}$/.test(declaredHS.replace(/[\.\-]/g,''))){
     return { code: declaredHS.replace(/[\.\-]/g,''), confidence: 100, method: 'DECLARED' };
@@ -1025,7 +1087,17 @@ function ocrClassifyHS(description, declaredHS){
   if(typeof HS_CODES === 'undefined') return { code: null, confidence: 0, method: 'NOT_FOUND' };
 
   const q = (description || '').toLowerCase();
-  // Recherche directe dans les descriptions françaises
+
+  // ── Priorité 1 : dictionnaire anglais/multilingue intégré ──
+  for(const [re, sh] of OCR_EN_KEYWORDS){
+    if(re.test(q)){
+      const match = HS_CODES.find(c => c.sh && c.sh.replace(/\D/g,'').startsWith(sh.substring(0,6)));
+      const desc  = match ? match.desc : sh;
+      return { code: sh, confidence: 88, method: 'EN_KEYWORDS', desc };
+    }
+  }
+
+  // ── Priorité 2 : recherche dans descriptions françaises HS_CODES ──
   const tokens = q.split(/\s+/).filter(t => t.length > 3);
   if(tokens.length > 0){
     let best = null, bestScore = 0;
@@ -1034,11 +1106,12 @@ function ocrClassifyHS(description, declaredHS){
       const score = tokens.filter(t => desc.includes(t)).length / tokens.length;
       if(score > bestScore){ bestScore = score; best = c; }
     }
-    if(best && bestScore >= 0.5){
-      return { code: best.sh, confidence: Math.round(bestScore * 85), method: 'TEXT_SEARCH', desc: best.desc };
+    if(best && bestScore >= 0.35){
+      return { code: best.sh, confidence: Math.round(bestScore * 80), method: 'TEXT_SEARCH', desc: best.desc };
     }
   }
-  // Recherche via AI_KEYWORDS
+
+  // ── Priorité 3 : AI_KEYWORDS ──
   if(typeof AI_KEYWORDS !== 'undefined'){
     for(const [pattern, chapters] of Object.entries(AI_KEYWORDS)){
       if(new RegExp(pattern, 'iu').test(q)){
@@ -1286,34 +1359,102 @@ function ocrParseInvoice(text, filename){
 
 /* ── Extraction articles du texte brut ──────────────────────── */
 function ocrExtractArticles(text, globalCountry, currency){
-  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.length>3);
+  const lines = text.split('\n').map(l=>l.trim()).filter(l=>l.length>2);
   const arts  = [];
   const hsRe  = /\b(\d{6,10})\b/;
   const wRe   = /(\d[\d,.']*)\s*(?:kg|kgs)/i;
-  const SKIP  = /^(total|subtotal|tva|tax|shipping|freight|discount|remise|description|article|qty|price|amount|date|invoice|facture|from|to|tel|fax|email|page|bank|swift|iban)/i;
 
-  for(const line of lines){
-    const nums = line.match(/\d[\d,.']{0,}/g)||[];
-    if(nums.length < 2 || line.length < 10 || line.length > 250) continue;
-    const descM = line.match(/^((?:[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\s\-\/,\.&%°]{3,})+)/);
-    if(!descM) continue;
-    const desc = descM[1].trim().replace(/\s+/g,' ').substring(0,100);
-    if(desc.length < 4 || SKIP.test(desc)) continue;
+  // Mots-clés à ignorer en début de ligne (champs métadonnées facture)
+  const SKIP = /^(total|subtotal|tva|vat|tax|shipping|freight|discount|remise|description|article|qty|quantity|price|amount|date|invoice|facture|from|to|tel|fax|email|page|bank|swift|iban|account|holder|address|contact|consignee|seller|importer|payment|packing|delivery|term|remark|note|product\s*image|product\s*name|unit|incoterm|currency|country|branch|routing|the\s*seller|bank\s*name|bank\s*location|bank\s*code|account\s*type|account\s*number|bank\s*address)/i;
 
-    const hs  = (line.match(hsRe)||[])[1] || null;
-    const wg  = (line.match(wRe)||[])[1] || null;
-    const numV= nums.map(n=>parseFloat(n.replace(/[,\s]/g,'.'))).filter(v=>v>0&&v<1e9);
+  // Lignes complètes à ignorer (contenu bancaire, adresse, mentions légales)
+  const SKIP_LINE = /(account\s*number|bank\s*name|bank\s*location|bank\s*address|swift|bic|iban|holder\s*name|branch\s*number|bank\s*code|tax\s*id|ice\s*:|payment\s*terms?|payment\s*upon|term\s*of\s*payment|packing\s*:|origin\s*&|delivery\s*time|immeuble|lotissement|casablanca|@[\w.-]+\.|0086-|road,|street,|district,|guangdong|zhongcun|hanxing|panyu|hong\s*kong|queen'?s\s*road|the\s*center|floor)/i;
 
-    arts.push({
-      description:   desc,
-      quantity:      numV[0] != null ? String(numV[0]) : '—',
-      unitPrice:     numV[1] != null ? numV[1].toFixed(2)+' '+currency : '—',
-      totalPrice:    numV[2] != null ? numV[2].toFixed(2)+' '+currency : (numV[1] != null ? numV[1].toFixed(2)+' '+currency : '—'),
-      _rawPrice:     numV[2] != null ? numV[2] : (numV[1] != null ? numV[1] : 0),
-      weight:        wg ? wg+' kg' : '—',
-      _rawHS:        hs,
-      originCountry: globalCountry || '—',
-    });
+  // ── Stratégie 1 : détecter le tableau produits par son en-tête ──
+  let tableStart = -1;
+  for(let i=0; i<lines.length; i++){
+    const l = lines[i].toLowerCase();
+    if((l.includes('product name') || l.includes('product image') || l.includes('désignation') || l.includes('designation') || l.includes('description des marchandises')) &&
+       (l.includes('quant') || l.includes('price') || l.includes('unit') || l.includes('montant') || l.includes('prix'))){
+      tableStart = i + 1;
+      break;
+    }
+    // Aussi : ligne "INVOICE NO" suivie du tableau
+    if(l.includes('invoice no') && i < lines.length - 2){
+      // Chercher la prochaine ligne avec "product" ou "qty"
+      for(let j=i+1; j<Math.min(i+5, lines.length); j++){
+        if(lines[j].toLowerCase().includes('product') || lines[j].toLowerCase().includes('qty')){
+          tableStart = j + 1; break;
+        }
+      }
+      if(tableStart !== -1) break;
+    }
+  }
+
+  if(tableStart !== -1){
+    for(let i=tableStart; i<lines.length; i++){
+      const line = lines[i];
+      // Arrêter au pied de tableau
+      if(/^(total|subtotal|freight|grand\s*total|remarks?|notes?|term)/i.test(line)) break;
+      if(line.length < 4) continue;
+      if(SKIP_LINE.test(line)) continue;
+
+      // Extraire description (partie texte avant les chiffres)
+      const descM = line.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,100}?)(?=\s+\d|\s*$)/);
+      if(!descM) continue;
+      const desc = descM[1].trim().replace(/\s+/g,' ').replace(/\$\s*/g,'');
+      if(desc.length < 4 || SKIP.test(desc)) continue;
+
+      const nums = line.match(/[\d,.']+/g)||[];
+      const numV = nums.map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+
+      const hs = (line.match(hsRe)||[])[1]||null;
+      const wg = (line.match(wRe)||[])[1]||null;
+
+      // Qty = premier entier "raisonnable" (souvent < 1000000), unitPrice = suivant, total = dernier
+      const qty   = numV.find(v=>Number.isInteger(v)||v===Math.round(v));
+      const qtyIdx= qty!=null ? numV.indexOf(qty) : 0;
+      const priceNums = numV.slice(qtyIdx+1);
+
+      arts.push({
+        description:   desc.substring(0,120),
+        quantity:      qty!=null ? String(qty) : (numV[0]!=null ? String(numV[0]) : '—'),
+        unitPrice:     priceNums[0]!=null ? priceNums[0].toFixed(2)+' '+currency : '—',
+        totalPrice:    priceNums[1]!=null ? priceNums[1].toFixed(2)+' '+currency : (priceNums[0]!=null ? priceNums[0].toFixed(2)+' '+currency : '—'),
+        _rawPrice:     priceNums[1]!=null ? priceNums[1] : (priceNums[0]!=null ? priceNums[0] : 0),
+        weight:        wg ? wg+' kg' : '—',
+        _rawHS:        hs,
+        originCountry: globalCountry || '—',
+      });
+    }
+  }
+
+  // ── Stratégie 2 : fallback ligne par ligne si tableau non trouvé ──
+  if(arts.length === 0){
+    for(const line of lines){
+      if(SKIP_LINE.test(line)) continue;
+      const nums = line.match(/\d[\d,.']{0,}/g)||[];
+      if(nums.length < 2 || line.length < 10 || line.length > 250) continue;
+      const descM = line.match(/^((?:[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\s\-\/,\.&%°]{3,})+)/);
+      if(!descM) continue;
+      const desc = descM[1].trim().replace(/\s+/g,' ').substring(0,100);
+      if(desc.length < 4 || SKIP.test(desc)) continue;
+
+      const hs  = (line.match(hsRe)||[])[1]||null;
+      const wg  = (line.match(wRe)||[])[1]||null;
+      const numV= nums.map(n=>parseFloat(n.replace(/[,\s]/g,'.'))).filter(v=>v>0&&v<1e9);
+
+      arts.push({
+        description:   desc,
+        quantity:      numV[0]!=null ? String(numV[0]) : '—',
+        unitPrice:     numV[1]!=null ? numV[1].toFixed(2)+' '+currency : '—',
+        totalPrice:    numV[2]!=null ? numV[2].toFixed(2)+' '+currency : (numV[1]!=null ? numV[1].toFixed(2)+' '+currency : '—'),
+        _rawPrice:     numV[2]!=null ? numV[2] : (numV[1]!=null ? numV[1] : 0),
+        weight:        wg ? wg+' kg' : '—',
+        _rawHS:        hs,
+        originCountry: globalCountry || '—',
+      });
+    }
   }
 
   const seen = new Set();
