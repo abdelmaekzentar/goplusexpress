@@ -98,6 +98,7 @@ function ecInit(){
   ecHsInit();
   expInitCountries();
   shpInit();
+  ocrInitAiPanel();  // Restaure la clé API Claude si déjà enregistrée
 }
 
 function ecGetUser(){
@@ -1080,6 +1081,230 @@ const OCR_EN_KEYWORDS = [
   [/watch|montre\b(?!\s*connect)/i, '910211'],
 ];
 
+/* ══════════════════════════════════════════════════════
+   MOTEUR IA MULTILINGUE — Claude API
+   ══════════════════════════════════════════════════════ */
+
+/** Récupère la clé API depuis localStorage */
+function ocrGetApiKey(){
+  try { return localStorage.getItem('gpe_claude_api_key') || ''; } catch(e){ return ''; }
+}
+
+/** Enregistre la clé API dans localStorage et met à jour l'UI */
+function ocrSaveApiKey(){
+  const input = document.getElementById('ocr-api-key-input');
+  if(!input) return;
+  const key = (input.value || '').trim();
+  try { localStorage.setItem('gpe_claude_api_key', key); } catch(e){}
+  const statusEl = document.getElementById('ocr-ai-key-status');
+  const dotEl    = document.getElementById('ocr-ai-status-dot');
+  if(key && key.startsWith('sk-ant')){
+    if(statusEl){ statusEl.textContent = '✓ Clé enregistrée'; statusEl.className = 'ocr-ai-key-status ok'; }
+    if(dotEl){ dotEl.className = 'ocr-ai-dot ocr-ai-dot-on'; dotEl.title = 'IA active'; }
+  } else if(key){
+    if(statusEl){ statusEl.textContent = '⚠ Format invalide (doit commencer par sk-ant)'; statusEl.className = 'ocr-ai-key-status err'; }
+    if(dotEl){ dotEl.className = 'ocr-ai-dot ocr-ai-dot-off'; dotEl.title = 'Clé invalide'; }
+  } else {
+    if(statusEl){ statusEl.textContent = 'Clé supprimée'; statusEl.className = 'ocr-ai-key-status'; }
+    if(dotEl){ dotEl.className = 'ocr-ai-dot ocr-ai-dot-off'; dotEl.title = 'IA non configurée'; }
+  }
+}
+
+/** Réaction instantanée lors de la saisie de la clé */
+function ocrApiKeyChanged(){
+  const statusEl = document.getElementById('ocr-ai-key-status');
+  if(statusEl){ statusEl.textContent = ''; }
+}
+
+/** Ouvre/ferme le panneau IA */
+function ocrToggleAiPanel(){
+  const body    = document.getElementById('ocr-ai-body');
+  const chevron = document.getElementById('ocr-ai-chevron');
+  if(!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if(chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+/** Initialise le panneau IA au chargement (restaure la clé) */
+function ocrInitAiPanel(){
+  const key    = ocrGetApiKey();
+  const input  = document.getElementById('ocr-api-key-input');
+  const dotEl  = document.getElementById('ocr-ai-status-dot');
+  const status = document.getElementById('ocr-ai-key-status');
+  if(input && key) input.value = key;
+  if(key && key.startsWith('sk-ant')){
+    if(dotEl)  { dotEl.className  = 'ocr-ai-dot ocr-ai-dot-on'; dotEl.title = 'IA active'; }
+    if(status) { status.textContent = '✓ Clé configurée'; status.className = 'ocr-ai-key-status ok'; }
+  }
+}
+
+/**
+ * Appelle Claude Haiku pour classer un produit multilingue en code NGP marocain.
+ * Retourne {code, confidence, method, desc} ou null si échec.
+ */
+async function aiClassifyHSWithClaude(description){
+  const apiKey = ocrGetApiKey();
+  if(!apiKey || !apiKey.startsWith('sk-ant')) return null;
+  if(!(document.getElementById('ocr-ai-enabled')?.checked !== false)) return null;
+
+  // Cache sessionStorage pour éviter les appels répétés
+  const cacheKey = 'hs_ai_' + description.substring(0,80).toLowerCase().replace(/\s+/g,'_').replace(/[^a-z0-9_\u4e00-\u9fff\u0600-\u06ff]/g,'');
+  try {
+    const cached = sessionStorage.getItem(cacheKey);
+    if(cached) return JSON.parse(cached);
+  } catch(e){}
+
+  // Construire liste des 30 premiers chapitres SH pertinents depuis HS_CODES
+  let contextCodes = '';
+  if(typeof HS_CODES !== 'undefined'){
+    const q = description.toLowerCase();
+    const scored = HS_CODES
+      .map(c => {
+        const d = (c.desc||'').toLowerCase();
+        const score = q.split(/\s+/).filter(t=>t.length>2 && d.includes(t)).length;
+        return { sh: c.sh, desc: c.desc, score };
+      })
+      .filter(c => c.score > 0)
+      .sort((a,b) => b.score - a.score)
+      .slice(0, 20);
+    contextCodes = scored.length
+      ? '\nCodes ADIL candidats:\n' + scored.map(c=>`${c.sh} — ${c.desc}`).join('\n')
+      : '';
+  }
+
+  const prompt =
+`Tu es un expert en nomenclature douanière marocaine NGP/SH (système harmonisé).
+Le produit décrit peut être en anglais, arabe, français ou chinois.
+Produit: "${description}"${contextCodes}
+
+Identifie le code NGP marocain à 10 chiffres le plus précis et sa désignation officielle en français.
+Réponds UNIQUEMENT au format (une seule ligne, rien d'autre):
+CODE_10_CHIFFRES|DÉSIGNATION_FRANÇAISE_COURTE
+Exemple: 8518300000|Écouteurs et casques d'écoute`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-20240307',
+        max_tokens: 60,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+    if(!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    const text = (data.content?.[0]?.text || '').trim();
+    const parts = text.split('|');
+    const code  = (parts[0]||'').replace(/\D/g,'').substring(0,10);
+    const desc  = (parts[1]||'').trim();
+    if(code.length >= 6){
+      const result = { code, confidence: 92, method: 'AI_CLAUDE', desc };
+      try { sessionStorage.setItem(cacheKey, JSON.stringify(result)); } catch(e){}
+      return result;
+    }
+    return null;
+  } catch(err){
+    console.warn('[IA-NGP] Erreur Claude:', err.message);
+    return null;
+  }
+}
+
+/**
+ * Enrichit progressivement les articles dont le code NGP n'a pas été trouvé.
+ * Met à jour l'UI article par article sans bloquer le rendu initial.
+ */
+async function ocrEnrichWithAI(articles){
+  const apiKey = ocrGetApiKey();
+  if(!apiKey || !apiKey.startsWith('sk-ant')) return;
+  if(!(document.getElementById('ocr-ai-enabled')?.checked !== false)) return;
+
+  // Mettre le dot en mode busy
+  const dotEl = document.getElementById('ocr-ai-status-dot');
+  if(dotEl) dotEl.className = 'ocr-ai-dot ocr-ai-dot-busy';
+
+  let enriched = 0;
+  for(let idx = 0; idx < articles.length; idx++){
+    const a = articles[idx];
+    // Enrichir si : code non trouvé OU confiance faible (< 80) et méthode non DECLARED
+    if(a.classification_method === 'DECLARED') continue;
+    if(a.ngp_code_maroc && a.classification_confidence >= 80) continue;
+
+    // Indiquer "en cours" sur la carte
+    const card = document.getElementById('art-card-' + idx);
+    if(card){
+      const ngpEl = card.querySelector('.ocr2-ngp-code');
+      if(ngpEl) ngpEl.innerHTML = '<span class="ocr-ai-enriching"><i class="fa-solid fa-microchip"></i> IA…</span>';
+    }
+
+    const result = await aiClassifyHSWithClaude(a.description);
+
+    if(result && result.code){
+      // Mettre à jour l'objet article
+      a.ngp_code_maroc = result.code;
+      a.classification_confidence = result.confidence;
+      a.classification_method = result.method;
+      a.clf_desc = result.desc || a.clf_desc;
+
+      // Recalculer les droits si possible
+      const calcDuties = document.getElementById('ocr-calc-duties')?.checked !== false;
+      if(calcDuties && typeof ocrCalcCIF === 'function' && typeof ocrCalcDuty === 'function'){
+        const cif = ocrCalcCIF(a._rawPrice || 0, articles.reduce((s,x)=>s+(x._rawPrice||0),0)||1, a.currency||'USD');
+        const duty = ocrCalcDuty(result.code, cif.cifMAD, a.currency||'USD');
+        const accord = typeof getAccord === 'function' ? getAccord(a.origin_country) : null;
+        a.duty_calc = duty ? { ...duty, accord } : null;
+      }
+      if(typeof getAuthorizations === 'function'){
+        a.authorizations = getAuthorizations(result.code);
+      }
+
+      // Re-rendre la carte article dans le DOM
+      if(card) card.outerHTML = ocrRenderArticleRow(a, idx);
+      enriched++;
+    } else {
+      // Marquer "non trouvé par IA"
+      if(card){
+        const ngpEl = card.querySelector('.ocr2-ngp-code');
+        if(ngpEl) ngpEl.innerHTML = '<span class="ocr-ai-fail"><i class="fa-solid fa-xmark"></i> Non trouvé</span>';
+      }
+    }
+
+    // Petite pause pour ne pas saturer l'API
+    await new Promise(r => setTimeout(r, 300));
+  }
+
+  // Mettre à jour le résumé taxes si des articles ont été enrichis
+  if(enriched > 0 && typeof ocrRenderResults === 'function'){
+    // Re-rendre uniquement le résumé taxes
+    const totalTaxes  = articles.reduce((s,a2)=>s+((a2.duty_calc||{}).totalTaxes||0),0);
+    const totalLanded = articles.reduce((s,a2)=>s+((a2.duty_calc||{}).landedCost||0),0);
+    const totalCIF    = articles.reduce((s,a2)=>s+((a2.duty_calc||{}).cifMAD||0),0);
+    const hasDuty     = articles.some(a2=>a2.duty_calc);
+    const summaryGrid = document.getElementById('ocr-summary-grid');
+    if(hasDuty && summaryGrid){
+      summaryGrid.innerHTML = [
+        {label:'Valeur CIF totale (MAD)',  value:totalCIF.toFixed(2)+' MAD',    cls:'ocr2-sum-blue'},
+        {label:'Taxes totales estimées',   value:totalTaxes.toFixed(2)+' MAD',  cls:'ocr2-sum-orange'},
+        {label:'Landed Cost total (MAD)',  value:totalLanded.toFixed(2)+' MAD', cls:'ocr2-sum-green'},
+      ].map(c=>`<div class="ocr2-sum-card ${c.cls}">
+        <div class="ocr2-sum-label">${c.label}</div>
+        <div class="ocr2-sum-value">${c.value}</div>
+      </div>`).join('');
+      summaryGrid.style.display = 'grid';
+    }
+  }
+
+  // Dot final
+  if(dotEl) dotEl.className = 'ocr-ai-dot ocr-ai-dot-on';
+}
+
+/* ── Classification NGP locale ─────────────────────────────── */
 function ocrClassifyHS(description, declaredHS){
   if(declaredHS && /^\d{4,10}$/.test(declaredHS.replace(/[\.\-]/g,''))){
     return { code: declaredHS.replace(/[\.\-]/g,''), confidence: 100, method: 'DECLARED' };
@@ -1091,9 +1316,11 @@ function ocrClassifyHS(description, declaredHS){
   // ── Priorité 1 : dictionnaire anglais/multilingue intégré ──
   for(const [re, sh] of OCR_EN_KEYWORDS){
     if(re.test(q)){
-      const match = HS_CODES.find(c => c.sh && c.sh.replace(/\D/g,'').startsWith(sh.substring(0,6)));
-      const desc  = match ? match.desc : sh;
-      return { code: sh, confidence: 88, method: 'EN_KEYWORDS', desc };
+      // Chercher le code complet à 10 chiffres dans HS_CODES depuis le préfixe 6 chiffres
+      const match    = HS_CODES.find(c => c.sh && c.sh.replace(/\D/g,'').startsWith(sh.substring(0,6)));
+      const fullCode = match ? match.sh.replace(/\D/g,'') : sh.padEnd(10, '0');
+      const desc     = match ? match.desc : sh;
+      return { code: fullCode, confidence: 88, method: 'EN_KEYWORDS', desc };
     }
   }
 
@@ -1353,8 +1580,11 @@ function ocrParseInvoice(text, filename){
   ocrArticles = articles;
   ocrDone     = true;
 
-  // Afficher les résultats
+  // Afficher les résultats (rendu initial local)
   ocrRenderResults(info, articles, filename, currency, totalInvoiceValue);
+
+  // Enrichissement IA en arrière-plan (codes non trouvés ou confiance faible)
+  ocrEnrichWithAI(articles);
 }
 
 /* ── Extraction articles du texte brut ──────────────────────── */
@@ -1578,18 +1808,45 @@ function ocrRenderArticleRow(a, idx){
           <div class="ocr2-dl">Landed Cost</div>
           <div class="ocr2-landed-val">${duty.landedCost.toFixed(2)} MAD</div>
           ${duty.accord ? `<div class="ocr2-accord">✓ ${escapeHTML(duty.accord.name)}</div>` : ''}
-        </div>` : `
-        <div class="ocr2-noduty" style="grid-column:2/-1">
-          <i class="fa-solid fa-circle-info"></i> Calcul de droits non disponible${noCode ? ' (code SH non détecté)' : ''}
-        </div>`}
+        </div>` : (() => {
+          // Pas de calcul CIF mais on peut quand même afficher les taux ADIL si le code existe
+          const tarif = code && typeof getTarifBase === 'function' ? getTarifBase(code) : null;
+          const accord = tarif && a.origin_country && a.origin_country !== '—' && typeof getAccord === 'function' ? getAccord(a.origin_country) : null;
+          if(tarif){
+            return `
+            <div>
+              <div class="ocr2-dl">DI Maroc</div>
+              <div class="ocr2-dv" style="color:#16a34a;font-weight:700">${parseFloat(tarif.di)||0}%</div>
+              ${tarif.tpi>0?`<div class="ocr2-dl" style="margin-top:4px">TPI</div><div class="ocr2-dv">${parseFloat(tarif.tpi)||0}%</div>`:''}
+              <div class="ocr2-dl" style="margin-top:4px">TVA</div>
+              <div class="ocr2-dv">${parseFloat(tarif.tva)||20}%</div>
+              ${tarif.fds?`<div class="ocr2-dl" style="margin-top:4px">FDS</div><div class="ocr2-dv">200 MAD</div>`:''}
+              <div class="ocr2-dl" style="margin-top:4px">Recouvrement</div>
+              <div class="ocr2-dv">6%</div>
+            </div>
+            <div class="ocr2-landed-box" style="grid-column:3/-1">
+              <div class="ocr2-dl" style="font-size:.75rem;color:#94a3b8">Entrez le fret pour calculer le montant exact</div>
+              <div style="font-size:.78rem;color:#64748b;margin-top:4px">${escapeHTML(tarif.note||'')}</div>
+              ${accord ? `<div class="ocr2-accord" style="margin-top:8px">✓ Accord : ${escapeHTML(accord.name)} — ${escapeHTML(accord.reduction||'')}</div>` : ''}
+            </div>`;
+          }
+          return `<div class="ocr2-noduty" style="grid-column:2/-1">
+            <i class="fa-solid fa-circle-info"></i> ${noCode ? 'Code SH non détecté — calcul de droits impossible' : 'Entrez le coût fret pour calculer les droits (incoterm FOB/EXW)'}
+          </div>`;
+        })()}
       </div>
       ${duty&&duty.fdsApplicable ? `<div class="ocr2-alert ocr2-alert-warn"><i class="fa-solid fa-circle-exclamation"></i> Soumis à la taxe FDS 004801 (protection de l'environnement)</div>` : ''}
-      ${a.authorizations&&a.authorizations.length>0 ? `
-      <div class="ocr2-alert ocr2-alert-info">
-        <i class="fa-solid fa-shield-halved"></i>
-        <strong>Autorisations requises :</strong>
-        ${a.authorizations.map(au=>`<span class="ocr2-auth-chip ocr2-auth-${au.badge}">${escapeHTML(au.authority)} — ${escapeHTML(au.type)}</span>`).join(' ')}
-      </div>` : ''}
+      ${!duty && code && typeof getTarifBase==='function' && getTarifBase(code)?.fds ? `<div class="ocr2-alert ocr2-alert-warn"><i class="fa-solid fa-circle-exclamation"></i> Soumis à la taxe FDS 004801 (protection de l'environnement)</div>` : ''}
+      ${(()=>{
+        const auths = a.authorizations && a.authorizations.length > 0 ? a.authorizations
+          : (code && typeof getAuthorizations==='function' ? getAuthorizations(code) : []);
+        return auths.length > 0 ? `
+        <div class="ocr2-alert ocr2-alert-info">
+          <i class="fa-solid fa-shield-halved"></i>
+          <strong>Autorisations requises :</strong>
+          ${auths.map(au=>`<span class="ocr2-auth-chip ocr2-auth-${escapeHTML(au.badge)}">${escapeHTML(au.authority)} — ${escapeHTML(au.type)}</span>`).join(' ')}
+        </div>` : '';
+      })()}
     </div>
   </div>`;
 }
@@ -1622,9 +1879,62 @@ function ocrRenderAuthPanel(articles, info){
   }
 
   if(typeof renderAuthPanel === 'function'){
+    // Utiliser le rendu complet du module maroc-authorizations.js
     body.innerHTML = renderAuthPanel(artList);
   } else {
-    body.innerHTML = '<p style="color:#888">Module autorisations non chargé.</p>';
+    // ── Fallback inline : construit le panneau directement depuis les fonctions ADIL ──
+    if(!artList.length){ panel.style.display='none'; return; }
+    let html = '';
+    artList.forEach((art, i) => {
+      const hs     = art.hsCode && art.hsCode !== '—' ? art.hsCode : null;
+      const auths  = hs && typeof getAuthorizations === 'function' ? getAuthorizations(hs) : [];
+      const tarif  = hs && typeof getTarifBase     === 'function' ? getTarifBase(hs)       : null;
+      const accord = art.originCountry !== '—' && typeof getAccord === 'function' ? getAccord(art.originCountry) : null;
+
+      const hasDanger  = auths.some(a=>a.badge==='danger');
+      const hasWarning = auths.some(a=>a.badge==='warning');
+      const hColor     = hasDanger?'#dc3545':hasWarning?'#fd7e14':auths.length>0?'#0dcaf0':'#28a745';
+
+      html += `<div style="border-radius:10px;border:1px solid #e2e8f0;margin-bottom:14px;overflow:hidden">
+        <div style="border-left:4px solid ${hColor};padding:12px 16px;background:#f8fafc;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="background:#e2e8f0;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:.82rem">${i+1}</span>
+          <strong style="flex:1;font-size:.92rem">${escapeHTML(art.description)}</strong>
+          ${hs ? `<span style="background:#1a202c;color:#fff;border-radius:6px;padding:2px 10px;font-size:.78rem;font-family:monospace">${escapeHTML(hs)}</span>` : ''}
+          ${art.originCountry!=='—'?`<span style="color:#64748b;font-size:.8rem"><i class="fa-solid fa-globe"></i> ${escapeHTML(art.originCountry)}</span>`:''}
+        </div>
+        <div style="padding:12px 16px">
+          ${auths.length === 0 ? `<div style="color:#16a34a;font-size:.87rem;display:flex;align-items:center;gap:7px"><i class="fa-solid fa-circle-check"></i> Aucune autorisation spéciale — importation libre sous documents standard</div>` : ''}
+          ${auths.map(au=>{
+            const bc = au.badge==='danger'?'#dc3545':au.badge==='warning'?'#fd7e14':au.badge==='info'?'#0dcaf0':'#6c757d';
+            return `<div style="border:1px solid ${bc};border-radius:8px;padding:10px 14px;margin-bottom:8px">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px">
+                <span style="background:${bc};color:#fff;border-radius:4px;padding:2px 8px;font-size:.72rem;font-weight:700">${escapeHTML(au.type)}</span>
+                <strong style="font-size:.87rem">${escapeHTML(au.authority)}</strong>
+                <span style="color:#64748b;font-size:.82rem">${escapeHTML(au.document||'')}</span>
+                ${au.delay>0?`<span style="color:#94a3b8;font-size:.77rem"><i class="fa-regular fa-clock"></i> ~${parseInt(au.delay)||0} j</span>`:''}
+              </div>
+              <p style="margin:4px 0;font-size:.83rem;color:#475569">${escapeHTML(au.note||'')}</p>
+              <p style="margin:4px 0;font-size:.77rem;color:#94a3b8"><i class="fa-solid fa-scale-balanced"></i> ${escapeHTML(au.reference||'')}</p>
+            </div>`;
+          }).join('')}
+          ${tarif ? `
+          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;margin-top:8px">
+            <div style="font-size:.8rem;font-weight:700;color:#15803d;margin-bottom:8px"><i class="fa-solid fa-percent"></i> Droits &amp; Taxes ADIL — ${escapeHTML(tarif.note||'')}</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px">
+              <div style="background:#fff;border-radius:6px;padding:6px 10px;font-size:.8rem"><span style="color:#64748b">DI</span><strong style="float:right">${parseFloat(tarif.di)||0}%</strong></div>
+              ${tarif.tpi>0?`<div style="background:#fff;border-radius:6px;padding:6px 10px;font-size:.8rem"><span style="color:#64748b">TPI</span><strong style="float:right">${parseFloat(tarif.tpi)||0}%</strong></div>`:''}
+              <div style="background:#fff;border-radius:6px;padding:6px 10px;font-size:.8rem"><span style="color:#64748b">TVA</span><strong style="float:right">${parseFloat(tarif.tva)||20}%</strong></div>
+              ${tarif.fds?`<div style="background:#fff;border-radius:6px;padding:6px 10px;font-size:.8rem"><span style="color:#64748b">FDS</span><strong style="float:right">200 MAD</strong></div>`:''}
+              <div style="background:#fff;border-radius:6px;padding:6px 10px;font-size:.8rem"><span style="color:#64748b">Recouvrement</span><strong style="float:right">6%</strong></div>
+            </div>
+            ${accord ? `<div style="margin-top:8px;padding:7px 10px;background:#eff6ff;border-radius:6px;font-size:.8rem;color:#1d4ed8">
+              <i class="fa-solid fa-handshake"></i> <strong>Accord préférentiel :</strong> ${escapeHTML(accord.name)} — ${escapeHTML(accord.reduction||'')} — Doc: ${escapeHTML(accord.document||'')}
+            </div>` : ''}
+          </div>` : ''}
+        </div>
+      </div>`;
+    });
+    body.innerHTML = html || '<p style="color:#888">Aucun article à analyser.</p>';
   }
   panel.style.display = artList.length > 0 ? 'block' : 'none';
 }

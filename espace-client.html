@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
-<link rel="stylesheet" href="css/style.css?v=20260419d"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260419d"/>
+<link rel="stylesheet" href="css/style.css?v=20260423a"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260423a"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -245,6 +245,42 @@
           <i class="fa-solid fa-circle-info"></i>
           Traitement 100% local — données confidentielles
         </span>
+      </div>
+
+      <!-- ── Moteur IA Claude ── -->
+      <div class="ocr-ai-panel" id="ocr-ai-panel">
+        <div class="ocr-ai-header" onclick="ocrToggleAiPanel()">
+          <span class="ocr-ai-badge"><i class="fa-solid fa-microchip"></i> Moteur IA Multilingue</span>
+          <span class="ocr-ai-subtitle">Classification NGP via Claude AI — EN · ZH · AR · FR</span>
+          <span id="ocr-ai-status-dot" class="ocr-ai-dot ocr-ai-dot-off" title="IA non configurée"></span>
+          <i class="fa-solid fa-chevron-down ocr-ai-chevron" id="ocr-ai-chevron"></i>
+        </div>
+        <div class="ocr-ai-body" id="ocr-ai-body" style="display:none">
+          <p class="ocr-ai-desc">
+            <i class="fa-solid fa-globe"></i>
+            Détecte automatiquement la langue du produit (anglais, chinois, arabe, français) et interroge l'ADIL marocain via Claude AI pour un code NGP précis.
+          </p>
+          <div class="ocr-ai-keyrow">
+            <div class="ec-form-group" style="margin:0;flex:1">
+              <label>Clé API Anthropic (Claude)</label>
+              <input type="password" id="ocr-api-key-input" placeholder="sk-ant-api03-…"
+                     autocomplete="off" spellcheck="false"
+                     oninput="ocrApiKeyChanged()"
+                     value=""/>
+              <small style="color:#64748b">Stockée localement dans votre navigateur — jamais envoyée à nos serveurs</small>
+            </div>
+            <button class="ocr-ai-save-btn" onclick="ocrSaveApiKey()">
+              <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+            </button>
+          </div>
+          <div class="ocr-ai-actions">
+            <label class="ocr-option-check" style="margin:0">
+              <input type="checkbox" id="ocr-ai-enabled" checked/>
+              <span>Activer le moteur IA pour les codes NGP non trouvés</span>
+            </label>
+            <span id="ocr-ai-key-status" class="ocr-ai-key-status"></span>
+          </div>
+        </div>
       </div>
 
       <!-- ── Transport & Incoterm ── -->
@@ -1647,11 +1683,11 @@
 </div>
 
 <!-- ══════════════ SCRIPTS ══════════════ -->
-<script src="hscodes_data.js?v=20260419d"></script>
-<script src="js/i18n.js?v=20260419d"></script>
-<script src="js/maroc-authorizations.js?v=20260419d"></script>
-<script src="js/express-tarifs.js?v=20260419d"></script>
-<script src="js/postal-lookup.js?v=20260419d"></script>
-<script src="js/espace-client.js?v=20260419d"></script>
+<script src="hscodes_data.js?v=20260423a"></script>
+<script src="js/i18n.js?v=20260423a"></script>
+<script src="js/maroc-authorizations.js?v=20260423a"></script>
+<script src="js/express-tarifs.js?v=20260423a"></script>
+<script src="js/postal-lookup.js?v=20260423a"></script>
+<script src="js/espace-client.js?v=20260423a"></script>
 </body>
 </html>
