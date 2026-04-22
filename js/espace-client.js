@@ -348,8 +348,8 @@ function invPrint(){
   }
 }
 
-/* ── Codes Aéroports & Ports ─────────────────────────── */
-const AIRPORTS = [
+/* ── Codes Aéroports & Ports — base complète dans js/airports-ports-data.js ── */
+const _AIRPORTS_OLD_UNUSED = [
   {code:'CMN',name:'Mohammed V International',city:'Casablanca',country:'Maroc',region:'AF',type:'airport'},
   {code:'RAK',name:'Marrakech-Ménara',city:'Marrakech',country:'Maroc',region:'AF',type:'airport'},
   {code:'AGA',name:'Al Massira',city:'Agadir',country:'Maroc',region:'AF',type:'airport'},
@@ -398,7 +398,7 @@ const AIRPORTS = [
   {code:'SYD',name:'Kingsford Smith',city:'Sydney',country:'Australie',region:'OC',type:'airport'},
 ];
 
-const PORTS = [
+const _PORTS_OLD_UNUSED = [
   {code:'MAAGP',name:'Agadir',city:'Agadir',country:'Maroc',region:'AF',type:'port'},
   {code:'MACAS',name:'Casablanca',city:'Casablanca',country:'Maroc',region:'AF',type:'port'},
   {code:'MATAN',name:'Tanger Med',city:'Tanger',country:'Maroc',region:'AF',type:'port'},
@@ -437,6 +437,7 @@ const PORTS = [
   {code:'BRSAO',name:'Santos',city:'São Paulo',country:'Brésil',region:'SA',type:'port'},
   {code:'AUSYD',name:'Sydney',city:'Sydney',country:'Australie',region:'OC',type:'port'},
 ];
+// NOTE: _AIRPORTS_OLD_UNUSED et PORTS_OLD_UNUSED ignorés — vraies données dans airports-ports-data.js
 
 let currentCodesTab = 'airports';
 
