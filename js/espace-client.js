@@ -1371,92 +1371,121 @@ function ocrLoadFile(input){
   const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
 
   if(isPDF){
-    // ── PDF : convertir page 1 en image via PDF.js avant Tesseract ──
-    if(sub) sub.textContent = 'Conversion PDF → image…';
-    const loadPdfJs = (cb) => {
-      if(window.pdfjsLib){ cb(); return; }
-      const s = document.createElement('script');
-      s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.min.mjs';
-      s.type = 'module';
-      // fallback non-module
-      s.onerror = () => {
-        const s2 = document.createElement('script');
-        s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.mjs';
-        s2.type = 'module';
-        s2.onload = cb;
-        document.head.appendChild(s2);
-      };
-      s.onload = cb;
-      document.head.appendChild(s);
-    };
+    // ── PDF : extraction texte directe via PDF.js (toutes les pages) ──
+    if(sub) sub.textContent = 'Chargement PDF.js…';
 
     const arrayBufReader = new FileReader();
     arrayBufReader.onload = async (e) => {
       try {
-        // Chargement PDF.js dynamique si besoin
+        // ── 1. Charger PDF.js dynamiquement ──
         if(!window.pdfjsLib){
-          await new Promise((res, rej) => {
-            // Utiliser importmap-compatible CDN
-            import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.min.mjs').then(mod => {
-              window.pdfjsLib = mod;
-              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdn.jsdelivr.net/npm/pdfjs-dist@4/build/pdf.worker.min.mjs';
-              res();
-            }).catch(async () => {
-              // Fallback: version UMD
-              await new Promise((r2, rej2) => {
+          await new Promise((res) => {
+            // Essai ESM moderne
+            import('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js')
+              .then(mod => { window.pdfjsLib = mod; res(); })
+              .catch(() => {
+                // Fallback UMD classique
                 const s = document.createElement('script');
                 s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
                 s.onload = () => {
                   window.pdfjsLib = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
-                  if(window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc =
-                    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-                  r2();
+                  res();
                 };
-                s.onerror = rej2;
+                s.onerror = () => res(); // continue même si échec
                 document.head.appendChild(s);
               });
-              res();
-            });
           });
+        }
+        // Configurer le worker
+        if(window.pdfjsLib && window.pdfjsLib.GlobalWorkerOptions){
+          window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
         if(bar) bar.style.width = '20%';
-        if(sub) sub.textContent = 'Rendu PDF page 1…';
+        if(sub) sub.textContent = 'Lecture du PDF…';
 
-        const pdf  = await window.pdfjsLib.getDocument({ data: e.target.result }).promise;
-        const page = await pdf.getPage(1);
-        const scale    = 2.5; // haute résolution pour meilleur OCR
-        const viewport = page.getViewport({ scale });
-        const canvas   = document.createElement('canvas');
-        canvas.width   = viewport.width;
-        canvas.height  = viewport.height;
-        const ctx = canvas.getContext('2d');
-        await page.render({ canvasContext: ctx, viewport }).promise;
+        const pdf = await window.pdfjsLib.getDocument({ data: e.target.result }).promise;
+        const numPages = Math.min(pdf.numPages, 5); // max 5 pages
 
-        const dataUrl = canvas.toDataURL('image/png');
-
-        // Afficher preview
-        const img = document.getElementById('ocr-preview-img');
-        if(img){ img.src = dataUrl; img.style.display = 'block'; }
-
+        // ── 2. Extraire le texte de toutes les pages ──
         if(bar) bar.style.width = '35%';
-        if(sub) sub.textContent = 'Reconnaissance OCR en cours…';
+        if(sub) sub.textContent = `Extraction texte (${numPages} page${numPages>1?'s':''})…`;
 
-        if(!window.Tesseract){
-          const s = document.createElement('script');
-          s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
-          s.onload = () => ocrRun(dataUrl, file);
-          document.head.appendChild(s);
-        } else {
-          ocrRun(dataUrl, file);
+        const allLines = [];
+        for(let p = 1; p <= numPages; p++){
+          const page    = await pdf.getPage(p);
+          const content = await page.getTextContent();
+          // Grouper les items par ligne Y (±5px)
+          const byY = {};
+          content.items.forEach(it => {
+            if(!it.str || !it.str.trim()) return;
+            const y = Math.round(it.transform[5] / 5) * 5; // arrondi à 5px
+            if(!byY[y]) byY[y] = [];
+            byY[y].push(it.str.trim());
+          });
+          // Trier Y décroissant (haut de page = Y grand en PDF)
+          Object.keys(byY).sort((a,b)=>b-a).forEach(y => {
+            const line = byY[y].join(' ').replace(/\s+/g,' ').trim();
+            if(line) allLines.push(line);
+          });
+          if(p < numPages) allLines.push(''); // séparateur de page
         }
+        const extractedText = allLines.join('\n');
+
+        // ── 3. Afficher preview (rendu page 1) ──
+        if(bar) bar.style.width = '60%';
+        if(sub) sub.textContent = 'Aperçu PDF…';
+        try {
+          const page1    = await pdf.getPage(1);
+          const viewport = page1.getViewport({ scale: 1.5 });
+          const canvas   = document.createElement('canvas');
+          canvas.width   = viewport.width;
+          canvas.height  = viewport.height;
+          await page1.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          const img = document.getElementById('ocr-preview-img');
+          if(img){ img.src = canvas.toDataURL('image/jpeg', 0.8); img.style.display = 'block'; }
+        } catch(previewErr){ /* preview non critique */ }
+
+        if(bar) bar.style.width = '80%';
+        if(sub) sub.textContent = 'Analyse de la facture…';
+
+        // ── 4. Parser le texte extrait ──
+        if(extractedText.trim().length > 20){
+          ocrParseInvoice(extractedText, file.name);
+        } else {
+          // ── 5. Fallback OCR Tesseract si PDF scanné (pas de texte) ──
+          if(sub) sub.textContent = 'PDF scanné — OCR en cours…';
+          const page1    = await pdf.getPage(1);
+          const viewport = page1.getViewport({ scale: 2.5 });
+          const canvas   = document.createElement('canvas');
+          canvas.width   = viewport.width;
+          canvas.height  = viewport.height;
+          await page1.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+          const dataUrl  = canvas.toDataURL('image/png');
+          if(!window.Tesseract){
+            const s = document.createElement('script');
+            s.src   = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+            s.onload = () => ocrRun(dataUrl, file);
+            document.head.appendChild(s);
+          } else {
+            ocrRun(dataUrl, file);
+          }
+          return; // ocrRun appellera ocrParseInvoice
+        }
+
       } catch(err){
-        console.error('PDF render error:', err);
+        console.error('PDF error:', err);
         if(lbl) lbl.textContent = '⚠️ Impossible de lire ce PDF. Essaie une image JPG/PNG.';
         if(sub) sub.textContent = '';
         if(prog) prog.style.display = 'none';
+        return;
       }
+      // Restore drop zone
+      if(lbl) lbl.textContent = 'Glissez une autre facture pour analyser';
+      if(sub) sub.textContent = 'PDF, JPG, PNG — max 15 MB';
+      if(bar) bar.style.width = '100%';
+      setTimeout(()=>{ const p=document.getElementById('ocr-progress'); if(p) p.style.display='none'; }, 800);
     };
     arrayBufReader.readAsArrayBuffer(file);
 
@@ -1602,23 +1631,38 @@ function ocrExtractArticles(text, globalCountry, currency){
   const SKIP_LINE = /(account\s*number|bank\s*name|bank\s*location|bank\s*address|swift|bic|iban|holder\s*name|branch\s*number|bank\s*code|tax\s*id|ice\s*:|payment\s*terms?|payment\s*upon|term\s*of\s*payment|packing\s*:|origin\s*&|delivery\s*time|immeuble|lotissement|casablanca|@[\w.-]+\.|0086-|road,|street,|district,|guangdong|zhongcun|hanxing|panyu|hong\s*kong|queen'?s\s*road|the\s*center|floor)/i;
 
   // ── Stratégie 1 : détecter le tableau produits par son en-tête ──
+  // Mots-clés description (au moins 1 requis)
+  const DESC_KW = ['product name','product image','désignation','designation',
+    'description des marchandises','description','goods','commodity','item description',
+    'item name','article','libellé','marchandise','model','specification','spec',
+    'part no','reference','nature','détail'];
+  // Mots-clés quantité/prix (au moins 1 requis sur la même ligne ou la ligne suivante)
+  const QTY_KW  = ['quant','quantity','qty','price','unit price','unit cost','montant',
+    'amount','total','prix','pcs','pieces','pièces','nbr','nbre','units'];
+
   let tableStart = -1;
   for(let i=0; i<lines.length; i++){
     const l = lines[i].toLowerCase();
-    if((l.includes('product name') || l.includes('product image') || l.includes('désignation') || l.includes('designation') || l.includes('description des marchandises')) &&
-       (l.includes('quant') || l.includes('price') || l.includes('unit') || l.includes('montant') || l.includes('prix'))){
+    const hasDesc = DESC_KW.some(k => l.includes(k));
+    const hasQty  = QTY_KW.some(k  => l.includes(k));
+    if(hasDesc && hasQty){
       tableStart = i + 1;
       break;
     }
-    // Aussi : ligne "INVOICE NO" suivie du tableau
-    if(l.includes('invoice no') && i < lines.length - 2){
-      // Chercher la prochaine ligne avec "product" ou "qty"
-      for(let j=i+1; j<Math.min(i+5, lines.length); j++){
-        if(lines[j].toLowerCase().includes('product') || lines[j].toLowerCase().includes('qty')){
-          tableStart = j + 1; break;
-        }
+    // En-tête multi-lignes : description sur la ligne i, qté sur i+1 ou i+2
+    if(hasDesc && i < lines.length - 2){
+      const next = (lines[i+1]||'').toLowerCase() + ' ' + (lines[i+2]||'').toLowerCase();
+      if(QTY_KW.some(k => next.includes(k))){
+        tableStart = i + 2;
+        break;
       }
-      if(tableStart !== -1) break;
+    }
+    // Ligne "No." ou "S/N" ou numéro de ligne = probable début tableau
+    if(/^\s*(no\.?|s\/n|item\s*no|#)\s*$/i.test(lines[i]) && i < lines.length - 1){
+      const next = lines[i+1].toLowerCase();
+      if(DESC_KW.some(k=>next.includes(k)) || QTY_KW.some(k=>next.includes(k))){
+        tableStart = i + 2; break;
+      }
     }
   }
 
@@ -1662,25 +1706,33 @@ function ocrExtractArticles(text, globalCountry, currency){
 
   // ── Stratégie 2 : fallback ligne par ligne si tableau non trouvé ──
   if(arts.length === 0){
+    // Chercher un bloc de lignes qui ressemblent à des articles
+    // (texte + au moins 2 nombres dont l'un plausiblement > 1 = prix)
     for(const line of lines){
       if(SKIP_LINE.test(line)) continue;
-      const nums = line.match(/\d[\d,.']{0,}/g)||[];
-      if(nums.length < 2 || line.length < 10 || line.length > 250) continue;
-      const descM = line.match(/^((?:[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\s\-\/,\.&%°]{3,})+)/);
-      if(!descM) continue;
-      const desc = descM[1].trim().replace(/\s+/g,' ').substring(0,100);
-      if(desc.length < 4 || SKIP.test(desc)) continue;
+      if(line.length < 6 || line.length > 300) continue;
+      const nums = line.match(/[\d,.']+/g)||[];
+      if(nums.length < 1) continue;
+      const numV = nums.map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e8);
+      if(numV.length < 1) continue;
 
-      const hs  = (line.match(hsRe)||[])[1]||null;
-      const wg  = (line.match(wRe)||[])[1]||null;
-      const numV= nums.map(n=>parseFloat(n.replace(/[,\s]/g,'.'))).filter(v=>v>0&&v<1e9);
+      // Extraire la partie texte (description avant les chiffres)
+      const descM = line.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,120}?)(?=\s+[\d]|\s*$)/);
+      if(!descM) continue;
+      const desc = descM[1].trim().replace(/\s+/g,' ').substring(0,120);
+      if(desc.length < 5 || SKIP.test(desc)) continue;
+      // Ignorer les lignes qui sont clairement des coordonnées ou numéros
+      if(/^\d{4,}/.test(desc)) continue;
+
+      const hs = (line.match(hsRe)||[])[1]||null;
+      const wg = (line.match(wRe)||[])[1]||null;
 
       arts.push({
         description:   desc,
         quantity:      numV[0]!=null ? String(numV[0]) : '—',
         unitPrice:     numV[1]!=null ? numV[1].toFixed(2)+' '+currency : '—',
         totalPrice:    numV[2]!=null ? numV[2].toFixed(2)+' '+currency : (numV[1]!=null ? numV[1].toFixed(2)+' '+currency : '—'),
-        _rawPrice:     numV[2]!=null ? numV[2] : (numV[1]!=null ? numV[1] : 0),
+        _rawPrice:     numV[numV.length-1] || 0,
         weight:        wg ? wg+' kg' : '—',
         _rawHS:        hs,
         originCountry: globalCountry || '—',
@@ -2625,6 +2677,178 @@ function shpRemoveArticle(idx){
   shpArticles.splice(idx,1);
   shpRenderCustomsArticles();
 }
+
+/* ══════════════════════════════════════════════════════
+   HORLOGE MONDIALE — Temps Réel
+   ══════════════════════════════════════════════════════ */
+
+const WORLD_CITIES = [
+  /* ── Maroc ── */
+  {city:'Casablanca',  country:'Maroc',              tz:'Africa/Casablanca',                   region:'AF', flag:'🇲🇦'},
+  {city:'Rabat',       country:'Maroc',              tz:'Africa/Casablanca',                   region:'AF', flag:'🇲🇦'},
+  {city:'Marrakech',   country:'Maroc',              tz:'Africa/Casablanca',                   region:'AF', flag:'🇲🇦'},
+  {city:'Tanger',      country:'Maroc',              tz:'Africa/Casablanca',                   region:'AF', flag:'🇲🇦'},
+  /* ── Afrique ── */
+  {city:'Le Caire',    country:'Égypte',             tz:'Africa/Cairo',                        region:'AF', flag:'🇪🇬'},
+  {city:'Tunis',       country:'Tunisie',            tz:'Africa/Tunis',                        region:'AF', flag:'🇹🇳'},
+  {city:'Alger',       country:'Algérie',            tz:'Africa/Algiers',                      region:'AF', flag:'🇩🇿'},
+  {city:'Dakar',       country:'Sénégal',            tz:'Africa/Dakar',                        region:'AF', flag:'🇸🇳'},
+  {city:'Abidjan',     country:'Côte d\'Ivoire',     tz:'Africa/Abidjan',                      region:'AF', flag:'🇨🇮'},
+  {city:'Lagos',       country:'Nigéria',            tz:'Africa/Lagos',                        region:'AF', flag:'🇳🇬'},
+  {city:'Accra',       country:'Ghana',              tz:'Africa/Accra',                        region:'AF', flag:'🇬🇭'},
+  {city:'Nairobi',     country:'Kenya',              tz:'Africa/Nairobi',                      region:'AF', flag:'🇰🇪'},
+  {city:'Johannesburg',country:'Afrique du Sud',     tz:'Africa/Johannesburg',                 region:'AF', flag:'🇿🇦'},
+  {city:'Addis-Abeba', country:'Éthiopie',           tz:'Africa/Addis_Ababa',                  region:'AF', flag:'🇪🇹'},
+  {city:'Tripoli',     country:'Libye',              tz:'Africa/Tripoli',                      region:'AF', flag:'🇱🇾'},
+  /* ── Europe ── */
+  {city:'Londres',     country:'Royaume-Uni',        tz:'Europe/London',                       region:'EU', flag:'🇬🇧'},
+  {city:'Paris',       country:'France',             tz:'Europe/Paris',                        region:'EU', flag:'🇫🇷'},
+  {city:'Madrid',      country:'Espagne',            tz:'Europe/Madrid',                       region:'EU', flag:'🇪🇸'},
+  {city:'Lisbonne',    country:'Portugal',           tz:'Europe/Lisbon',                       region:'EU', flag:'🇵🇹'},
+  {city:'Amsterdam',   country:'Pays-Bas',           tz:'Europe/Amsterdam',                    region:'EU', flag:'🇳🇱'},
+  {city:'Bruxelles',   country:'Belgique',           tz:'Europe/Brussels',                     region:'EU', flag:'🇧🇪'},
+  {city:'Genève',      country:'Suisse',             tz:'Europe/Zurich',                       region:'EU', flag:'🇨🇭'},
+  {city:'Frankfurt',   country:'Allemagne',          tz:'Europe/Berlin',                       region:'EU', flag:'🇩🇪'},
+  {city:'Milan',       country:'Italie',             tz:'Europe/Rome',                         region:'EU', flag:'🇮🇹'},
+  {city:'Barcelone',   country:'Espagne',            tz:'Europe/Madrid',                       region:'EU', flag:'🇪🇸'},
+  {city:'Stockholm',   country:'Suède',              tz:'Europe/Stockholm',                    region:'EU', flag:'🇸🇪'},
+  {city:'Varsovie',    country:'Pologne',            tz:'Europe/Warsaw',                       region:'EU', flag:'🇵🇱'},
+  {city:'Istanbul',    country:'Turquie',            tz:'Europe/Istanbul',                     region:'EU', flag:'🇹🇷'},
+  {city:'Moscou',      country:'Russie',             tz:'Europe/Moscow',                       region:'EU', flag:'🇷🇺'},
+  {city:'Athènes',     country:'Grèce',              tz:'Europe/Athens',                       region:'EU', flag:'🇬🇷'},
+  /* ── Moyen-Orient ── */
+  {city:'Dubaï',       country:'Émirats Arabes Unis',tz:'Asia/Dubai',                          region:'ME', flag:'🇦🇪'},
+  {city:'Abu Dhabi',   country:'Émirats Arabes Unis',tz:'Asia/Dubai',                          region:'ME', flag:'🇦🇪'},
+  {city:'Riyad',       country:'Arabie Saoudite',    tz:'Asia/Riyadh',                         region:'ME', flag:'🇸🇦'},
+  {city:'Doha',        country:'Qatar',              tz:'Asia/Qatar',                          region:'ME', flag:'🇶🇦'},
+  {city:'Koweït',      country:'Koweït',             tz:'Asia/Kuwait',                         region:'ME', flag:'🇰🇼'},
+  {city:'Manama',      country:'Bahreïn',            tz:'Asia/Bahrain',                        region:'ME', flag:'🇧🇭'},
+  {city:'Muscat',      country:'Oman',               tz:'Asia/Muscat',                         region:'ME', flag:'🇴🇲'},
+  {city:'Beyrouth',    country:'Liban',              tz:'Asia/Beirut',                         region:'ME', flag:'🇱🇧'},
+  {city:'Amman',       country:'Jordanie',           tz:'Asia/Amman',                          region:'ME', flag:'🇯🇴'},
+  {city:'Téhéran',     country:'Iran',               tz:'Asia/Tehran',                         region:'ME', flag:'🇮🇷'},
+  /* ── Asie ── */
+  {city:'Pékin',       country:'Chine',              tz:'Asia/Shanghai',                       region:'AS', flag:'🇨🇳'},
+  {city:'Shanghai',    country:'Chine',              tz:'Asia/Shanghai',                       region:'AS', flag:'🇨🇳'},
+  {city:'Guangzhou',   country:'Chine',              tz:'Asia/Shanghai',                       region:'AS', flag:'🇨🇳'},
+  {city:'Shenzhen',    country:'Chine',              tz:'Asia/Shanghai',                       region:'AS', flag:'🇨🇳'},
+  {city:'Hong Kong',   country:'Chine (RAS)',        tz:'Asia/Hong_Kong',                      region:'AS', flag:'🇭🇰'},
+  {city:'Tokyo',       country:'Japon',              tz:'Asia/Tokyo',                          region:'AS', flag:'🇯🇵'},
+  {city:'Séoul',       country:'Corée du Sud',       tz:'Asia/Seoul',                          region:'AS', flag:'🇰🇷'},
+  {city:'Singapour',   country:'Singapour',          tz:'Asia/Singapore',                      region:'AS', flag:'🇸🇬'},
+  {city:'Mumbai',      country:'Inde',               tz:'Asia/Kolkata',                        region:'AS', flag:'🇮🇳'},
+  {city:'New Delhi',   country:'Inde',               tz:'Asia/Kolkata',                        region:'AS', flag:'🇮🇳'},
+  {city:'Bangkok',     country:'Thaïlande',          tz:'Asia/Bangkok',                        region:'AS', flag:'🇹🇭'},
+  {city:'Kuala Lumpur',country:'Malaisie',           tz:'Asia/Kuala_Lumpur',                   region:'AS', flag:'🇲🇾'},
+  {city:'Jakarta',     country:'Indonésie',          tz:'Asia/Jakarta',                        region:'AS', flag:'🇮🇩'},
+  {city:'Karachi',     country:'Pakistan',           tz:'Asia/Karachi',                        region:'AS', flag:'🇵🇰'},
+  {city:'Tachkent',    country:'Ouzbékistan',        tz:'Asia/Tashkent',                       region:'AS', flag:'🇺🇿'},
+  {city:'Taipei',      country:'Taïwan',             tz:'Asia/Taipei',                         region:'AS', flag:'🇹🇼'},
+  {city:'Ho Chi Minh', country:'Viêt Nam',           tz:'Asia/Ho_Chi_Minh',                    region:'AS', flag:'🇻🇳'},
+  {city:'Dhaka',       country:'Bangladesh',         tz:'Asia/Dhaka',                          region:'AS', flag:'🇧🇩'},
+  /* ── Amérique du Nord ── */
+  {city:'New York',    country:'États-Unis',         tz:'America/New_York',                    region:'NA', flag:'🇺🇸'},
+  {city:'Los Angeles', country:'États-Unis',         tz:'America/Los_Angeles',                 region:'NA', flag:'🇺🇸'},
+  {city:'Chicago',     country:'États-Unis',         tz:'America/Chicago',                     region:'NA', flag:'🇺🇸'},
+  {city:'Miami',       country:'États-Unis',         tz:'America/New_York',                    region:'NA', flag:'🇺🇸'},
+  {city:'Houston',     country:'États-Unis',         tz:'America/Chicago',                     region:'NA', flag:'🇺🇸'},
+  {city:'Toronto',     country:'Canada',             tz:'America/Toronto',                     region:'NA', flag:'🇨🇦'},
+  {city:'Montréal',    country:'Canada',             tz:'America/Montreal',                    region:'NA', flag:'🇨🇦'},
+  {city:'Vancouver',   country:'Canada',             tz:'America/Vancouver',                   region:'NA', flag:'🇨🇦'},
+  {city:'Mexico City', country:'Mexique',            tz:'America/Mexico_City',                 region:'NA', flag:'🇲🇽'},
+  /* ── Amérique du Sud ── */
+  {city:'São Paulo',   country:'Brésil',             tz:'America/Sao_Paulo',                   region:'SA', flag:'🇧🇷'},
+  {city:'Rio de Janeiro',country:'Brésil',           tz:'America/Sao_Paulo',                   region:'SA', flag:'🇧🇷'},
+  {city:'Buenos Aires',country:'Argentine',          tz:'America/Argentina/Buenos_Aires',      region:'SA', flag:'🇦🇷'},
+  {city:'Santiago',    country:'Chili',              tz:'America/Santiago',                    region:'SA', flag:'🇨🇱'},
+  {city:'Bogotá',      country:'Colombie',           tz:'America/Bogota',                      region:'SA', flag:'🇨🇴'},
+  {city:'Lima',        country:'Pérou',              tz:'America/Lima',                        region:'SA', flag:'🇵🇪'},
+  /* ── Océanie ── */
+  {city:'Sydney',      country:'Australie',          tz:'Australia/Sydney',                    region:'OC', flag:'🇦🇺'},
+  {city:'Melbourne',   country:'Australie',          tz:'Australia/Melbourne',                 region:'OC', flag:'🇦🇺'},
+  {city:'Auckland',    country:'Nouvelle-Zélande',   tz:'Pacific/Auckland',                    region:'OC', flag:'🇳🇿'},
+  {city:'Perth',       country:'Australie',          tz:'Australia/Perth',                     region:'OC', flag:'🇦🇺'},
+];
+
+let _wcActiveFilter = { q:'', region:'' };
+let _wcInterval     = null;
+
+/**
+ * Construit le HTML pour toutes les villes filtrées et injecte dans #wc-grid.
+ */
+function wcRender(cities){
+  const grid = document.getElementById('wc-grid');
+  if(!grid) return;
+  if(!cities.length){
+    grid.innerHTML = '<p style="color:#94a3b8;font-style:italic;grid-column:1/-1;padding:20px 0">Aucune ville trouvée.</p>';
+    return;
+  }
+  const now = new Date();
+  grid.innerHTML = cities.map(c => {
+    try {
+      const timeFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:c.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+      const dateFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:c.tz,weekday:'short',day:'numeric',month:'short'});
+      const utcFmt  = new Intl.DateTimeFormat('en-GB',{timeZone:c.tz,timeZoneName:'shortOffset',hour:'2-digit',minute:'2-digit'});
+      const utcStr  = utcFmt.format(now).split(' ').pop() || '';
+      const cardId  = 'wc-' + c.city.replace(/[\s']/g,'_');
+      return `<div class="wc-card" id="${cardId}">
+        <div class="wc-flag">${c.flag}</div>
+        <div class="wc-city">${escapeHTML(c.city)}</div>
+        <div class="wc-country">${escapeHTML(c.country)}</div>
+        <div class="wc-time">${timeFmt.format(now)}</div>
+        <div class="wc-date">${dateFmt.format(now)}</div>
+        <div class="wc-utc">${escapeHTML(utcStr)}</div>
+      </div>`;
+    } catch(e){ return ''; }
+  }).join('');
+}
+
+/**
+ * Filtre les villes selon la recherche et la région sélectionnée.
+ */
+function wcFilter(){
+  _wcActiveFilter.q      = ((document.getElementById('wc-search')||{}).value||'').toLowerCase().trim();
+  _wcActiveFilter.region = (document.getElementById('wc-region')||{}).value||'';
+  const {q, region} = _wcActiveFilter;
+  const filtered = WORLD_CITIES.filter(c => {
+    if(region && c.region !== region) return false;
+    if(q && !c.city.toLowerCase().includes(q) && !c.country.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  wcRender(filtered);
+}
+
+/**
+ * Met à jour les heures toutes les secondes sans reconstruire le DOM.
+ */
+function wcTick(){
+  const grid = document.getElementById('wc-grid');
+  if(!grid || !grid.children.length) return;
+  const {q, region} = _wcActiveFilter;
+  const now = new Date();
+  WORLD_CITIES.forEach(c => {
+    if(region && c.region !== region) return;
+    if(q && !c.city.toLowerCase().includes(q) && !c.country.toLowerCase().includes(q)) return;
+    const cardId = 'wc-' + c.city.replace(/[\s']/g,'_');
+    const card   = document.getElementById(cardId);
+    if(!card) return;
+    try {
+      const timeFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:c.tz,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false});
+      const dateFmt = new Intl.DateTimeFormat('fr-FR',{timeZone:c.tz,weekday:'short',day:'numeric',month:'short'});
+      const tEl = card.querySelector('.wc-time');
+      const dEl = card.querySelector('.wc-date');
+      if(tEl) tEl.textContent = timeFmt.format(now);
+      if(dEl) dEl.textContent = dateFmt.format(now);
+    } catch(e){}
+  });
+}
+
+/* Démarrage automatique au chargement de la page */
+document.addEventListener('DOMContentLoaded', function(){
+  wcFilter();
+  if(_wcInterval) clearInterval(_wcInterval);
+  _wcInterval = setInterval(wcTick, 1000);
+});
 function shpArticleUpdate(idx,field,value){
   shpArticles[idx][field] = value;
 }

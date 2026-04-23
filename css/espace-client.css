@@ -690,6 +690,50 @@
 .shp-customs-notice{background:#eff6ff;border:1px solid #93c5fd;border-radius:10px;padding:14px 18px;font-size:.85rem;color:#1e40af;margin-bottom:20px;line-height:1.5}
 .shp-customs-section{margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--ec-border)}
 .shp-customs-section:last-child{border-bottom:none;margin-bottom:0}
+
+/* ══════════════════════════════════════════════════════
+   PALETTE GUIDE
+   ══════════════════════════════════════════════════════ */
+.palette-section-title{font-weight:800;font-size:.95rem;color:var(--dark);margin:20px 0 12px;padding:10px 14px;background:linear-gradient(90deg,#f0f4f8,#fff);border-left:4px solid var(--teal);border-radius:6px;display:flex;align-items:center;gap:10px}
+
+/* ══════════════════════════════════════════════════════
+   INCOTERMS 2020
+   ══════════════════════════════════════════════════════ */
+.inco-diagram{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:14px;padding:20px;margin-bottom:24px}
+.inco-diagram-title{font-weight:800;font-size:.95rem;color:var(--dark);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.inco-scale{position:relative;padding-bottom:8px}
+.inco-scale-bar{display:flex;border-radius:8px;overflow:hidden;height:36px;margin-bottom:8px}
+.inco-seller-zone{flex:1;background:#e53e3e;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem;letter-spacing:.05em}
+.inco-buyer-zone{flex:1;background:#2563eb;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem;letter-spacing:.05em}
+.inco-scale-labels{display:flex;justify-content:space-between;font-size:.72rem;color:#64748b;margin-bottom:8px;padding:0 2px}
+.inco-scale-arrow{position:relative;height:24px;display:flex;align-items:center;gap:4px}
+.inco-arrow-track{flex:1;height:6px;background:#e2e8f0;border-radius:3px;position:relative;overflow:hidden}
+.inco-arrow-fill{height:100%;width:70%;background:linear-gradient(90deg,#e53e3e,#f59e0b,#2563eb);border-radius:3px}
+.inco-arrow-head{color:#2563eb;font-size:1rem;line-height:1}
+.inco-code{display:inline-block;color:#fff;border-radius:4px;padding:3px 10px;font-weight:700;font-family:monospace;font-size:.9rem;letter-spacing:.05em}
+.inco-notes{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px 20px;margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.inco-note{font-size:.85rem;color:var(--text-body);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+
+/* ══════════════════════════════════════════════════════
+   HORLOGE MONDIALE
+   ══════════════════════════════════════════════════════ */
+/* ── Truck / Remorque illustration ── */
+.cont-truck-img{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);padding:12px 16px 4px;border-bottom:1px solid rgba(0,0,0,.2);overflow:hidden}
+.cont-truck-img svg{width:100%;height:72px;display:block}
+
+.wc-search-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.wc-search-row input{flex:1;min-width:200px;padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;background:#fff;transition:var(--transition)}
+.wc-search-row input:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,169,157,.12)}
+.wc-search-row select{padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;background:#fff;cursor:pointer;transition:var(--transition)}
+.wc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.wc-card{background:#fff;border:1px solid var(--ec-border);border-radius:14px;padding:16px 18px;display:flex;flex-direction:column;gap:3px;box-shadow:0 2px 8px rgba(0,0,0,.05);transition:var(--transition)}
+.wc-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(0,169,157,.12);transform:translateY(-2px)}
+.wc-flag{font-size:1.8rem;line-height:1;margin-bottom:4px}
+.wc-city{font-weight:800;font-size:.95rem;color:var(--dark)}
+.wc-country{font-size:.75rem;color:#64748b}
+.wc-time{font-size:1.5rem;font-weight:900;color:var(--teal);font-family:monospace;margin-top:6px;letter-spacing:.02em}
+.wc-date{font-size:.72rem;color:#94a3b8;text-transform:capitalize}
+.wc-utc{font-size:.7rem;color:#cbd5e1;margin-top:2px}
 .shp-customs-subtitle{margin:0 0 14px;font-size:.9rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
 .shp-article-card{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px;margin-bottom:12px}
 .shp-pickup-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--ec-border)}

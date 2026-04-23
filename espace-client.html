@@ -148,6 +148,9 @@
       <button class="ec-nav-item" onclick="ecShowModule('expedition')" id="ecnav-expedition">
         <i class="fa-solid fa-tag"></i> Nouvelle Expédition
       </button>
+      <button class="ec-nav-item" onclick="ecShowModule('horloge')" id="ecnav-horloge">
+        <i class="fa-solid fa-clock"></i> Horloge Mondiale
+      </button>
     </nav>
     <div class="ec-sidebar-footer">
       <a href="index.html" class="ec-sidebar-link"><i class="fa-solid fa-globe"></i> Site principal</a>
@@ -721,9 +724,11 @@
       </div>
 
       <div class="guide-tabs">
-        <button class="guide-tab active" onclick="guideSwitch('cont')" id="gtab-cont">Conteneurs ISO</button>
-        <button class="guide-tab" onclick="guideSwitch('rem')" id="gtab-rem">Remorques &amp; Semi</button>
-        <button class="guide-tab" onclick="guideSwitch('swap')" id="gtab-swap">Caisses Mobiles</button>
+        <button class="guide-tab active" onclick="guideSwitch('cont')" id="gtab-cont"><i class="fa-solid fa-cube"></i> Conteneurs ISO</button>
+        <button class="guide-tab" onclick="guideSwitch('rem')" id="gtab-rem"><i class="fa-solid fa-truck"></i> Remorques &amp; Semi</button>
+        <button class="guide-tab" onclick="guideSwitch('swap')" id="gtab-swap"><i class="fa-solid fa-box-open"></i> Caisses Mobiles</button>
+        <button class="guide-tab" onclick="guideSwitch('palette')" id="gtab-palette"><i class="fa-solid fa-pallet"></i> Palettes</button>
+        <button class="guide-tab" onclick="guideSwitch('incoterms')" id="gtab-incoterms"><i class="fa-solid fa-handshake"></i> Incoterms 2020</button>
       </div>
 
       <!-- Conteneurs -->
@@ -848,11 +853,18 @@
       <!-- Remorques -->
       <div class="guide-panel" id="gpanel-rem">
         <div class="cont-grid">
+
+          <!-- 1 ── Tautliner -->
           <div class="cont-card">
             <div class="cont-header" style="background:#0f4c81">
-              <i class="fa-solid fa-truck"></i>
-              <strong>Semi-remorque tautliner</strong>
-              <span>Bâché / ridelles coulissantes</span>
+              <i class="fa-solid fa-truck"></i><strong>Semi-remorque tautliner</strong><span>Bâché / ridelles coulissantes</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Tautliner trailer --><rect x="112" y="31" width="278" height="4" rx="1" fill="#475569"/><rect x="112" y="74" width="278" height="5" rx="1" fill="#475569"/><rect x="112" y="31" width="4" height="48" fill="#475569"/><rect x="386" y="31" width="4" height="48" fill="#475569"/><rect x="116" y="35" width="270" height="39" fill="#60a5fa" opacity="0.18"/><line x1="155" y1="35" x2="155" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><line x1="194" y1="35" x2="194" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><line x1="233" y1="35" x2="233" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><line x1="272" y1="35" x2="272" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><line x1="311" y1="35" x2="311" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/><line x1="350" y1="35" x2="350" y2="74" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
@@ -864,11 +876,18 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Marchandises générales — Europe-Maroc (passage Tanger Med)</div>
           </div>
+
+          <!-- 2 ── Frigorifique -->
           <div class="cont-card">
             <div class="cont-header" style="background:#1a6b3a">
-              <i class="fa-solid fa-snowflake"></i>
-              <strong>Frigorifique (Frigo)</strong>
-              <span>ATP — Accord Transport Périssables</span>
+              <i class="fa-solid fa-snowflake"></i><strong>Frigorifique (Frigo)</strong><span>ATP — Accord Transport Périssables</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Reefer box --><rect x="112" y="28" width="278" height="50" rx="2" fill="#e0f2fe" opacity="0.12"/><rect x="112" y="28" width="278" height="50" rx="2" stroke="#7dd3fc" stroke-width="2" fill="none"/><rect x="112" y="28" width="24" height="50" rx="1" fill="#334155"/><rect x="115" y="32" width="18" height="8" fill="#1e3a5f"/><rect x="115" y="44" width="18" height="8" fill="#1e3a5f"/><rect x="115" y="56" width="18" height="8" fill="#1e3a5f"/><!-- Snowflake --><line x1="241" y1="41" x2="241" y2="67" stroke="#7dd3fc" stroke-width="2.5"/><line x1="228" y1="54" x2="254" y2="54" stroke="#7dd3fc" stroke-width="2.5"/><line x1="232" y1="45" x2="250" y2="63" stroke="#7dd3fc" stroke-width="1.8"/><line x1="250" y1="45" x2="232" y2="63" stroke="#7dd3fc" stroke-width="1.8"/><circle cx="241" cy="41" r="3" fill="#7dd3fc"/><circle cx="241" cy="67" r="3" fill="#7dd3fc"/><circle cx="228" cy="54" r="3" fill="#7dd3fc"/><circle cx="254" cy="54" r="3" fill="#7dd3fc"/><!-- Rear doors --><line x1="352" y1="28" x2="352" y2="78" stroke="#7dd3fc" stroke-width="1.5" opacity="0.5"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
@@ -880,11 +899,18 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Produits frais, viandes, produits laitiers, pharmaceutiques</div>
           </div>
+
+          <!-- 3 ── Porte-autos -->
           <div class="cont-card">
             <div class="cont-header" style="background:#5a2e8a">
-              <i class="fa-solid fa-layer-group"></i>
-              <strong>Porte-autos</strong>
-              <span>2 ou 3 niveaux</span>
+              <i class="fa-solid fa-layer-group"></i><strong>Porte-autos</strong><span>2 ou 3 niveaux</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Decks --><rect x="112" y="68" width="278" height="4" fill="#475569"/><rect x="112" y="44" width="278" height="4" fill="#64748b"/><rect x="112" y="22" width="278" height="4" fill="#475569"/><!-- Posts --><rect x="133" y="22" width="3" height="50" fill="#334155"/><rect x="200" y="22" width="3" height="26" fill="#334155"/><rect x="267" y="22" width="3" height="26" fill="#334155"/><rect x="334" y="22" width="3" height="50" fill="#334155"/><!-- Cars bottom --><rect x="138" y="50" width="58" height="16" rx="3" fill="#2563eb" opacity="0.8"/><rect x="205" y="50" width="58" height="16" rx="3" fill="#dc2626" opacity="0.8"/><!-- Cars top --><rect x="138" y="26" width="58" height="16" rx="3" fill="#16a34a" opacity="0.8"/><rect x="205" y="26" width="58" height="16" rx="3" fill="#d97706" opacity="0.8"/><rect x="272" y="26" width="58" height="16" rx="3" fill="#7c3aed" opacity="0.8"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Longueur</td><td><strong>18,75 m</strong></td></tr>
@@ -894,11 +920,18 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Véhicules neufs, motos, engins agricoles</div>
           </div>
+
+          <!-- 4 ── Plateau -->
           <div class="cont-card">
             <div class="cont-header" style="background:#c0392b">
-              <i class="fa-solid fa-compress-arrows-alt"></i>
-              <strong>Plateau (Flat Bed)</strong>
-              <span>Porte-engins / hors gabarit</span>
+              <i class="fa-solid fa-compress-arrows-alt"></i><strong>Plateau (Flat Bed)</strong><span>Porte-engins / hors gabarit</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Flat deck --><rect x="112" y="66" width="278" height="8" rx="2" fill="#475569"/><rect x="125" y="58" width="4" height="9" fill="#64748b"/><rect x="170" y="58" width="4" height="9" fill="#64748b"/><rect x="215" y="58" width="4" height="9" fill="#64748b"/><rect x="260" y="58" width="4" height="9" fill="#64748b"/><rect x="305" y="58" width="4" height="9" fill="#64748b"/><rect x="350" y="58" width="4" height="9" fill="#64748b"/><!-- Cargo (crate) --><rect x="130" y="35" width="120" height="31" rx="2" fill="#b45309" opacity="0.75"/><line x1="160" y1="35" x2="160" y2="66" stroke="#92400e" stroke-width="1.5"/><line x1="190" y1="35" x2="190" y2="66" stroke="#92400e" stroke-width="1.5"/><line x1="220" y1="35" x2="220" y2="66" stroke="#92400e" stroke-width="1.5"/><!-- Straps --><line x1="145" y1="38" x2="130" y2="61" stroke="#fbbf24" stroke-width="2"/><line x1="240" y1="38" x2="252" y2="61" stroke="#fbbf24" stroke-width="2"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Longueur</td><td><strong>13,60 m</strong></td></tr>
@@ -908,11 +941,18 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Machines industrielles, pièces hors gabarit, métaux</div>
           </div>
+
+          <!-- 5 ── Citerne -->
           <div class="cont-card">
             <div class="cont-header" style="background:#d35400">
-              <i class="fa-solid fa-oil-can"></i>
-              <strong>Citerne (Tanker)</strong>
-              <span>ADR / Matières dangereuses</span>
+              <i class="fa-solid fa-oil-can"></i><strong>Citerne (Tanker)</strong><span>ADR / Matières dangereuses</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Cylinder tank --><rect x="128" y="34" width="256" height="40" rx="20" fill="#64748b"/><rect x="128" y="34" width="256" height="40" rx="20" stroke="#94a3b8" stroke-width="1.5" fill="none"/><rect x="128" y="35" width="256" height="12" rx="8" fill="#94a3b8" opacity="0.3"/><ellipse cx="128" cy="54" rx="8" ry="20" fill="#475569"/><ellipse cx="384" cy="54" rx="8" ry="20" fill="#475569"/><!-- Manhole --><rect x="246" y="26" width="12" height="10" rx="2" fill="#475569"/><ellipse cx="252" cy="36" rx="10" ry="4" fill="#334155"/><!-- Baffles --><line x1="200" y1="35" x2="200" y2="73" stroke="#94a3b8" stroke-width="1.2" opacity="0.5"/><line x1="252" y1="35" x2="252" y2="73" stroke="#94a3b8" stroke-width="1.2" opacity="0.5"/><line x1="304" y1="35" x2="304" y2="73" stroke="#94a3b8" stroke-width="1.2" opacity="0.5"/><!-- ADR plate --><rect x="366" y="60" width="18" height="12" rx="2" fill="#f97316"/><line x1="366" y1="66" x2="384" y2="66" stroke="#fff" stroke-width="1.5"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Capacité</td><td><strong>24 000 – 34 000 L</strong></td></tr>
@@ -922,11 +962,18 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Carburants, huiles, produits chimiques, alimentaires liquides</div>
           </div>
+
+          <!-- 6 ── Mega / Jumbo -->
           <div class="cont-card">
             <div class="cont-header" style="background:#1a252f">
-              <i class="fa-solid fa-boxes-stacked"></i>
-              <strong>Mega / Jumbo</strong>
-              <span>Haute capacité volume</span>
+              <i class="fa-solid fa-boxes-stacked"></i><strong>Mega / Jumbo</strong><span>Haute capacité volume</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Tall Mega box --><rect x="112" y="16" width="278" height="62" rx="2" fill="#1e293b" opacity="0.8"/><rect x="112" y="16" width="278" height="62" rx="2" stroke="#475569" stroke-width="1.5" fill="none"/><!-- Height arrow --><line x1="396" y1="16" x2="396" y2="78" stroke="#f59e0b" stroke-width="2"/><polygon points="392,20 396,12 400,20" fill="#f59e0b"/><polygon points="392,74 396,82 400,74" fill="#f59e0b"/><!-- 3m label --><text x="392" y="52" font-size="8" fill="#f59e0b" text-anchor="middle" font-family="monospace">3m</text><!-- Rear doors --><line x1="352" y1="16" x2="352" y2="78" stroke="#475569" stroke-width="1.5"/><!-- Brand stripes --><rect x="116" y="30" width="232" height="12" rx="1" fill="#2952a0" opacity="0.4"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
             </div>
             <table class="cont-specs">
               <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
@@ -938,8 +985,256 @@
             </table>
             <div class="cont-usage"><i class="fa-solid fa-tag"></i> Articles volumineux légers : meubles, matelas, électroménager</div>
           </div>
+
+          <!-- 7 ── Savoyarde / Open-top -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#6d4c41">
+              <i class="fa-solid fa-box-open"></i><strong>Savoyarde / Open-top</strong><span>Bâche souple amovible</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Open-top walls --><rect x="112" y="30" width="4" height="48" fill="#5d4037"/><rect x="386" y="30" width="4" height="48" fill="#5d4037"/><rect x="112" y="72" width="278" height="6" rx="1" fill="#4e342e"/><!-- Top frame only --><rect x="112" y="28" width="278" height="4" fill="#6d4c41"/><!-- Cargo rocks --><ellipse cx="200" cy="42" rx="80" ry="18" fill="#78716c" opacity="0.8"/><ellipse cx="200" cy="38" rx="80" ry="10" fill="#a8a29e" opacity="0.5"/><!-- Crane hook --><line x1="251" y1="6" x2="251" y2="26" stroke="#94a3b8" stroke-width="2" stroke-dasharray="4,3"/><circle cx="251" cy="28" r="3" fill="#94a3b8"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur utile</td><td><strong>2,48 m</strong></td></tr>
+              <tr><td>Hauteur utile</td><td><strong>variable (toit ouvrant)</strong></td></tr>
+              <tr><td>Volume</td><td><strong>90 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 kg</strong></td></tr>
+              <tr><td>Chargement</td><td><strong>Par le haut à la grue</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Bobines d'acier, granulats, charges haute volumineuses, bois</div>
+          </div>
+
+          <!-- 8 ── Benne céréalière -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#f9a825">
+              <i class="fa-solid fa-wheat-awn"></i><strong>Benne céréalière</strong><span>Vrac agricole</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Grain hopper (trapezoid top, narrow bottom) --><polygon points="112,30 390,30 390,65 112,65" fill="#92400e" opacity="0.85"/><polygon points="112,30 390,30 390,65 112,65" stroke="#b45309" stroke-width="1.5" fill="none"/><!-- Roof --><rect x="112" y="26" width="278" height="6" rx="1" fill="#a16207"/><!-- Discharge hatches at bottom --><rect x="175" y="65" width="25" height="8" rx="1" fill="#78350f"/><rect x="270" y="65" width="25" height="8" rx="1" fill="#78350f"/><!-- Grain texture lines --><line x1="130" y1="35" x2="130" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/><line x1="170" y1="35" x2="170" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/><line x1="210" y1="35" x2="210" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/><line x1="250" y1="35" x2="250" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/><line x1="290" y1="35" x2="290" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/><line x1="330" y1="35" x2="330" y2="63" stroke="#b45309" stroke-width="1" opacity="0.5"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Capacité</td><td><strong>40 à 55 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>26 000 – 28 000 kg</strong></td></tr>
+              <tr><td>Déchargement</td><td><strong>Trappe fond ou côté</strong></td></tr>
+              <tr><td>Matériau</td><td><strong>Acier ou aluminium</strong></td></tr>
+              <tr><td>Accès</td><td><strong>Par le toit (convoyeur)</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Blé, maïs, orge, soja, sucre en vrac — Maroc exportateur</div>
+          </div>
+
+          <!-- 9 ── Benne TP -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#bf360c">
+              <i class="fa-solid fa-dumpster"></i><strong>Benne TP</strong><span>Travaux publics</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Tipper body (raised at angle) --><polygon points="112,72 310,72 310,28 200,28" fill="#c62828" opacity="0.9"/><polygon points="112,72 310,72 310,28 200,28" stroke="#ef5350" stroke-width="1.5" fill="none"/><!-- Hydraulic cylinder --><rect x="132" y="52" width="8" height="22" rx="2" fill="#607d8b"/><rect x="134" y="42" width="4" height="14" rx="1" fill="#78909c"/><!-- Open tailgate --><line x1="310" y1="72" x2="328" y2="90" stroke="#c62828" stroke-width="3.5"/><!-- Earth/gravel spilling --><ellipse cx="322" cy="82" rx="14" ry="6" fill="#78716c" opacity="0.7"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Capacité</td><td><strong>25 à 35 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>25 000 – 32 000 kg</strong></td></tr>
+              <tr><td>Déchargement</td><td><strong>Basculement arrière hydraulique</strong></td></tr>
+              <tr><td>Parois</td><td><strong>Acier renforcé (Hardox)</strong></td></tr>
+              <tr><td>Variantes</td><td><strong>Simple / double essieu poussé</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Gravats, sable, terre, déchets BTP, minerais concassés</div>
+          </div>
+
+          <!-- 10 ── Silotruck -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#37474f">
+              <i class="fa-solid fa-wind"></i><strong>Silotruck / Vrac pulvérulent</strong><span>Pressurisation pneumatique</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Chassis --><rect x="112" y="66" width="278" height="8" rx="2" fill="#334155"/><!-- Silo 1 --><ellipse cx="185" cy="48" rx="48" ry="30" fill="#546e7a"/><ellipse cx="185" cy="22" rx="48" ry="10" fill="#607d8b"/><rect x="137" y="22" width="96" height="28" fill="#546e7a"/><!-- Silo 2 --><ellipse cx="295" cy="48" rx="48" ry="30" fill="#455a64"/><ellipse cx="295" cy="22" rx="48" ry="10" fill="#546e7a"/><rect x="247" y="22" width="96" height="28" fill="#455a64"/><!-- Discharge pipes --><rect x="172" y="66" width="10" height="12" rx="2" fill="#37474f"/><rect x="282" y="66" width="10" height="12" rx="2" fill="#37474f"/><!-- Air pipe on top --><line x1="185" y1="10" x2="185" y2="20" stroke="#90a4ae" stroke-width="2.5"/><line x1="295" y1="10" x2="295" y2="20" stroke="#90a4ae" stroke-width="2.5"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Capacité</td><td><strong>35 à 60 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>22 000 – 28 000 kg</strong></td></tr>
+              <tr><td>Déchargement</td><td><strong>Air comprimé — flexible</strong></td></tr>
+              <tr><td>Cuves</td><td><strong>1 à 4 compartiments</strong></td></tr>
+              <tr><td>Pression</td><td><strong>1,5 à 2 bar</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Ciment, farine, sucre poudre, chaux, produits chimiques secs</div>
+          </div>
+
+          <!-- 11 ── Bétaillère -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#388e3c">
+              <i class="fa-solid fa-cow"></i><strong>Bétaillère</strong><span>Transport animaux vivants</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Livestock body --><rect x="112" y="28" width="278" height="50" rx="2" fill="#2d4a2d" opacity="0.6"/><!-- Ventilation slats (horizontal) --><line x1="116" y1="34" x2="386" y2="34" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><line x1="116" y1="40" x2="386" y2="40" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><line x1="116" y1="46" x2="386" y2="46" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><!-- Mid deck --><rect x="112" y="52" width="278" height="4" fill="#1b5e20"/><!-- Lower slats --><line x1="116" y1="58" x2="386" y2="58" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><line x1="116" y1="64" x2="386" y2="64" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><line x1="116" y1="70" x2="386" y2="70" stroke="#4caf50" stroke-width="1.2" opacity="0.7"/><!-- Animal silhouettes --><ellipse cx="185" cy="44" rx="22" ry="7" fill="#4caf50" opacity="0.3"/><ellipse cx="255" cy="44" rx="22" ry="7" fill="#4caf50" opacity="0.3"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Niveaux</td><td><strong>2 niveaux (modulables)</strong></td></tr>
+              <tr><td>Ventilation</td><td><strong>Naturelle + forcée</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>20 000 – 22 000 kg</strong></td></tr>
+              <tr><td>Réglementation</td><td><strong>CE 1/2005 (bien-être animal)</strong></td></tr>
+              <tr><td>Abreuvement</td><td><strong>Citerne embarquée 500 L</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Bovins, ovins, caprins, chevaux — Europe-Maroc-Afrique</div>
+          </div>
+
+          <!-- 12 ── Porte-conteneurs routier -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#01579b">
+              <i class="fa-solid fa-ship"></i><strong>Porte-conteneurs routier</strong><span>Châssis ISO — 20/40/45 pieds</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Chassis rails --><rect x="112" y="68" width="278" height="6" rx="1" fill="#334155"/><!-- ISO Container (40ft) --><rect x="128" y="28" width="244" height="42" rx="2" fill="#0d47a1" opacity="0.9"/><rect x="128" y="28" width="244" height="42" rx="2" stroke="#1565c0" stroke-width="1.5" fill="none"/><!-- Corrugations --><line x1="168" y1="28" x2="168" y2="70" stroke="#1565c0" stroke-width="1"/><line x1="208" y1="28" x2="208" y2="70" stroke="#1565c0" stroke-width="1"/><line x1="248" y1="28" x2="248" y2="70" stroke="#1565c0" stroke-width="1"/><line x1="288" y1="28" x2="288" y2="70" stroke="#1565c0" stroke-width="1"/><line x1="328" y1="28" x2="328" y2="70" stroke="#1565c0" stroke-width="1"/><!-- Doors --><line x1="346" y1="28" x2="346" y2="70" stroke="#1976d2" stroke-width="2"/><!-- Twist locks --><circle cx="130" cy="70" r="3.5" fill="#fbbf24"/><circle cx="370" cy="70" r="3.5" fill="#fbbf24"/><circle cx="130" cy="30" r="3.5" fill="#fbbf24"/><circle cx="370" cy="30" r="3.5" fill="#fbbf24"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur châssis</td><td><strong>6,10 m / 12,20 m / 13,72 m</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>jusqu'à 34 000 kg</strong></td></tr>
+              <tr><td>Twist-locks</td><td><strong>4 coins ISO standard</strong></td></tr>
+              <tr><td>Variante</td><td><strong>Extensible 20+40 pieds</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Trafic maritime Tanger Med</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Transport pré/post-acheminement conteneurs maritimes ISO</div>
+          </div>
+
+          <!-- 13 ── Surbaissée / Low-loader -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#4a148c">
+              <i class="fa-solid fa-arrow-down"></i><strong>Surbaissée / Low-loader</strong><span>Hors gabarit hauteur</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Step-down deck --><rect x="112" y="52" width="62" height="14" rx="1" fill="#4a148c" opacity="0.7"/><polygon points="174,52 196,68 174,68" fill="#4a148c" opacity="0.7"/><!-- Low main deck --><rect x="196" y="68" width="192" height="7" rx="1" fill="#4a148c" opacity="0.7"/><!-- Rear ramp --><polygon points="388,68 388,82 372,76" fill="#4a148c" opacity="0.6"/><!-- Excavator/cargo on deck --><rect x="210" y="36" width="160" height="34" rx="4" fill="#b45309" opacity="0.75"/><rect x="228" y="24" width="32" height="14" rx="3" fill="#92400e" opacity="0.8"/><rect x="342" y="18" width="16" height="20" rx="2" fill="#92400e" opacity="0.7"/>
+                <!-- Trailer wheels (more axles) --><circle cx="300" cy="89" r="9" fill="#1e293b"/><circle cx="314" cy="89" r="9" fill="#1e293b"/><circle cx="337" cy="89" r="9" fill="#1e293b"/><circle cx="351" cy="89" r="9" fill="#1e293b"/><circle cx="372" cy="89" r="9" fill="#1e293b"/><circle cx="300" cy="89" r="4.5" fill="#475569"/><circle cx="314" cy="89" r="4.5" fill="#475569"/><circle cx="337" cy="89" r="4.5" fill="#475569"/><circle cx="351" cy="89" r="4.5" fill="#475569"/><circle cx="372" cy="89" r="4.5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur plateau</td><td><strong>12 à 18 m</strong></td></tr>
+              <tr><td>Largeur</td><td><strong>2,55 à 3,00 m</strong></td></tr>
+              <tr><td>Hauteur de chargement</td><td><strong>0,75 à 1,00 m</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>40 000 – 80 000 kg</strong></td></tr>
+              <tr><td>Rampes</td><td><strong>Arrière hydrauliques</strong></td></tr>
+              <tr><td>Essieux</td><td><strong>3 à 5 essieux</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Engins de chantier, transformateurs, équipements > 4 m hauteur</div>
+          </div>
+
+          <!-- 14 ── Walking floor -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#00695c">
+              <i class="fa-solid fa-arrows-left-right"></i><strong>Walking floor</strong><span>Fond mouvant hydraulique</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Box --><rect x="112" y="28" width="278" height="50" rx="2" fill="#00695c" opacity="0.5"/><rect x="112" y="28" width="278" height="50" rx="2" stroke="#26a69a" stroke-width="1.5" fill="none"/><!-- Floor slats --><line x1="116" y1="71" x2="386" y2="71" stroke="#26a69a" stroke-width="1.5"/><line x1="116" y1="66" x2="386" y2="66" stroke="#26a69a" stroke-width="1.2" opacity="0.6"/><!-- Moving arrow --><line x1="200" y1="52" x2="340" y2="52" stroke="#4dd0e1" stroke-width="2.5" stroke-dasharray="10,5"/><polygon points="330,47 342,52 330,57" fill="#4dd0e1"/><!-- Rear door open --><line x1="386" y1="28" x2="396" y2="20" stroke="#26a69a" stroke-width="2.5"/><line x1="386" y1="52" x2="393" y2="56" stroke="#26a69a" stroke-width="2"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Largeur utile</td><td><strong>2,48 m</strong></td></tr>
+              <tr><td>Hauteur utile</td><td><strong>2,60 – 2,80 m</strong></td></tr>
+              <tr><td>Volume</td><td><strong>92 – 95 m³</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 – 26 000 kg</strong></td></tr>
+              <tr><td>Déchargement</td><td><strong>Lames coulissantes hydrauliques</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Déchets, bois, copeaux, papier, vrac non coulant — sans grue</div>
+          </div>
+
+          <!-- 15 ── Double pont -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1565c0">
+              <i class="fa-solid fa-layer-group"></i><strong>Double pont (bi-niveau)</strong><span>2 niveaux de chargement</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Bi-level box --><rect x="112" y="16" width="278" height="62" rx="2" fill="#0d47a1" opacity="0.5"/><rect x="112" y="16" width="278" height="62" rx="2" stroke="#1565c0" stroke-width="1.5" fill="none"/><!-- Mid floor --><rect x="116" y="46" width="270" height="4" fill="#1565c0"/><!-- Upper pallets --><rect x="125" y="20" width="34" height="24" rx="2" fill="#78716c" opacity="0.7"/><rect x="164" y="20" width="34" height="24" rx="2" fill="#78716c" opacity="0.7"/><rect x="203" y="20" width="34" height="24" rx="2" fill="#78716c" opacity="0.7"/><rect x="242" y="20" width="34" height="24" rx="2" fill="#78716c" opacity="0.7"/><!-- Lower pallets --><rect x="125" y="52" width="34" height="22" rx="2" fill="#57534e" opacity="0.7"/><rect x="164" y="52" width="34" height="22" rx="2" fill="#57534e" opacity="0.7"/><rect x="203" y="52" width="34" height="22" rx="2" fill="#57534e" opacity="0.7"/><rect x="242" y="52" width="34" height="22" rx="2" fill="#57534e" opacity="0.7"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur utile</td><td><strong>13,60 m × 2 niveaux</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>24 000 kg</strong></td></tr>
+              <tr><td>Palettes</td><td><strong>66 palettes EUR-1</strong></td></tr>
+              <tr><td>Hauteur max/niveau</td><td><strong>1,35 m</strong></td></tr>
+              <tr><td>Volume total</td><td><strong>≈ 180 m³</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Électroménager, boissons, colis légers — maximise la capacité</div>
+          </div>
+
+          <!-- 16 ── Extensible -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#6a1010">
+              <i class="fa-solid fa-left-right"></i><strong>Remorque extensible</strong><span>Longueur variable</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- Cab --><circle cx="28" cy="89" r="10" fill="#1e293b"/><circle cx="28" cy="89" r="5" fill="#475569"/><circle cx="77" cy="89" r="10" fill="#1e293b"/><circle cx="92" cy="89" r="10" fill="#1e293b"/><circle cx="77" cy="89" r="5" fill="#475569"/><circle cx="92" cy="89" r="5" fill="#475569"/><rect x="6" y="34" width="88" height="42" rx="4" fill="#1e3a5f"/><rect x="22" y="25" width="62" height="11" rx="3" fill="#2952a0"/><rect x="12" y="39" width="37" height="17" rx="2" fill="#7dd3d0" opacity="0.5"/><polygon points="51,39 79,39 86,47 86,56 51,56" fill="#7dd3d0" opacity="0.5"/><line x1="51" y1="36" x2="51" y2="75" stroke="#2952a0" stroke-width="1.5"/><rect x="4" y="65" width="8" height="11" rx="2" fill="#2952a0"/><rect x="96" y="58" width="16" height="18" rx="3" fill="#334155"/><rect x="90" y="74" width="22" height="5" rx="1.5" fill="#64748b"/><rect x="33" y="14" width="5" height="13" rx="2" fill="#2952a0"/>
+                <!-- Fixed section --><rect x="112" y="64" width="148" height="8" rx="1" fill="#475569"/><!-- Sliding extension --><rect x="258" y="60" width="130" height="8" rx="1" fill="#334155"/><rect x="254" y="58" width="8" height="14" fill="#1e293b"/><!-- Rail guides --><line x1="175" y1="58" x2="388" y2="58" stroke="#64748b" stroke-width="1.2" stroke-dasharray="6,4"/><!-- Long load (pipes/beams) --><rect x="118" y="50" width="270" height="12" rx="2" fill="#9a3412" opacity="0.8"/><rect x="118" y="44" width="270" height="7" rx="2" fill="#7f2d0e" opacity="0.7"/><!-- Straps --><line x1="178" y1="45" x2="178" y2="63" stroke="#fbbf24" stroke-width="2"/><line x1="280" y1="45" x2="280" y2="63" stroke="#fbbf24" stroke-width="2"/><line x1="356" y1="45" x2="356" y2="63" stroke="#fbbf24" stroke-width="2"/>
+                <!-- Trailer wheels --><circle cx="337" cy="89" r="10" fill="#1e293b"/><circle cx="352" cy="89" r="10" fill="#1e293b"/><circle cx="372" cy="89" r="10" fill="#1e293b"/><circle cx="337" cy="89" r="5" fill="#475569"/><circle cx="352" cy="89" r="5" fill="#475569"/><circle cx="372" cy="89" r="5" fill="#475569"/>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur min.</td><td><strong>13,60 m</strong></td></tr>
+              <tr><td>Longueur max.</td><td><strong>jusqu'à 30 m</strong></td></tr>
+              <tr><td>Charge utile</td><td><strong>40 000 – 80 000 kg</strong></td></tr>
+              <tr><td>Largeur</td><td><strong>2,55 à 5,00 m (convoi)</strong></td></tr>
+              <tr><td>Autorisation</td><td><strong>Convoi exceptionnel obligatoire</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Poutres, pylônes, éoliennes, pièces métalliques très longues</div>
+          </div>
+
+          <!-- 17 ── Multi-essieux modulaire -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1b2631">
+              <i class="fa-solid fa-truck-monster"></i><strong>Multi-essieux modulaire</strong><span>SPMT / convoi lourd</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg">
+                <!-- No standard cab — SPMT is self-propelled or pushed --><!-- Power unit (small) --><rect x="4" y="40" width="62" height="36" rx="4" fill="#1e3a5f"/><rect x="18" y="33" width="44" height="9" rx="3" fill="#2952a0"/><rect x="10" y="44" width="28" height="14" rx="2" fill="#7dd3d0" opacity="0.45"/><rect x="2" y="62" width="6" height="12" rx="2" fill="#2952a0"/><!-- SPMT platform --><rect x="66" y="56" width="326" height="12" rx="2" fill="#334155"/><!-- Many axle wheels (SPMT) --><circle cx="88" cy="79" r="9" fill="#1e293b"/><circle cx="88" cy="79" r="4.5" fill="#475569"/><circle cx="110" cy="79" r="9" fill="#1e293b"/><circle cx="110" cy="79" r="4.5" fill="#475569"/><circle cx="145" cy="79" r="9" fill="#1e293b"/><circle cx="145" cy="79" r="4.5" fill="#475569"/><circle cx="167" cy="79" r="9" fill="#1e293b"/><circle cx="167" cy="79" r="4.5" fill="#475569"/><circle cx="202" cy="79" r="9" fill="#1e293b"/><circle cx="202" cy="79" r="4.5" fill="#475569"/><circle cx="224" cy="79" r="9" fill="#1e293b"/><circle cx="224" cy="79" r="4.5" fill="#475569"/><circle cx="259" cy="79" r="9" fill="#1e293b"/><circle cx="259" cy="79" r="4.5" fill="#475569"/><circle cx="281" cy="79" r="9" fill="#1e293b"/><circle cx="281" cy="79" r="4.5" fill="#475569"/><circle cx="316" cy="79" r="9" fill="#1e293b"/><circle cx="316" cy="79" r="4.5" fill="#475569"/><circle cx="338" cy="79" r="9" fill="#1e293b"/><circle cx="338" cy="79" r="4.5" fill="#475569"/><circle cx="370" cy="79" r="9" fill="#1e293b"/><circle cx="370" cy="79" r="4.5" fill="#475569"/><!-- Heavy load (reactor/transformer) --><rect x="80" y="18" width="312" height="40" rx="4" fill="#3a3a2a" opacity="0.9"/><ellipse cx="90" cy="36" rx="14" ry="20" fill="#2a2a1a"/><ellipse cx="382" cy="36" rx="14" ry="20" fill="#2a2a1a"/><!-- Weight text --><text x="236" y="44" font-size="11" fill="#fbbf24" text-anchor="middle" font-family="monospace" font-weight="bold">1000t+</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Charge utile</td><td><strong>100 t à plus de 1 000 t</strong></td></tr>
+              <tr><td>Modules</td><td><strong>Accouplables à l'infini</strong></td></tr>
+              <tr><td>Direction</td><td><strong>Électro-hydraulique 360°</strong></td></tr>
+              <tr><td>Vitesse max.</td><td><strong>10 km/h chargé</strong></td></tr>
+              <tr><td>Autorisation</td><td><strong>Convoi exceptionnel cat. 4+</strong></td></tr>
+              <tr><td>Marques</td><td><strong>Goldhofer, Scheuerle, Nicolas</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Réacteurs industriels, transformateurs HT, plateformes offshore</div>
+          </div>
+
         </div>
       </div>
+
+      <!-- Remorques supplémentaires injectées dynamiquement par JS -->
 
       <!-- Caisses mobiles -->
       <div class="guide-panel" id="gpanel-swap">
@@ -978,6 +1273,378 @@
           </div>
         </div>
       </div>
+
+      <!-- ══ PALETTES ══════════════════════════════════════════════════════ -->
+      <div class="guide-panel" id="gpanel-palette">
+        <div class="ec-module-header" style="padding:0 0 16px">
+          <p>Dimensions, charges et compatibilité des palettes utilisées en transport maritime, routier et aérien.</p>
+        </div>
+
+        <!-- Euro / EPAL -->
+        <div class="palette-section-title"><i class="fa-solid fa-euro-sign"></i> Palettes Européennes (EPAL)</div>
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#003399">
+              <i class="fa-solid fa-pallet"></i><strong>EUR / EPAL-1</strong><span>La palette universelle Europe</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 200 × 800 mm</strong></td></tr>
+              <tr><td>Hauteur</td><td><strong>144 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>4 000 kg</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>1 500 kg</strong></td></tr>
+              <tr><td>Poids palette</td><td><strong>~20–24 kg</strong></td></tr>
+              <tr><td>Matériau</td><td><strong>Bois (NIMP 15)</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Standard EU — compatible fourche 4 côtés — échangeable</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a5276">
+              <i class="fa-solid fa-pallet"></i><strong>EUR-2 / EPAL-2</strong><span>Grande palette industrie</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 200 × 1 000 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>4 000 kg</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>1 500 kg</strong></td></tr>
+              <tr><td>Poids palette</td><td><strong>~25–30 kg</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Industrie automobile</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Pièces auto, matériaux lourds, Turquie / industrie lourde</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a3a6b">
+              <i class="fa-solid fa-pallet"></i><strong>EUR-3</strong><span>Palette chimie</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 000 × 1 200 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>4 000 kg</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>1 500 kg</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Chimie, pharmaceutique</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Secteur chimique et pharmaceutique Europe</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#2e4057">
+              <i class="fa-solid fa-pallet"></i><strong>EUR-6 / Demi-palette</strong><span>Petite surface — retail</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>800 × 600 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>2 000 kg</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>750 kg</strong></td></tr>
+              <tr><td>Poids palette</td><td><strong>~9–11 kg</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Grande distribution</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Présentation en magasin, promotion retail</div>
+          </div>
+        </div>
+
+        <!-- Palettes américaines -->
+        <div class="palette-section-title" style="margin-top:24px"><i class="fa-solid fa-flag-usa"></i> Palettes Américaines (GMA)</div>
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#8b0000">
+              <i class="fa-solid fa-pallet"></i><strong>GMA Standard</strong><span>48" × 40" — USA dominant</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 219 × 1 016 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>4 627 kg (10 200 lb)</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>2 268 kg (5 000 lb)</strong></td></tr>
+              <tr><td>Poids palette</td><td><strong>~29 kg</strong></td></tr>
+              <tr><td>Matériau</td><td><strong>Bois ou plastique</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Standard USA/Canada — alimentation, retail, industrie</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#6b2d0f">
+              <i class="fa-solid fa-pallet"></i><strong>Palette 48" × 48"</strong><span>Industries lourdes</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 219 × 1 219 mm</strong></td></tr>
+              <tr><td>Charge statique</td><td><strong>4 536 kg</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>2 041 kg</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Produits pétroliers, chimie</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Barils, fûts, industrie pétrolière</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#5a3010">
+              <i class="fa-solid fa-pallet"></i><strong>Palette 40" × 40"</strong><span>Compact américain</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Dimensions</td><td><strong>1 016 × 1 016 mm</strong></td></tr>
+              <tr><td>Charge dynamique</td><td><strong>1 814 kg</strong></td></tr>
+              <tr><td>Utilisation</td><td><strong>Alimentation, lait, boissons</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Dairy, boissons, alimentation USA</div>
+          </div>
+        </div>
+
+        <!-- Palettes aériennes ULD -->
+        <div class="palette-section-title" style="margin-top:24px"><i class="fa-solid fa-plane"></i> Palettes &amp; Conteneurs Aériens (ULD — Unit Load Device)</div>
+        <div class="cont-grid">
+          <div class="cont-card">
+            <div class="cont-header" style="background:#006994">
+              <i class="fa-solid fa-plane-up"></i><strong>PMC (P6P)</strong><span>Full Pallet — Widebody</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>3 175 × 2 235 mm</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>1 626 mm (160 cm)</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>6 804 kg</strong></td></tr>
+              <tr><td>Poids ULD vide</td><td><strong>~115 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B747, B777, A330</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Fret lourd longue distance — usage universel cargo</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0a4d68">
+              <i class="fa-solid fa-plane-up"></i><strong>PAG (P1P)</strong><span>Demi-palette widebody</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>1 534 × 2 235 mm</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>4 626 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B747, A380, B777</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Fret médium — soute large body</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0e3d5b">
+              <i class="fa-solid fa-plane-up"></i><strong>LD3 (AKE)</strong><span>Conteneur soute narrowbody</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>1 534 × 1 534 mm</strong></td></tr>
+              <tr><td>Hauteur ext.</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Volume</td><td><strong>4,3 m³</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>1 587 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B737, A320, A321</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Le plus utilisé en soute passager (belly cargo)</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#13445f">
+              <i class="fa-solid fa-plane-up"></i><strong>LD7 (ALF/AAP)</strong><span>Grande palette soute</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>3 175 × 2 235 mm</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>4 626 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B747, A340, B777</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Soute principale wide-body — fret volumineux</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a4f72">
+              <i class="fa-solid fa-plane-up"></i><strong>LD11 (AMP)</strong><span>Demi full-pallet</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>3 175 × 1 534 mm</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>3 176 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B747F, B777F, A330F</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Demi-palette full freighter — fret lourd</div>
+          </div>
+          <div class="cont-card">
+            <div class="cont-header" style="background:#2c5364">
+              <i class="fa-solid fa-plane-up"></i><strong>M1 / AAY</strong><span>Main deck full freighter</span>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Base</td><td><strong>2 438 × 3 175 mm</strong></td></tr>
+              <tr><td>Hauteur max</td><td><strong>2 438 mm</strong></td></tr>
+              <tr><td>Charge max</td><td><strong>6 033 kg</strong></td></tr>
+              <tr><td>Avions</td><td><strong>B747-8F, B777F</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Main deck — avion tout cargo — haute valeur/volume</div>
+          </div>
+        </div>
+
+        <!-- Tableau compatibilité -->
+        <div class="palette-section-title" style="margin-top:24px"><i class="fa-solid fa-table"></i> Nombre de palettes EUR-1 par équipement</div>
+        <div style="overflow-x:auto;border-radius:10px;border:1px solid #e2e8f0">
+          <table style="width:100%;border-collapse:collapse;min-width:600px">
+            <thead><tr style="background:#f8fafc">
+              <th style="padding:10px 14px;text-align:left;font-size:.8rem;color:#64748b;border-bottom:2px solid #e2e8f0">Équipement</th>
+              <th style="padding:10px 14px;text-align:center;font-size:.8rem;color:#64748b;border-bottom:2px solid #e2e8f0">Palettes EUR-1 (80×120)</th>
+              <th style="padding:10px 14px;text-align:center;font-size:.8rem;color:#64748b;border-bottom:2px solid #e2e8f0">Palettes US (48×40)</th>
+              <th style="padding:10px 14px;text-align:left;font-size:.8rem;color:#64748b;border-bottom:2px solid #e2e8f0">Charge utile max</th>
+            </tr></thead>
+            <tbody>
+              <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px;font-size:.85rem">20' DC</td><td style="padding:8px 14px;text-align:center;font-weight:700">11</td><td style="padding:8px 14px;text-align:center;font-weight:700">9</td><td style="padding:8px 14px;font-size:.85rem">21 780 kg</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9;background:#f9fafb"><td style="padding:8px 14px;font-size:.85rem">40' DC</td><td style="padding:8px 14px;text-align:center;font-weight:700">23</td><td style="padding:8px 14px;text-align:center;font-weight:700">20</td><td style="padding:8px 14px;font-size:.85rem">26 680 kg</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px;font-size:.85rem">40' HC</td><td style="padding:8px 14px;text-align:center;font-weight:700">25</td><td style="padding:8px 14px;text-align:center;font-weight:700">21</td><td style="padding:8px 14px;font-size:.85rem">26 460 kg</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9;background:#f9fafb"><td style="padding:8px 14px;font-size:.85rem">Semi-remorque standard</td><td style="padding:8px 14px;text-align:center;font-weight:700">33</td><td style="padding:8px 14px;text-align:center;font-weight:700">26</td><td style="padding:8px 14px;font-size:.85rem">24 000 kg</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9"><td style="padding:8px 14px;font-size:.85rem">Mega / Jumbo</td><td style="padding:8px 14px;text-align:center;font-weight:700">36</td><td style="padding:8px 14px;text-align:center;font-weight:700">30</td><td style="padding:8px 14px;font-size:.85rem">24 000 kg</td></tr>
+              <tr style="border-bottom:1px solid #f1f5f9;background:#f9fafb"><td style="padding:8px 14px;font-size:.85rem">B747F (main deck)</td><td style="padding:8px 14px;text-align:center;font-weight:700">~96</td><td style="padding:8px 14px;text-align:center;font-weight:700">~80</td><td style="padding:8px 14px;font-size:.85rem">102 000 kg</td></tr>
+              <tr><td style="padding:8px 14px;font-size:.85rem">B777F</td><td style="padding:8px 14px;text-align:center;font-weight:700">~64</td><td style="padding:8px 14px;text-align:center;font-weight:700">~52</td><td style="padding:8px 14px;font-size:.85rem">102 000 kg</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ INCOTERMS 2020 ══════════════════════════════════════════════ -->
+      <div class="guide-panel" id="gpanel-incoterms">
+        <div class="ec-module-header" style="padding:0 0 16px">
+          <p>Les 11 règles Incoterms® 2020 (ICC) — répartition des coûts, risques et obligations vendeur/acheteur.</p>
+        </div>
+
+        <!-- Schéma visuel -->
+        <div class="inco-diagram">
+          <div class="inco-diagram-title"><i class="fa-solid fa-route"></i> Transfert de risque selon l'Incoterm</div>
+          <div class="inco-scale">
+            <div class="inco-scale-bar">
+              <div class="inco-seller-zone">VENDEUR</div>
+              <div class="inco-buyer-zone">ACHETEUR</div>
+            </div>
+            <div class="inco-scale-labels">
+              <span>EXW</span><span>FCA</span><span>FAS</span><span>FOB</span><span>CFR/CPT</span><span>CIF/CIP</span><span>DAP</span><span>DPU</span><span>DDP</span>
+            </div>
+            <div class="inco-scale-arrow">
+              <div class="inco-arrow-track">
+                <div class="inco-arrow-fill"></div>
+                <span class="inco-arrow-head">▶</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#94a3b8;margin-top:4px">
+                <span>Usine vendeur</span><span style="text-align:center">Port/quai embarquement</span><span>Destination finale</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tableau tous les incoterms -->
+        <div style="overflow-x:auto;border-radius:12px;border:1px solid #e2e8f0;margin-top:18px">
+          <table style="width:100%;border-collapse:collapse;min-width:800px">
+            <thead><tr style="background:#0f4c81;color:#fff">
+              <th style="padding:12px 14px;text-align:left;font-size:.8rem">Incoterm</th>
+              <th style="padding:12px 14px;text-align:left;font-size:.8rem">Nom complet</th>
+              <th style="padding:12px 14px;text-align:center;font-size:.8rem">Transport</th>
+              <th style="padding:12px 14px;text-align:left;font-size:.8rem">Risque passe à</th>
+              <th style="padding:12px 14px;text-align:center;font-size:.8rem">Fret</th>
+              <th style="padding:12px 14px;text-align:center;font-size:.8rem">Assurance</th>
+              <th style="padding:12px 14px;text-align:center;font-size:.8rem">Dédouanement exp.</th>
+              <th style="padding:12px 14px;text-align:center;font-size:.8rem">Dédouanement imp.</th>
+            </tr></thead>
+            <tbody>
+              <tr style="background:#fff8f0;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#e53e3e">EXW</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Ex Works</strong> — À l'usine</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Mise à disposition chez le vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#f0fff4;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#38a169">FCA</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Free Carrier</strong> — Franco transporteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Remise au transporteur désigné</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#fffbeb;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#d97706">FAS</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Free Alongside Ship</strong> — Franco long du bord</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">⚓ Maritime uniquement</td>
+                <td style="padding:10px 14px;font-size:.8rem">Marchandise le long du navire</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#fff;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#0f4c81">FOB</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Free On Board</strong> — Franco bord</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">⚓ Maritime uniquement</td>
+                <td style="padding:10px 14px;font-size:.8rem">Passage du bastingage du navire</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#f8f4ff;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#6b46c1">CFR</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Cost and Freight</strong> — Coût et fret</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">⚓ Maritime uniquement</td>
+                <td style="padding:10px 14px;font-size:.8rem">Embarquement au port d'expédition</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#fff5f5;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#c0392b">CIF</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Cost, Insurance &amp; Freight</strong> — Coût, assurance, fret</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">⚓ Maritime uniquement</td>
+                <td style="padding:10px 14px;font-size:.8rem">Embarquement au port d'expédition</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur (min. ICC-C)</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#f0f4ff;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#2563eb">CPT</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Carriage Paid To</strong> — Port payé jusqu'à</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Remise au premier transporteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#f5f0ff;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#7c3aed">CIP</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Carriage &amp; Insurance Paid</strong> — Port payé, assurance comprise</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Remise au premier transporteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur (min. ICC-A)</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#f0fdf4;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#16a34a">DAP</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Delivered At Place</strong> — Rendu au lieu de destination</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Mise à dispo destination, non déchargé</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#ecfdf5;border-bottom:1px solid #f1f5f9">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#059669">DPU</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Delivered at Place Unloaded</strong> — Rendu déchargé (nouveau 2020)</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Déchargement à la destination</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#dc2626">Acheteur</td>
+              </tr>
+              <tr style="background:#eff6ff">
+                <td style="padding:10px 14px"><span class="inco-code" style="background:#1e40af">DDP</span></td>
+                <td style="padding:10px 14px;font-size:.82rem"><strong>Delivered Duty Paid</strong> — Rendu droits acquittés</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.78rem">🌍 Tous modes</td>
+                <td style="padding:10px 14px;font-size:.8rem">Mise à dispo destination, droits payés</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+                <td style="padding:10px 14px;text-align:center;font-size:.8rem;color:#16a34a">Vendeur</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="inco-notes">
+          <div class="inco-note"><i class="fa-solid fa-circle-info" style="color:#2563eb"></i> <strong>CIF vs CIP :</strong> CIF = maritime seulement, assurance minimale (ICC-C). CIP = tous modes, assurance étendue (ICC-A). Préférez CIP pour l'aérien.</div>
+          <div class="inco-note"><i class="fa-solid fa-circle-info" style="color:#16a34a"></i> <strong>DPU (nouveau 2020) :</strong> Remplace l'ancien DAT — seul incoterm où le vendeur est responsable du déchargement.</div>
+          <div class="inco-note"><i class="fa-solid fa-circle-info" style="color:#d97706"></i> <strong>FOB/CIF au Maroc :</strong> Les douanes marocaines calculent la valeur CIF pour le tarif. Si votre facture est en FOB, vous devez ajouter fret + assurance.</div>
+          <div class="inco-note"><i class="fa-solid fa-triangle-exclamation" style="color:#dc2626"></i> <strong>EXW à éviter export :</strong> L'acheteur doit dédouaner à l'export depuis le pays du vendeur — pratiquement impossible pour un acheteur étranger.</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- ── Module: Appareils Cargo ── -->
@@ -1679,6 +2346,28 @@
 
     </div><!-- /#ecmod-expedition -->
 
+    <!-- ── Module: Horloge Mondiale ── -->
+    <div class="ec-module" id="ecmod-horloge">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-clock"></i> Horloge Mondiale — Temps Réel</h1>
+        <p>Heures locales dans les principales villes du monde utilisées en commerce international.</p>
+      </div>
+      <div class="wc-search-row">
+        <input type="text" id="wc-search" placeholder="Rechercher une ville ou pays…" oninput="wcFilter()" />
+        <select id="wc-region" onchange="wcFilter()">
+          <option value="">Toutes régions</option>
+          <option value="AF">Afrique</option>
+          <option value="EU">Europe</option>
+          <option value="ME">Moyen-Orient</option>
+          <option value="AS">Asie</option>
+          <option value="NA">Amérique du Nord</option>
+          <option value="SA">Amérique du Sud</option>
+          <option value="OC">Océanie</option>
+        </select>
+      </div>
+      <div class="wc-grid" id="wc-grid"></div>
+    </div>
+
   </main>
 </div>
 
@@ -1689,6 +2378,6 @@
 <script src="js/express-tarifs.js?v=20260423c"></script>
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
-<script src="js/espace-client.js?v=20260423c"></script>
+<script src="js/espace-client.js?v=20260423e"></script>
 </body>
 </html>
