@@ -717,9 +717,9 @@
 /* ══════════════════════════════════════════════════════
    HORLOGE MONDIALE
    ══════════════════════════════════════════════════════ */
-/* ── Truck / Remorque illustration ── */
-.cont-truck-img{background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);padding:12px 16px 4px;border-bottom:1px solid rgba(0,0,0,.2);overflow:hidden}
-.cont-truck-img svg{width:100%;height:72px;display:block}
+/* ── Truck / Container illustration ── */
+.cont-truck-img{background:#f1f5f9;padding:10px 14px 4px;border-bottom:1px solid var(--ec-border);overflow:hidden}
+.cont-truck-img svg{width:100%;height:80px;display:block}
 
 .wc-search-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .wc-search-row input{flex:1;min-width:200px;padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;background:#fff;transition:var(--transition)}
