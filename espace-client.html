@@ -6,7 +6,7 @@
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425a"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425b"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -1707,7 +1707,7 @@
         <p>Recherchez parmi les 13 135 codes SH marocains · Droits · Documents · Normes · Accords préférentiels (source : <strong>ADIL — douane.gov.ma</strong>)</p>
       </div>
 
-      <!-- Barre de recherche -->
+      <!-- Barre de recherche texte -->
       <div class="hs-search-wrap" style="max-width:720px;position:relative">
         <div class="ai-search-box">
           <div class="ai-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
@@ -1716,6 +1716,53 @@
             oninput="ecHSInput(this.value)" autocomplete="off"/>
         </div>
         <div id="ec-hsDropdown" class="hs-dropdown hidden"></div>
+      </div>
+
+      <!-- ── Recherche par PHOTO ── -->
+      <div class="hs-photo-wrap" style="max-width:720px">
+        <div class="hs-photo-divider"><span>ou identifiez par photo</span></div>
+
+        <!-- Zone de dépôt / upload -->
+        <div class="hs-photo-zone" id="hs-photo-zone"
+             onclick="document.getElementById('hs-photo-input').click()"
+             ondragover="hsDragOver(event)" ondrop="hsDrop(event)">
+          <input type="file" id="hs-photo-input" accept="image/*"
+                 style="display:none" onchange="hsPhotoAnalyze(this.files[0])"/>
+          <div class="hs-photo-icon"><i class="fa-solid fa-camera"></i></div>
+          <div class="hs-photo-label">Identifier un article par sa photo</div>
+          <div class="hs-photo-sub">
+            Glissez une image · Cliquez pour parcourir · 📱 Prenez une photo
+          </div>
+          <div class="hs-photo-badges">
+            <span class="hs-pbadge"><i class="fa-solid fa-robot"></i> Claude Vision AI</span>
+            <span class="hs-pbadge"><i class="fa-solid fa-database"></i> 13 135 codes SH</span>
+            <span class="hs-pbadge"><i class="fa-solid fa-shield-halved"></i> Local &amp; privé</span>
+          </div>
+        </div>
+
+        <!-- Résultat photo -->
+        <div id="hs-photo-result" style="display:none">
+          <!-- Preview + statut -->
+          <div class="hs-photo-preview-wrap">
+            <img id="hs-photo-preview" src="" alt="Article" class="hs-photo-preview"/>
+            <div id="hs-photo-status" class="hs-photo-status-box">
+              <div class="hs-photo-loading">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Analyse en cours — Claude Vision identifie l'article…</span>
+              </div>
+            </div>
+          </div>
+          <!-- Résultats IA -->
+          <div id="hs-photo-info" class="hs-photo-info" style="display:none"></div>
+        </div>
+
+        <!-- Info : clé API requise -->
+        <div class="hs-photo-api-note" id="hs-photo-api-note" style="display:none">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          La reconnaissance par photo nécessite une clé API Claude.
+          <a href="#" onclick="ecShowModule('ocr');document.getElementById('ocr-api-config').scrollIntoView({behavior:'smooth'});return false">
+            Configurer ma clé</a>
+        </div>
       </div>
 
       <!-- Panneau résultats ADIL (caché par défaut) -->
@@ -2409,10 +2456,10 @@
 <!-- ══════════════ SCRIPTS ══════════════ -->
 <script src="hscodes_data.js?v=20260423c"></script>
 <script src="js/i18n.js?v=20260423c"></script>
-<script src="js/maroc-authorizations.js?v=20260425a"></script>
+<script src="js/maroc-authorizations.js?v=20260425b"></script>
 <script src="js/express-tarifs.js?v=20260423c"></script>
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
-<script src="js/espace-client.js?v=20260425a"></script>
+<script src="js/espace-client.js?v=20260425b"></script>
 </body>
 </html>

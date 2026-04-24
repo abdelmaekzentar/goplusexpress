@@ -907,6 +907,187 @@ function ecHSClose() {
   document.getElementById('ec-hsSearchInput').value = '';
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   MODULE PHOTO → HS CODE (Claude Vision AI)
+   Identifie l'article depuis une photo et retourne le code NGP Maroc
+   ══════════════════════════════════════════════════════════════════ */
+
+/** Drag-over sur la zone photo */
+function hsDragOver(e){
+  e.preventDefault();
+  document.getElementById('hs-photo-zone').classList.add('hs-photo-drag');
+}
+/** Drop d'un fichier image */
+function hsDrop(e){
+  e.preventDefault();
+  document.getElementById('hs-photo-zone').classList.remove('hs-photo-drag');
+  const file = e.dataTransfer.files[0];
+  if(file && file.type.startsWith('image/')) hsPhotoAnalyze(file);
+}
+
+/** Analyse une image via Claude Vision → retourne code SH + taux douaniers */
+async function hsPhotoAnalyze(file){
+  if(!file) return;
+
+  // Vérifier clé API
+  const apiKey = typeof ocrGetApiKey === 'function' ? ocrGetApiKey() : '';
+  const noteEl = document.getElementById('hs-photo-api-note');
+  if(!apiKey || !apiKey.startsWith('sk-ant')){
+    if(noteEl) noteEl.style.display = 'flex';
+    return;
+  }
+  if(noteEl) noteEl.style.display = 'none';
+
+  // Afficher preview + spinner
+  const resultEl  = document.getElementById('hs-photo-result');
+  const statusEl  = document.getElementById('hs-photo-status');
+  const infoEl    = document.getElementById('hs-photo-info');
+  const previewEl = document.getElementById('hs-photo-preview');
+
+  resultEl.style.display = 'block';
+  infoEl.style.display   = 'none';
+  statusEl.innerHTML = `<div class="hs-photo-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Analyse en cours — Claude Vision identifie l'article…</span></div>`;
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const dataUrl  = e.target.result;
+    const base64   = dataUrl.split(',')[1];
+    const mimeType = file.type || 'image/jpeg';
+
+    previewEl.src = dataUrl;
+
+    const prompt = `Tu es un expert en classification douanière marocaine (Nomenclature Générale des Produits / SH — Tarif douanier 2024).
+Analyse attentivement cette photo de produit commercial et identifie-le avec précision.
+
+Réponds UNIQUEMENT dans ce format exact (une valeur par ligne, rien d'autre) :
+PRODUIT: [description courte et précise du produit en français, ex: "Écouteurs Bluetooth avec traduction simultanée"]
+CODE_SH: [code SH marocain à 10 chiffres, ex: 8518300000]
+CONFIANCE: [nombre entier de 0 à 100]
+RAISON: [explication courte du choix du code, 1-2 phrases max]`;
+
+    try {
+      const resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 300,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: mimeType, data: base64 } },
+              { type: 'text',  text: prompt }
+            ]
+          }]
+        })
+      });
+
+      if(!resp.ok){
+        const err = await resp.json().catch(()=>({}));
+        throw new Error(err.error?.message || `HTTP ${resp.status}`);
+      }
+      const data = await resp.json();
+      const text = data?.content?.[0]?.text || '';
+
+      // Parser la réponse
+      const produit  = (text.match(/PRODUIT:\s*(.+)/i)||[])[1]?.trim() || 'Produit non identifié';
+      const codeSH   = (text.match(/CODE_SH:\s*(\d{6,10})/i)||[])[1]?.trim() || null;
+      const conf     = parseInt((text.match(/CONFIANCE:\s*(\d+)/i)||[])[1]||'0');
+      const raison   = (text.match(/RAISON:\s*(.+)/i)||[])[1]?.trim() || '';
+
+      statusEl.innerHTML = '';
+
+      if(codeSH){
+        const tarif = typeof getTarifBase === 'function' ? getTarifBase(codeSH) : null;
+        const di    = tarif ? tarif.di    : '—';
+        const tpi   = tarif ? (tarif.tpi||0) : '—';
+        const tva   = tarif ? tarif.tva   : '—';
+        const fds   = tarif ? tarif.fds   : false;
+        const confColor = conf >= 80 ? '#16a34a' : conf >= 50 ? '#d97706' : '#dc2626';
+        const totalTaxEst = tarif
+          ? (di + tpi + (tva * (1 + di/100 + tpi/100) / 100) * 100 + (fds ? 0.25 : 0)).toFixed(1)
+          : '—';
+
+        infoEl.innerHTML = `
+          <div class="hs-photo-product"><i class="fa-solid fa-box"></i> ${escapeHTML(produit)}</div>
+
+          <div class="hs-photo-code-row">
+            <span class="hs-photo-code-badge">${escapeHTML(codeSH)}</span>
+            <span class="hs-photo-conf" style="color:${confColor}">
+              <i class="fa-solid fa-gauge-high"></i> Confiance : ${conf}%
+            </span>
+            ${tarif ? `<span class="hs-photo-chapter-note">${escapeHTML(tarif.note||'')}</span>` : ''}
+          </div>
+
+          ${raison ? `<div class="hs-photo-reason"><i class="fa-solid fa-circle-info"></i> ${escapeHTML(raison)}</div>` : ''}
+
+          ${tarif ? `
+          <div class="hs-photo-rates-grid">
+            <div class="hs-photo-rate hs-rate-blue">
+              <div class="hs-rate-label">DI</div>
+              <div class="hs-rate-value">${di}%</div>
+              <div class="hs-rate-sub">Droit Importation</div>
+            </div>
+            <div class="hs-photo-rate hs-rate-orange">
+              <div class="hs-rate-label">TPI</div>
+              <div class="hs-rate-value">${tpi}%</div>
+              <div class="hs-rate-sub">Taxe Parafiscale</div>
+            </div>
+            <div class="hs-photo-rate hs-rate-purple">
+              <div class="hs-rate-label">TVA</div>
+              <div class="hs-rate-value">${tva}%</div>
+              <div class="hs-rate-sub">Valeur Ajoutée</div>
+            </div>
+            ${fds ? `
+            <div class="hs-photo-rate hs-rate-red">
+              <div class="hs-rate-label">FDS</div>
+              <div class="hs-rate-value">0.25%</div>
+              <div class="hs-rate-sub">Fonds Sauvegarde</div>
+            </div>` : ''}
+          </div>
+
+          <div class="hs-photo-cta-row">
+            <button class="hs-photo-btn-primary" onclick="ecSelectHS('${escapeHTML(codeSH)}','${escapeHTML(produit)}',${di||0})">
+              <i class="fa-solid fa-magnifying-glass-plus"></i> Fiche complète ADIL (Documents · Normes · Accords)
+            </button>
+            <button class="hs-photo-btn-secondary" onclick="document.getElementById('hs-photo-result').style.display='none';document.getElementById('hs-photo-zone').style.display='block';document.getElementById('hs-photo-input').value=''">
+              <i class="fa-solid fa-rotate-left"></i> Nouvelle photo
+            </button>
+          </div>` : `
+          <div class="hs-photo-notarif">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Code SH détecté mais taux non disponibles localement —
+            consultez <a href="https://www.douane.gov.ma/adil/" target="_blank" rel="noopener">ADIL douane.gov.ma</a>
+          </div>`}
+        `;
+      } else {
+        infoEl.innerHTML = `
+          <div class="hs-photo-error-box">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <div>
+              <strong>Produit non identifié</strong>
+              <div>Essayez une photo plus nette, mieux éclairée, ou utilisez la recherche textuelle.</div>
+            </div>
+          </div>`;
+      }
+      infoEl.style.display = 'block';
+
+    } catch(err){
+      statusEl.innerHTML = `
+        <div class="hs-photo-error-box">
+          <i class="fa-solid fa-wifi"></i>
+          <div><strong>Erreur API</strong><div>${escapeHTML(String(err.message||err))}</div></div>
+        </div>`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
 /* ── Simulateur rapide DI+TVA ── */
 function adilCalcTaxes(code, di, tpi, tva, fds) {
   const cifEl = document.getElementById('adil-cif-input');
