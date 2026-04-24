@@ -1668,9 +1668,10 @@ function ocrExtractArticles(text, globalCountry, currency){
   }
 
   if(tableStart !== -1){
-    // pendingNumV : dernière ligne "chiffres seuls" mémorisée
-    // (dans certains PDFs, les chiffres du tableau apparaissent avant le nom produit)
     let pendingNumV = [], pendingHS = null, pendingWg = null;
+    // firstNumV : PREMIER groupe de chiffres valide vu dans le tableau (≥2 chiffres)
+    // Fallback quand pendingNumV a été écrasé par des sous-totaux avant la description produit
+    let firstNumV = null, firstHS = null, firstWg = null;
 
     const pushArt = (desc, numV, hs, wg) => {
       const qty    = numV.find(v => Number.isInteger(v) || Math.abs(v - Math.round(v)) < 0.01);
@@ -1690,63 +1691,78 @@ function ocrExtractArticles(text, globalCountry, currency){
 
     for(let i=tableStart; i<lines.length; i++){
       const line = lines[i];
-      // Arrêter au pied de tableau — uniquement si des articles ont déjà été trouvés
-      // (évite de s'arrêter prématurément si le nom produit apparaît après les totaux dans le PDF)
+      // Arrêter si des articles ont déjà été trouvés ET on atteint le pied de tableau
       if(arts.length > 0 && /^(total|subtotal|freight|grand\s*total|remarks?|notes?|term|bank\s*info)/i.test(line)) break;
       if(SKIP_LINE.test(line)) continue;
       if(line.length < 4) continue;
 
-      // Retirer un éventuel numéro de ligne en tête ("1. " / "01 ")
       const lineClean = line.replace(/^\s*\d{1,3}\.?\s+/, '');
 
-      // Regex description : premier char = lettre OU chiffre suivi de lettre (4G, 802.11ac, 5V…)
+      // Regex description : premier char = lettre OU chiffre-lettre (4G, 802.11ac…)
       const descM = lineClean.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\d][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,120}?)(?=\s+[\d,.']+|\s*$)/);
 
       if(descM){
         const rawDesc = descM[1].trim().replace(/\s+/g,' ').replace(/\$\s*/g,'');
-        // Supprimer numéro de ligne éventuellement capturé en tête
-        const desc = rawDesc.replace(/^\d{1,3}\.?\s+/, '').trim();
-        // La description doit contenir au moins une lettre (rejette les lignes purement numériques)
+        const desc    = rawDesc.replace(/^\d{1,3}\.?\s+/, '').trim();
         const hasLetter = /[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF]/.test(desc);
 
+        // Filtrer les noms de société AVANT toute consommation de firstNumV/pendingNumV
+        // (ltd, corp, inc, gmbh… ne figurent jamais dans un nom de produit)
+        if(/\b(ltd\.?|limited|corp\.?|inc\.|gmbh|sarl|sas|llc)\b/i.test(desc) ||
+           /\bco\.?,?\s*ltd\.?\b/i.test(desc)) continue;
+
         if(!hasLetter || desc.length < 4 || SKIP.test(desc)){
-          // Pas une vraie description → mémoriser comme ligne de chiffres potentielle
           const nf = (lineClean.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
-          if(nf.length){ pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null; }
+          if(nf.length){
+            pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null;
+            // Mémoriser aussi depuis ce chemin (lignes chiffres qui matchent descM par le 1er char digit)
+            if(!firstNumV && nf.length >= 2){ firstNumV=nf; firstHS=pendingHS; firstWg=pendingWg; }
+          }
           continue;
         }
 
-        // Chiffres depuis la partie après la description sur cette même ligne
+        // Chiffres depuis cette ligne ou depuis les lignes précédentes/suivantes
         const afterDesc = line.slice(line.indexOf(lineClean) + descM[0].length);
-        let numV = [];
+        let numV = [], useHS = null, useWg = null;
 
         if(/\d/.test(afterDesc)){
           numV = (afterDesc.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+        } else if(pendingNumV.length >= 2){
+          // Ligne de chiffres précédente avec ≥2 valeurs (probable ligne produit)
+          numV=pendingNumV; useHS=pendingHS; useWg=pendingWg;
+          pendingNumV=[]; pendingHS=null; pendingWg=null;
+        } else if(firstNumV){
+          // Fallback : premier groupe de chiffres valide vu dans le tableau
+          // (cas PDF où la desc apparaît loin après les chiffres produit)
+          numV=firstNumV; useHS=firstHS; useWg=firstWg;
+          firstNumV=null;
         } else if(pendingNumV.length){
-          // Chiffres sur la ligne précédente (cas PDF inversé : prix avant nom)
-          numV = pendingNumV;
+          numV=pendingNumV; useHS=pendingHS; useWg=pendingWg;
           pendingNumV=[]; pendingHS=null; pendingWg=null;
         } else {
-          // Lookahead : chercher une ligne de chiffres dans les 3 lignes suivantes
+          // Lookahead : 3 lignes suivantes
           for(let j=i+1; j<=Math.min(i+3,lines.length-1); j++){
             if(/[A-Za-z\u4E00-\u9FFF]{5,}/.test(lines[j])) break;
             if(/\d/.test(lines[j])){
-              numV = (lines[j].match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+              numV=(lines[j].match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
               break;
             }
           }
         }
 
-        const hs = (line.match(hsRe)||[])[1] || pendingHS || null;
-        const wg = (line.match(wRe)||[])[1]  || pendingWg || null;
+        const hs = (line.match(hsRe)||[])[1] || useHS || null;
+        const wg = (line.match(wRe)||[])[1]  || useWg || null;
         pushArt(desc, numV, hs, wg);
         pendingNumV=[]; pendingHS=null; pendingWg=null;
 
       } else {
-        // Ligne sans description reconnue → peut-être des chiffres seuls, mémoriser
+        // Ligne sans description → mémoriser comme groupe de chiffres
         const nf = (lineClean.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
         if(nf.length && !/[A-Za-z\u4E00-\u9FFF]{4,}/.test(lineClean)){
-          pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null;
+          const hs2=(line.match(hsRe)||[])[1]||null, wg2=(line.match(wRe)||[])[1]||null;
+          pendingNumV=nf; pendingHS=hs2; pendingWg=wg2;
+          // Mémoriser le PREMIER groupe ≥2 chiffres comme fallback
+          if(!firstNumV && nf.length >= 2){ firstNumV=nf; firstHS=hs2; firstWg=wg2; }
         }
       }
     }
