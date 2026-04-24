@@ -1382,7 +1382,14 @@ function ocrLoadFile(input){
           await new Promise((res) => {
             // Essai ESM moderne
             import('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js')
-              .then(mod => { window.pdfjsLib = mod; res(); })
+              .then(mod => {
+                // build UMD : import() réussit mais retourne un module vide ;
+                // la vraie lib est dans le global window['pdfjs-dist/build/pdf']
+                window.pdfjsLib = (mod && typeof mod.getDocument === 'function')
+                  ? mod
+                  : (window['pdfjs-dist/build/pdf'] || mod);
+                res();
+              })
               .catch(() => {
                 // Fallback UMD classique
                 const s = document.createElement('script');
@@ -1717,6 +1724,22 @@ function ocrExtractArticles(text, globalCountry, currency){
             pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null;
             // Mémoriser aussi depuis ce chemin (lignes chiffres qui matchent descM par le 1er char digit)
             if(!firstNumV && nf.length >= 2){ firstNumV=nf; firstHS=pendingHS; firstWg=pendingWg; }
+            // Cas "chiffres + description sur la même ligne" : ex. "3000 4 $12,000 4G MIFI-M10"
+            // Chercher un segment avec lettre en fin de ligne (après les chiffres)
+            const trailingM = lineClean.match(/(?:^|\s)((?:\d*[A-Za-z\u4E00-\u9FFF][A-Za-z0-9\u4E00-\u9FFF\s\-\/,\.&%°\+\(\)]{1,100}))$/);
+            if(trailingM){
+              const td = trailingM[1].trim().replace(/\s+/g,' ');
+              const tdOk = td.length >= 3 && td.length <= 120
+                && /[A-Za-z\u4E00-\u9FFF]/.test(td)
+                && !SKIP.test(td)
+                && !/^(total|subtotal|freight|fob|cif|dap|ddp|price|amount|cost|packing|term|bank|payment|origin|destination|delivery)/i.test(td)
+                && !/\b(ltd\.?|limited|corp\.?|inc\.|gmbh|sarl|sas|llc)\b/i.test(td);
+              if(tdOk){
+                const hs3=(line.match(hsRe)||[])[1]||null, wg3=(line.match(wRe)||[])[1]||null;
+                pushArt(td, nf, hs3, wg3);
+                pendingNumV=[]; pendingHS=null; pendingWg=null;
+              }
+            }
           }
           continue;
         }
