@@ -560,6 +560,22 @@
 .adil-country-more{background:#e2e8f0;color:#4a5568}
 .adil-accord-note{font-size:.78rem;color:var(--text-light);line-height:1.45;margin-top:2px}
 
+/* ── Accords Pays Table (style ADIL douane.gov.ma) ── */
+.adil-pays-table-wrap{overflow-x:auto;margin-bottom:12px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.adil-pays-table{width:100%;border-collapse:collapse;font-size:.85rem;background:#fff;border-radius:12px;overflow:hidden}
+.adil-pays-table thead tr{background:linear-gradient(135deg,#1a3a5c,#0f2241);color:#fff}
+.adil-pays-table th{padding:11px 14px;font-weight:700;font-size:.8rem;text-align:center;border:none;letter-spacing:.02em}
+.adil-pays-table th:nth-child(2){text-align:left}
+.adil-pays-row{border-bottom:1px solid #f0f4f8;cursor:default;transition:background .15s}
+.adil-pays-row:hover{background:#f0f7ff}
+.adil-pays-row:last-child{border-bottom:none}
+.adil-pays-flag{font-size:1.4rem;padding:7px 12px 7px 10px;text-align:center;width:44px;vertical-align:middle}
+.adil-pays-name{font-weight:700;color:#1a3a5c;padding:7px 6px;font-size:.84rem;white-space:nowrap;vertical-align:middle}
+.adil-pays-liste{color:#4a5568;font-size:.77rem;padding:7px 10px;font-style:italic;vertical-align:middle}
+.adil-pays-di,.adil-pays-tpi{text-align:center;font-weight:800;color:#276749;padding:7px 14px;font-size:.92rem;vertical-align:middle}
+.adil-pays-star{color:#c05621;cursor:help;font-weight:800;font-size:.9rem}
+.adil-pays-legend{text-align:right;font-size:.75rem;color:#c05621;font-style:italic;margin-top:7px;padding-right:4px;display:flex;align-items:center;justify-content:flex-end;gap:5px}
+
 /* ── Responsive ── */
 @media(max-width:900px){
   .ec-sidebar{display:none}

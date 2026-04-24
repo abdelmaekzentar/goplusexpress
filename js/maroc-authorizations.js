@@ -732,6 +732,28 @@ const MAROC_ACCORDS = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════════
+   ACCORDS PRÉFÉRENTIELS — LISTE PAR PAYS (style ADIL douane.gov.ma)
+   tpi: 0 = exonéré | null = (*) = Taux du Régime du Droit Commun
+   cert = certificat d'origine à présenter
+   ═══════════════════════════════════════════════════════════════════ */
+const MAROC_ACCORDS_PAYS = [
+  { flag: '🇩🇿', name: 'ALGERIE',        liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: "Certificat d'origine arabe (CAOA)" },
+  { flag: '🇱🇾', name: 'LIBYE',          liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: "Certificat d'origine arabe (CAOA)" },
+  { flag: '🌐',  name: 'QUAD-AGADIR',    liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: 'Certificat EUR.1 (Maroc, Tunisie, Égypte, Jordanie)' },
+  { flag: '🇮🇶', name: 'IRAQ',           liste: 'FRANCHISE',          di: 0, tpi: null, cert: "Certificat d'origine arabe (CAOA)" },
+  { flag: '🇦🇪', name: 'EMIRATS A.U.',   liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: "Certificat d'origine" },
+  { flag: '🇨🇭', name: 'AELE',           liste: 'ANNEXE 1 LISTE 1',   di: 0, tpi: null, cert: 'Certificat EUR.1 (Suisse, Islande, Norvège, Liechtenstein)' },
+  { flag: '🇪🇬', name: 'EGYPTE',         liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: 'Certificat EUR.1' },
+  { flag: '🇯🇴', name: 'JORDANIE',       liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: 'Certificat EUR.1' },
+  { flag: '🌍',  name: 'LIGUE ARABE',    liste: 'FRANCHISE',          di: 0, tpi: 0,    cert: "Certificat d'origine arabe (CAOA)" },
+  { flag: '🇹🇳', name: 'TUNISIE',        liste: 'M1',                 di: 0, tpi: 0,    cert: 'EUR.1 ou Formulaire A' },
+  { flag: '🇹🇷', name: 'TURQUIE',        liste: 'ANNEXE II LISTE 1',  di: 0, tpi: null, cert: 'A.TR ou EUR.1' },
+  { flag: '🇪🇺', name: 'UE',             liste: 'ANNEXE 1 LISTE 1',   di: 0, tpi: null, cert: 'Certificat EUR.1 (27 pays membres)' },
+  { flag: '🇺🇸', name: 'USA',            liste: 'ANNEXE II CAT. A',   di: 0, tpi: null, cert: "Déclaration d'origine sur facture" },
+  { flag: '🇬🇧', name: 'ROYAUME UNI',    liste: 'ANNEXE 1 LISTE 1',   di: 0, tpi: null, cert: 'Certificat EUR.1' },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
    DROITS & TAXES DE BASE PAR CHAPITRE SH (Tarif Douanier Maroc 2024)
    Source: ADIL — douane.gov.ma/adil
    ═══════════════════════════════════════════════════════════════════ */

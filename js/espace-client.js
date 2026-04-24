@@ -809,17 +809,57 @@ function ecSelectHS(code, desc, di) {
   document.getElementById('adil-normes-content').innerHTML = normesHtml;
 
   // ── Onglet Accords & Conventions ───────────────────────────────
-  const ACCORDS = (typeof MAROC_ACCORDS !== 'undefined') ? MAROC_ACCORDS : [];
+  const ACCORDS_PAYS = (typeof MAROC_ACCORDS_PAYS !== 'undefined') ? MAROC_ACCORDS_PAYS : [];
+  const drcTpi = tpiVal; // Taux Droit Commun TPI pour ce chapitre (affiché pour les (*))
+
   let accordsHtml = `
     <div class="adil-accords-intro">
       <i class="fa-solid fa-circle-info"></i>
       Les accords préférentiels s'appliquent selon le <strong>pays d'origine</strong> de la marchandise.
       Présentez le certificat d'origine correspondant pour bénéficier du taux réduit.
-    </div>
-    <div class="adil-accords-grid">`;
+      Taux de base (sans accord) : DI&nbsp;${diVal}% · TPI&nbsp;${drcTpi}%
+    </div>`;
 
-  ACCORDS.forEach(acc => {
+  if(ACCORDS_PAYS.length){
     accordsHtml += `
+    <div class="adil-pays-table-wrap">
+      <table class="adil-pays-table">
+        <thead>
+          <tr>
+            <th colspan="2" style="text-align:left;padding-left:16px">Accords</th>
+            <th>Liste</th>
+            <th>DI<br><small>(en %)</small></th>
+            <th>TPI<br><small>(en %)</small></th>
+          </tr>
+        </thead>
+        <tbody>`;
+    ACCORDS_PAYS.forEach(p => {
+      const tpiDisp = p.tpi === null
+        ? `<span class="adil-pays-star" title="Taux du Régime du Droit Commun : ${drcTpi}%">(*)</span>`
+        : p.tpi;
+      accordsHtml += `
+          <tr class="adil-pays-row" title="Certificat requis : ${escapeHTML(p.cert)}">
+            <td class="adil-pays-flag">${p.flag}</td>
+            <td class="adil-pays-name">${escapeHTML(p.name)}</td>
+            <td class="adil-pays-liste">${escapeHTML(p.liste)}</td>
+            <td class="adil-pays-di">${p.di}</td>
+            <td class="adil-pays-tpi">${tpiDisp}</td>
+          </tr>`;
+    });
+    accordsHtml += `
+        </tbody>
+      </table>
+      <div class="adil-pays-legend"><i class="fa-solid fa-circle-info"></i> (*) Taux du Régime du Droit Commun (${drcTpi}%)</div>
+    </div>`;
+  }
+
+  // Détail des accords (certificats) — cards compactes
+  const ACCORDS = (typeof MAROC_ACCORDS !== 'undefined') ? MAROC_ACCORDS : [];
+  if(ACCORDS.length){
+    accordsHtml += `<div class="adil-section-sep" style="margin-top:20px"><i class="fa-solid fa-file-signature"></i> Certificats d'origine — détail par accord</div>
+    <div class="adil-accords-grid">`;
+    ACCORDS.forEach(acc => {
+      accordsHtml += `
       <div class="adil-accord-card">
         <div class="adil-accord-head">
           <span class="adil-accord-code">${escapeHTML(acc.code)}</span>
@@ -844,8 +884,9 @@ function ecSelectHS(code, desc, di) {
           <i class="fa-solid fa-arrow-up-right-from-square"></i> Détails accord
         </a>
       </div>`;
-  });
-  accordsHtml += `</div>`;
+    });
+    accordsHtml += `</div>`;
+  }
   document.getElementById('adil-accords-content').innerHTML = accordsHtml;
 
   // Scroll vers le panneau
@@ -1572,6 +1613,10 @@ function ocrParseInvoice(text, filename){
     total_value:     pick([/(?:total|montant\s*total|grand\s*total|amount\s*due)[^\d]*([0-9][\d\s,.']{2,18})/i], t),
     origin_country:  pick([/(?:country\s*of\s*origin|pays\s*(?:d')?origine|origin)[:\s]+([A-Za-zÀ-ÿ\s]{2,30})/i], t),
     awb_bl:          pick([/(?:awb|airwaybill|b\/l|bill\s*of\s*lading)[:\s#]*([A-Z0-9\-\/]{6,20})/i], t),
+    freight_cost:    pick([
+      /(?:freight\s*cost|fret|transport\s*cost|shipping\s*cost|frais\s*(?:de\s*)?(?:fret|transport))[^\d$€£]*[\$€£]?\s*([\d,.']+)/i,
+      /(?:freight|fret|transport)[^\d$€£\n]{0,20}[\$€£]\s*([\d,.']+)/i,
+    ], t),
   };
 
   // Sync incoterm trouvé vers le sélecteur UI
@@ -1582,6 +1627,16 @@ function ocrParseInvoice(text, filename){
   if(info.currency){
     const sel = document.getElementById('ocr-currency');
     if(sel) sel.value = info.currency;
+  }
+  // Auto-remplir le champ fret si détecté dans la facture
+  if(info.freight_cost){
+    const fv = parseFloat(String(info.freight_cost).replace(/,/g,'').replace(/\s/g,''));
+    if(fv > 0){
+      const fretInput = document.getElementById('ocr-fret-cost');
+      if(fretInput && (!fretInput.value || parseFloat(fretInput.value) === 0)){
+        fretInput.value = fv.toFixed(2);
+      }
+    }
   }
 
   // Extraire articles
