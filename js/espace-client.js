@@ -1003,9 +1003,10 @@ function ocrCalcCIF(artTotalPrice, totalInvoiceValue, currency){
     const insMAD = insTotal > 0 ? insTotal * rate * ratio : priceMAD * 0.005;
     cifMAD = priceMAD + insMAD;
   } else if(incoterm === 'DAP'){
+    // DAP = vendeur paie tout jusqu'à destination → fret 100% inclus
     const fretMAD = fretTotal * rate * ratio;
     const insMAD  = insTotal > 0 ? insTotal * rate * ratio : (priceMAD + fretMAD) * 0.005;
-    cifMAD = priceMAD + fretMAD * 0.5 + insMAD;
+    cifMAD = priceMAD + fretMAD + insMAD;
   } else if(incoterm === 'DDP'){
     cifMAD = priceMAD; // droits déjà payés
   } else {
@@ -2003,10 +2004,13 @@ function ocrRenderResults(info, articles, filename, currency, totalValue){
       const insMAD   = invMAD * 0.005;
       const estCIF   = invMAD + insMAD;
       // Calcul estimé agrégé depuis taux ADIL de chaque article
+      // Fallback si HS inconnu : TVA 20% minimum (toujours appliquée sur imports)
+      const DEFAULT_TARIF = { di: 0, tpi: 0, tva: 20, fds: false };
       let estDI=0, estTPI=0, estTVA=0, estFDS=0;
       articles.forEach(a => {
-        if(!a.ngp_code_maroc) return;
-        const tarif = typeof getTarifBase === 'function' ? getTarifBase(a.ngp_code_maroc) : null;
+        const tarif = (typeof getTarifBase === 'function' && a.ngp_code_maroc)
+          ? getTarifBase(a.ngp_code_maroc)
+          : DEFAULT_TARIF;
         if(!tarif) return;
         const ratio   = invTotal > 0 && a._rawPrice > 0 ? a._rawPrice / invTotal : 1 / articles.length;
         const cifPart = estCIF * ratio;

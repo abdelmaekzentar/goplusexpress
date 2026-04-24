@@ -677,7 +677,7 @@ const MAROC_AUTH_DB = [
 const MAROC_ACCORDS = [
   {
     code: 'EUR.1',
-    name: 'Accord d'Association Maroc — Union Européenne',
+    name: "Accord d'Association Maroc — Union Européenne",
     countries: ['France','Espagne','Allemagne','Italie','Belgique','Pays-Bas','Portugal','Grèce','Autriche','Suède','Finlande','Danemark','Irlande','Luxembourg','Pologne','République Tchèque','Hongrie','Slovaquie','Slovénie','Estonie','Lettonie','Lituanie','Bulgarie','Roumanie','Croatie','Malte','Chypre'],
     document: 'Certificat EUR.1',
     reduction: 'Taux préférentiel (0% ou réduit)',
