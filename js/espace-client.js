@@ -1420,6 +1420,7 @@ function ocrLoadFile(input){
           const byY = {};
           content.items.forEach(it => {
             if(!it.str || !it.str.trim()) return;
+            if(!it.transform || it.transform.length < 6) return; // sécurité : items sans matrice
             const y = Math.round(it.transform[5] / 10) * 10; // bucket 10px — regroupe mieux les cellules de tableau
             if(!byY[y]) byY[y] = [];
             byY[y].push({ str: it.str.trim(), x: it.transform[4] });
@@ -1453,7 +1454,12 @@ function ocrLoadFile(input){
 
         // ── 4. Parser le texte extrait ──
         if(extractedText.trim().length > 20){
-          ocrParseInvoice(extractedText, file.name);
+          try { ocrParseInvoice(extractedText, file.name); }
+          catch(parseErr){
+            console.error('Parse error:', parseErr);
+            // Afficher 0 articles plutôt que de crasher
+            ocrParseInvoice('', file.name);
+          }
         } else {
           // ── 5. Fallback OCR Tesseract si PDF scanné (pas de texte) ──
           if(sub) sub.textContent = 'PDF scanné — OCR en cours…';
