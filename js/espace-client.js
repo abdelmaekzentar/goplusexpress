@@ -1420,13 +1420,14 @@ function ocrLoadFile(input){
           const byY = {};
           content.items.forEach(it => {
             if(!it.str || !it.str.trim()) return;
-            const y = Math.round(it.transform[5] / 5) * 5; // arrondi à 5px
+            const y = Math.round(it.transform[5] / 10) * 10; // bucket 10px — regroupe mieux les cellules de tableau
             if(!byY[y]) byY[y] = [];
-            byY[y].push(it.str.trim());
+            byY[y].push({ str: it.str.trim(), x: it.transform[4] });
           });
-          // Trier Y décroissant (haut de page = Y grand en PDF)
+          // Trier Y décroissant (haut de page) ; au sein d'un Y, trier par X (gauche → droite)
           Object.keys(byY).sort((a,b)=>b-a).forEach(y => {
-            const line = byY[y].join(' ').replace(/\s+/g,' ').trim();
+            const items = byY[y].sort((a,b) => a.x - b.x);
+            const line  = items.map(i => i.str).join(' ').replace(/\s+/g,' ').trim();
             if(line) allLines.push(line);
           });
           if(p < numPages) allLines.push(''); // séparateur de page
@@ -1635,30 +1636,26 @@ function ocrExtractArticles(text, globalCountry, currency){
   const DESC_KW = ['product name','product image','désignation','designation',
     'description des marchandises','description','goods','commodity','item description',
     'item name','article','libellé','marchandise','model','specification','spec',
-    'part no','reference','nature','détail'];
-  // Mots-clés quantité/prix (au moins 1 requis sur la même ligne ou la ligne suivante)
+    'part no','reference','nature','détail','name of goods','goods name','item'];
   const QTY_KW  = ['quant','quantity','qty','price','unit price','unit cost','montant',
-    'amount','total','prix','pcs','pieces','pièces','nbr','nbre','units'];
+    'amount','total','prix','pcs','pieces','pièces','nbr','nbre','units',
+    'u/p','fob price','unit fob','ctns','carton'];
 
   let tableStart = -1;
   for(let i=0; i<lines.length; i++){
     const l = lines[i].toLowerCase();
     const hasDesc = DESC_KW.some(k => l.includes(k));
     const hasQty  = QTY_KW.some(k  => l.includes(k));
-    if(hasDesc && hasQty){
-      tableStart = i + 1;
-      break;
-    }
-    // En-tête multi-lignes : description sur la ligne i, qté sur i+1 ou i+2
-    if(hasDesc && i < lines.length - 2){
-      const next = (lines[i+1]||'').toLowerCase() + ' ' + (lines[i+2]||'').toLowerCase();
-      if(QTY_KW.some(k => next.includes(k))){
-        tableStart = i + 2;
-        break;
+    if(hasDesc && hasQty){ tableStart = i + 1; break; }
+    // En-tête multi-lignes : fenêtre élargie à 6 lignes
+    if(hasDesc && i < lines.length - 6){
+      let last = -1;
+      for(let j=i+1; j<=Math.min(i+6,lines.length-1); j++){
+        if(QTY_KW.some(k=>lines[j].toLowerCase().includes(k))) last=j;
       }
+      if(last !== -1){ tableStart = last + 1; break; }
     }
-    // Ligne "No." ou "S/N" ou numéro de ligne = probable début tableau
-    if(/^\s*(no\.?|s\/n|item\s*no|#)\s*$/i.test(lines[i]) && i < lines.length - 1){
+    if(/^\s*(no\.?|s\/n|item\s*no\.?|seq\.?|#)\s*$/i.test(lines[i]) && i < lines.length - 1){
       const next = lines[i+1].toLowerCase();
       if(DESC_KW.some(k=>next.includes(k)) || QTY_KW.some(k=>next.includes(k))){
         tableStart = i + 2; break;
@@ -1667,40 +1664,87 @@ function ocrExtractArticles(text, globalCountry, currency){
   }
 
   if(tableStart !== -1){
-    for(let i=tableStart; i<lines.length; i++){
-      const line = lines[i];
-      // Arrêter au pied de tableau
-      if(/^(total|subtotal|freight|grand\s*total|remarks?|notes?|term)/i.test(line)) break;
-      if(line.length < 4) continue;
-      if(SKIP_LINE.test(line)) continue;
+    // pendingNumV : dernière ligne "chiffres seuls" mémorisée
+    // (dans certains PDFs, les chiffres du tableau apparaissent avant le nom produit)
+    let pendingNumV = [], pendingHS = null, pendingWg = null;
 
-      // Extraire description (partie texte avant les chiffres)
-      const descM = line.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,100}?)(?=\s+\d|\s*$)/);
-      if(!descM) continue;
-      const desc = descM[1].trim().replace(/\s+/g,' ').replace(/\$\s*/g,'');
-      if(desc.length < 4 || SKIP.test(desc)) continue;
-
-      const nums = line.match(/[\d,.']+/g)||[];
-      const numV = nums.map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
-
-      const hs = (line.match(hsRe)||[])[1]||null;
-      const wg = (line.match(wRe)||[])[1]||null;
-
-      // Qty = premier entier "raisonnable" (souvent < 1000000), unitPrice = suivant, total = dernier
-      const qty   = numV.find(v=>Number.isInteger(v)||v===Math.round(v));
-      const qtyIdx= qty!=null ? numV.indexOf(qty) : 0;
-      const priceNums = numV.slice(qtyIdx+1);
-
+    const pushArt = (desc, numV, hs, wg) => {
+      const qty    = numV.find(v => Number.isInteger(v) || Math.abs(v - Math.round(v)) < 0.01);
+      const qtyIdx = qty != null ? numV.indexOf(qty) : 0;
+      const prices = numV.slice(qtyIdx + 1);
       arts.push({
-        description:   desc.substring(0,120),
+        description:   desc.substring(0, 120),
         quantity:      qty!=null ? String(qty) : (numV[0]!=null ? String(numV[0]) : '—'),
-        unitPrice:     priceNums[0]!=null ? priceNums[0].toFixed(2)+' '+currency : '—',
-        totalPrice:    priceNums[1]!=null ? priceNums[1].toFixed(2)+' '+currency : (priceNums[0]!=null ? priceNums[0].toFixed(2)+' '+currency : '—'),
-        _rawPrice:     priceNums[1]!=null ? priceNums[1] : (priceNums[0]!=null ? priceNums[0] : 0),
+        unitPrice:     prices[0]!=null ? prices[0].toFixed(2)+' '+currency : '—',
+        totalPrice:    prices[1]!=null ? prices[1].toFixed(2)+' '+currency : (prices[0]!=null ? prices[0].toFixed(2)+' '+currency : '—'),
+        _rawPrice:     prices[1]!=null ? prices[1] : (prices[0]!=null ? prices[0] : 0),
         weight:        wg ? wg+' kg' : '—',
         _rawHS:        hs,
         originCountry: globalCountry || '—',
       });
+    };
+
+    for(let i=tableStart; i<lines.length; i++){
+      const line = lines[i];
+      // Arrêter au pied de tableau — uniquement si des articles ont déjà été trouvés
+      // (évite de s'arrêter prématurément si le nom produit apparaît après les totaux dans le PDF)
+      if(arts.length > 0 && /^(total|subtotal|freight|grand\s*total|remarks?|notes?|term|bank\s*info)/i.test(line)) break;
+      if(SKIP_LINE.test(line)) continue;
+      if(line.length < 4) continue;
+
+      // Retirer un éventuel numéro de ligne en tête ("1. " / "01 ")
+      const lineClean = line.replace(/^\s*\d{1,3}\.?\s+/, '');
+
+      // Regex description : premier char = lettre OU chiffre suivi de lettre (4G, 802.11ac, 5V…)
+      const descM = lineClean.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\d][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,120}?)(?=\s+[\d,.']+|\s*$)/);
+
+      if(descM){
+        const rawDesc = descM[1].trim().replace(/\s+/g,' ').replace(/\$\s*/g,'');
+        // Supprimer numéro de ligne éventuellement capturé en tête
+        const desc = rawDesc.replace(/^\d{1,3}\.?\s+/, '').trim();
+        // La description doit contenir au moins une lettre (rejette les lignes purement numériques)
+        const hasLetter = /[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF]/.test(desc);
+
+        if(!hasLetter || desc.length < 4 || SKIP.test(desc)){
+          // Pas une vraie description → mémoriser comme ligne de chiffres potentielle
+          const nf = (lineClean.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+          if(nf.length){ pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null; }
+          continue;
+        }
+
+        // Chiffres depuis la partie après la description sur cette même ligne
+        const afterDesc = line.slice(line.indexOf(lineClean) + descM[0].length);
+        let numV = [];
+
+        if(/\d/.test(afterDesc)){
+          numV = (afterDesc.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+        } else if(pendingNumV.length){
+          // Chiffres sur la ligne précédente (cas PDF inversé : prix avant nom)
+          numV = pendingNumV;
+          pendingNumV=[]; pendingHS=null; pendingWg=null;
+        } else {
+          // Lookahead : chercher une ligne de chiffres dans les 3 lignes suivantes
+          for(let j=i+1; j<=Math.min(i+3,lines.length-1); j++){
+            if(/[A-Za-z\u4E00-\u9FFF]{5,}/.test(lines[j])) break;
+            if(/\d/.test(lines[j])){
+              numV = (lines[j].match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+              break;
+            }
+          }
+        }
+
+        const hs = (line.match(hsRe)||[])[1] || pendingHS || null;
+        const wg = (line.match(wRe)||[])[1]  || pendingWg || null;
+        pushArt(desc, numV, hs, wg);
+        pendingNumV=[]; pendingHS=null; pendingWg=null;
+
+      } else {
+        // Ligne sans description reconnue → peut-être des chiffres seuls, mémoriser
+        const nf = (lineClean.match(/[\d,.']+/g)||[]).map(n=>parseFloat(n.replace(/,/g,''))).filter(v=>v>0&&v<1e9);
+        if(nf.length && !/[A-Za-z\u4E00-\u9FFF]{4,}/.test(lineClean)){
+          pendingNumV=nf; pendingHS=(line.match(hsRe)||[])[1]||null; pendingWg=(line.match(wRe)||[])[1]||null;
+        }
+      }
     }
   }
 
@@ -1717,12 +1761,12 @@ function ocrExtractArticles(text, globalCountry, currency){
       if(numV.length < 1) continue;
 
       // Extraire la partie texte (description avant les chiffres)
-      const descM = line.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,120}?)(?=\s+[\d]|\s*$)/);
+      const lineS2 = line.replace(/^\s*\d{1,3}\.?\s+/, '');
+      const descM = lineS2.match(/^([A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF\d][A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF0-9\s\-\/,\.&%°\+\(\)]{3,120}?)(?=\s+[\d,.']+|\s*$)/);
       if(!descM) continue;
-      const desc = descM[1].trim().replace(/\s+/g,' ').substring(0,120);
+      const desc = descM[1].trim().replace(/\s+/g,' ').replace(/^\d{1,3}\.?\s+/,'').substring(0,120);
       if(desc.length < 5 || SKIP.test(desc)) continue;
-      // Ignorer les lignes qui sont clairement des coordonnées ou numéros
-      if(/^\d{4,}/.test(desc)) continue;
+      if(!/[A-Za-zÀ-ÿ\u4E00-\u9FFF\u0600-\u06FF]/.test(desc)) continue;
 
       const hs = (line.match(hsRe)||[])[1]||null;
       const wg = (line.match(wRe)||[])[1]||null;
