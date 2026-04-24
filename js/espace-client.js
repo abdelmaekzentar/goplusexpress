@@ -1420,15 +1420,14 @@ function ocrLoadFile(input){
           const byY = {};
           content.items.forEach(it => {
             if(!it.str || !it.str.trim()) return;
-            if(!it.transform || it.transform.length < 6) return; // sécurité : items sans matrice
-            const y = Math.round(it.transform[5] / 10) * 10; // bucket 10px — regroupe mieux les cellules de tableau
+            if(!it.transform || it.transform.length < 6) return;
+            const y = Math.round(it.transform[5] / 5) * 5;
             if(!byY[y]) byY[y] = [];
-            byY[y].push({ str: it.str.trim(), x: it.transform[4] });
+            byY[y].push(it.str.trim());
           });
-          // Trier Y décroissant (haut de page) ; au sein d'un Y, trier par X (gauche → droite)
+          // Trier Y décroissant (haut de page = Y grand en PDF)
           Object.keys(byY).sort((a,b)=>b-a).forEach(y => {
-            const items = byY[y].sort((a,b) => a.x - b.x);
-            const line  = items.map(i => i.str).join(' ').replace(/\s+/g,' ').trim();
+            const line = byY[y].join(' ').replace(/\s+/g,' ').trim();
             if(line) allLines.push(line);
           });
           if(p < numPages) allLines.push(''); // séparateur de page
@@ -1456,9 +1455,8 @@ function ocrLoadFile(input){
         if(extractedText.trim().length > 20){
           try { ocrParseInvoice(extractedText, file.name); }
           catch(parseErr){
-            console.error('Parse error:', parseErr);
-            // Afficher 0 articles plutôt que de crasher
-            ocrParseInvoice('', file.name);
+            console.error('Parse error (non-bloquant):', parseErr);
+            try { ocrParseInvoice('', file.name); } catch(e2){ /* ignore */ }
           }
         } else {
           // ── 5. Fallback OCR Tesseract si PDF scanné (pas de texte) ──
