@@ -787,8 +787,9 @@
    HORLOGE MONDIALE
    ══════════════════════════════════════════════════════ */
 /* ── Truck / Container illustration ── */
-.cont-truck-img{background:#f1f5f9;padding:10px 14px 4px;border-bottom:1px solid var(--ec-border);overflow:hidden}
-.cont-truck-img svg{width:100%;height:80px;display:block}
+.cont-truck-img{background:#f1f5f9;border-bottom:1px solid var(--ec-border);overflow:hidden}
+.cont-truck-img svg{width:100%;height:80px;display:block;padding:8px 12px 2px}
+.cont-photo{width:100%;height:160px;object-fit:cover;display:block;transition:opacity .3s}
 
 .wc-search-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .wc-search-row input{flex:1;min-width:200px;padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;background:#fff;transition:var(--transition)}
