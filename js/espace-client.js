@@ -549,7 +549,7 @@ function simProCalc(){
 /* ── VesselFinder zone switcher ─────────────────────── */
 function vesselZone(lat,lon,zoom,btn){
   const iframe = document.getElementById('vessel-iframe');
-  if(iframe) iframe.src = `https://www.vesselfinder.com/aismap?zoom=${zoom}&lat=${lat}&lon=${lon}&names=true&fleet=&mmsi=`;
+  if(iframe) iframe.src = `https://www.vesselfinder.com/aismap?zoom=${zoom}&lat=${lat}&lon=${lon}&names=true&maptype=1&fleet=&mmsi=`;
   document.querySelectorAll('.vessel-zone-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }

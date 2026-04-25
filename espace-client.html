@@ -151,6 +151,9 @@
       <button class="ec-nav-item" onclick="ecShowModule('horloge')" id="ecnav-horloge">
         <i class="fa-solid fa-clock"></i> Horloge Mondiale
       </button>
+      <button class="ec-nav-item" onclick="ecShowModule('navires')" id="ecnav-navires">
+        <i class="fa-solid fa-ship"></i> Trafic Maritime
+      </button>
     </nav>
     <div class="ec-sidebar-footer">
       <a href="index.html" class="ec-sidebar-link"><i class="fa-solid fa-globe"></i> Site principal</a>
@@ -2676,6 +2679,32 @@
       </div>
       <div class="wc-grid" id="wc-grid"></div>
     </div>
+
+    <!-- ── Module: Trafic Maritime ── -->
+    <div class="ec-module" id="ecmod-navires">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-ship"></i> Trafic Maritime en Temps Réel</h1>
+        <p>Positions des navires en direct — Méditerranée · Tanger Med · Casablanca · Monde</p>
+      </div>
+      <div class="vessel-zone-row">
+        <button class="vessel-zone-btn active" onclick="vesselZone(35.9,-5.5,8,this)"><i class="fa-solid fa-anchor"></i> Tanger Med</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(33.6,-7.6,9,this)"><i class="fa-solid fa-anchor"></i> Casablanca</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(36.5,14.0,5,this)"><i class="fa-solid fa-water"></i> Méditerranée</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(29.0,-14.0,4,this)"><i class="fa-solid fa-globe-africa"></i> Côte Atlantique Maroc</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(20.0,10.0,2,this)"><i class="fa-solid fa-earth-africa"></i> Vue Monde</button>
+      </div>
+      <div class="vessel-map-wrap">
+        <iframe id="vessel-iframe"
+          src="https://www.vesselfinder.com/aismap?zoom=8&lat=35.9&lon=-5.5&names=true&maptype=1&fleet=&mmsi="
+          width="100%" height="580" style="border:none;border-radius:12px;display:block"
+          title="VesselFinder — Trafic Maritime" loading="lazy">
+        </iframe>
+      </div>
+      <p class="vessel-credit">
+        <i class="fa-solid fa-circle-info"></i>
+        Données AIS en temps réel par <a href="https://www.vesselfinder.com" target="_blank" rel="noopener">VesselFinder</a> · Fond de carte Google Maps — Mise à jour toutes les 2 min.
+      </p>
+    </div><!-- /#ecmod-navires -->
 
   </main>
 </div>
