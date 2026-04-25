@@ -5,6 +5,16 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
+<!-- ═══ PWA ═══ -->
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#00a99d"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="GO PLUS"/>
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
+<link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
 <link rel="stylesheet" href="css/espace-client.css?v=20260425h"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -2770,5 +2780,14 @@
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/espace-client.js?v=20260425h"></script>
+
+<!-- ═══ SERVICE WORKER ═══ -->
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+  });
+}
+</script>
 </body>
 </html>

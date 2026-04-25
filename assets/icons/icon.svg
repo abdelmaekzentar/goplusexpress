@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#0f172a"/>
+  <!-- Teal accent bar -->
+  <rect x="0" y="360" width="512" height="152" rx="0" fill="#00a99d" opacity="0.15"/>
+  <rect x="0" y="440" width="512" height="72" rx="0" fill="#00a99d" opacity="0.10"/>
+  <!-- Truck body -->
+  <rect x="60" y="220" width="250" height="140" rx="14" fill="#00a99d"/>
+  <!-- Truck cab -->
+  <rect x="310" y="260" width="130" height="100" rx="14" fill="#0ea5a0"/>
+  <!-- Cab window -->
+  <rect x="322" y="272" width="80" height="55" rx="8" fill="#e0f7f7" opacity="0.85"/>
+  <!-- Wheels -->
+  <circle cx="130" cy="375" r="32" fill="#1e293b" stroke="#00a99d" stroke-width="7"/>
+  <circle cx="130" cy="375" r="12" fill="#00a99d"/>
+  <circle cx="290" cy="375" r="32" fill="#1e293b" stroke="#00a99d" stroke-width="7"/>
+  <circle cx="290" cy="375" r="12" fill="#00a99d"/>
+  <circle cx="390" cy="375" r="28" fill="#1e293b" stroke="#0ea5a0" stroke-width="7"/>
+  <circle cx="390" cy="375" r="10" fill="#0ea5a0"/>
+  <!-- Plane icon top right -->
+  <g transform="translate(340,100) rotate(-30)" opacity="0.9">
+    <ellipse cx="0" cy="0" rx="60" ry="18" fill="#fff" opacity="0.95"/>
+    <polygon points="-20,-18 20,-18 10,0 -10,0" fill="#fff" opacity="0.95"/>
+    <polygon points="30,-8 60,-8 50,2 20,2" fill="#fff" opacity="0.8"/>
+    <polygon points="-40,-2 -10,-2 -18,8 -50,8" fill="#fff" opacity="0.7"/>
+  </g>
+  <!-- Text: GO+ -->
+  <text x="256" y="185" font-family="Arial Black, sans-serif" font-size="88" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-2">GO+</text>
+  <!-- Text: EXPRESS -->
+  <text x="256" y="490" font-family="Arial, sans-serif" font-size="46" font-weight="700" fill="#00a99d" text-anchor="middle" letter-spacing="8">EXPRESS</text>
+</svg>
