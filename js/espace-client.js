@@ -604,6 +604,20 @@ function vesselZone(lat,lon,zoom,btn){
   if(btn) btn.classList.add('active');
 }
 
+/* ── Trafic Routier — Waze ───────────────────────────── */
+function roadZone(lat, lon, zoom, portName, portInfo, btn){
+  const frame = document.getElementById('waze-frame');
+  const label = document.getElementById('road-port-label');
+  if(frame){
+    frame.src = `https://embed.waze.com/iframe?zoom=${zoom}&lat=${lat}&lon=${lon}&ct=livemap&pin=1`;
+  }
+  if(label){
+    label.innerHTML = `<strong>${portName}</strong> — ${portInfo}`;
+  }
+  document.querySelectorAll('.road-zone-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
 /* ── Guide / Switch panels ───────────────────────────── */
 function guideSwitch(name){
   document.querySelectorAll('.guide-tab').forEach(t=>t.classList.remove('active'));

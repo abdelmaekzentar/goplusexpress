@@ -813,6 +813,30 @@
 .vessel-credit{margin-top:12px;font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
 .vessel-credit a{color:var(--teal);text-decoration:none}
 .vessel-credit a:hover{text-decoration:underline}
+
+/* ── Trafic Routier ── */
+.road-zone-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.road-zone-btn{padding:9px 16px;border-radius:22px;border:2px solid var(--ec-border);background:#fff;color:var(--dark);font-size:.84rem;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:7px}
+.road-zone-btn:hover{border-color:#e67e22;color:#e67e22}
+.road-zone-btn.active{background:linear-gradient(135deg,#e67e22,#f39c12);border-color:#e67e22;color:#fff;box-shadow:0 3px 12px rgba(230,126,34,.3)}
+.road-map-wrap{border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);border:1px solid var(--ec-border);position:relative}
+.road-map-wrap iframe{display:block;width:100%;height:560px;border:none}
+.road-legend{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;background:#fff;border-radius:12px;border:1px solid var(--ec-border)}
+.road-legend-item{display:flex;align-items:center;gap:7px;font-size:.8rem;font-weight:600;color:var(--dark)}
+.road-legend-dot{width:14px;height:6px;border-radius:3px;flex-shrink:0}
+.road-legend-dot.green{background:#4ade80}
+.road-legend-dot.orange{background:#fb923c}
+.road-legend-dot.red{background:#ef4444}
+.road-legend-dot.grey{background:#94a3b8}
+.road-legend-sep{width:1px;height:18px;background:var(--ec-border)}
+.road-port-info{display:flex;align-items:center;gap:10px;font-size:.82rem;color:#64748b;flex:1;justify-content:flex-end}
+.road-port-info strong{color:var(--dark)}
+@media(max-width:600px){
+  .road-zone-row{gap:6px}
+  .road-zone-btn{padding:7px 12px;font-size:.78rem}
+  .road-legend{gap:12px}
+  .road-port-info{display:none}
+}
 .shp-customs-subtitle{margin:0 0 14px;font-size:.9rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
 .shp-article-card{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px;margin-bottom:12px}
 .shp-pickup-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--ec-border)}

@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425h"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425i"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -165,6 +165,9 @@
       <button class="ec-nav-item" onclick="ecShowModule('navires')" id="ecnav-navires">
         <i class="fa-solid fa-ship"></i> Trafic Maritime
       </button>
+      <button class="ec-nav-item" onclick="ecShowModule('trafic')" id="ecnav-trafic">
+        <i class="fa-solid fa-traffic-light"></i> Trafic Routier
+      </button>
     </nav>
     <div class="ec-sidebar-footer">
       <a href="index.html" class="ec-sidebar-link"><i class="fa-solid fa-globe"></i> Site principal</a>
@@ -289,6 +292,16 @@
           <div>
             <strong>Trafic Maritime</strong>
             <span>Carte satellite · Ports du Maroc · Navires en direct</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('trafic')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#e67e22,#f39c12)">
+            <i class="fa-solid fa-traffic-light"></i>
+          </div>
+          <div>
+            <strong>Trafic Routier</strong>
+            <span>Waze live · Embouteillages · Ports du Maroc</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -2768,6 +2781,79 @@
       </p>
     </div><!-- /#ecmod-navires -->
 
+    <!-- ── Module: Trafic Routier ── -->
+    <div class="ec-module" id="ecmod-trafic">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-traffic-light"></i> Trafic Routier — Accès Ports du Maroc</h1>
+        <p>Waze temps réel · Embouteillages · Incidents · Travaux · Sélectionnez un port</p>
+      </div>
+
+      <!-- Boutons ports -->
+      <div class="road-zone-row">
+        <button class="road-zone-btn active" id="rbtn-tangermed"
+          onclick="roadZone(35.884,-5.498,14,'Tanger Med','1er port africain · N1 · A1',this)">
+          <i class="fa-solid fa-anchor"></i> Tanger Med
+        </button>
+        <button class="road-zone-btn" id="rbtn-casa"
+          onclick="roadZone(33.603,-7.617,14,'Casablanca','Port Autonome · Boulevard Zerktouni',this)">
+          <i class="fa-solid fa-anchor"></i> Casablanca
+        </button>
+        <button class="road-zone-btn" id="rbtn-mohammedia"
+          onclick="roadZone(33.728,-7.384,14,'Mohammedia','Port pétrolier · A3',this)">
+          <i class="fa-solid fa-anchor"></i> Mohammedia
+        </button>
+        <button class="road-zone-btn" id="rbtn-agadir"
+          onclick="roadZone(30.427,-9.641,14,'Agadir','Port de pêche & conteneurs · N1',this)">
+          <i class="fa-solid fa-anchor"></i> Agadir
+        </button>
+        <button class="road-zone-btn" id="rbtn-nador"
+          onclick="roadZone(35.270,-2.943,14,'Nador','Nador West Med · N2',this)">
+          <i class="fa-solid fa-anchor"></i> Nador
+        </button>
+        <button class="road-zone-btn" id="rbtn-safi"
+          onclick="roadZone(32.304,-9.233,14,'Safi','Port phosphatier · N1',this)">
+          <i class="fa-solid fa-anchor"></i> Safi
+        </button>
+        <button class="road-zone-btn" id="rbtn-kenitra"
+          onclick="roadZone(34.261,-6.590,14,'Kénitra','Port fluvial · A14',this)">
+          <i class="fa-solid fa-anchor"></i> Kénitra
+        </button>
+        <button class="road-zone-btn" id="rbtn-tanger"
+          onclick="roadZone(35.790,-5.816,14,'Tanger Ville','Port historique · A4',this)">
+          <i class="fa-solid fa-anchor"></i> Tanger Ville
+        </button>
+      </div>
+
+      <!-- Carte Waze -->
+      <div class="road-map-wrap">
+        <iframe
+          id="waze-frame"
+          src="https://embed.waze.com/iframe?zoom=14&lat=35.884&lon=-5.498&ct=livemap&pin=1"
+          allowfullscreen
+          loading="lazy"
+          title="Trafic Routier Waze — Tanger Med"
+        ></iframe>
+      </div>
+
+      <!-- Légende + info port -->
+      <div class="road-legend">
+        <div class="road-legend-item"><div class="road-legend-dot green"></div> Trafic fluide</div>
+        <div class="road-legend-dot" style="display:none"></div>
+        <div class="road-legend-item"><div class="road-legend-dot orange"></div> Ralentissements</div>
+        <div class="road-legend-item"><div class="road-legend-dot red"></div> Embouteillages</div>
+        <div class="road-legend-item"><div class="road-legend-dot grey"></div> Données indisponibles</div>
+        <div class="road-legend-sep"></div>
+        <div class="road-port-info">
+          <i class="fa-solid fa-location-dot" style="color:#e67e22"></i>
+          <span id="road-port-label"><strong>Tanger Med</strong> — 1er port africain · N1 · A1</span>
+        </div>
+        <a href="https://www.waze.com/live-map" target="_blank" rel="noopener"
+           style="margin-left:auto;font-size:.78rem;color:var(--teal);text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:5px">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Waze
+        </a>
+      </div>
+    </div><!-- /#ecmod-trafic -->
+
   </main>
 </div>
 
@@ -2779,7 +2865,7 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/espace-client.js?v=20260425h"></script>
+<script src="js/espace-client.js?v=20260425i"></script>
 
 <!-- ═══ SERVICE WORKER ═══ -->
 <script>
