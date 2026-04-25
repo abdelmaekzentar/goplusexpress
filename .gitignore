@@ -19,4 +19,4 @@ npm-debug.log*
 .claude/
 "code accesss.txt"
 code\ accesss.txt
-netlify.toml
+# netlify.toml intentionnellement inclus dans Git pour que Netlify lise la config

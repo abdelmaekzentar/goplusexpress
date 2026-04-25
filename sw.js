@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
-   GO PLUS EXPRESS — Service Worker v20260425h
+   GO PLUS EXPRESS — Service Worker v20260425i
    Cache-first pour assets statiques, Network-first pour HTML
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME   = 'gpe-v20260425h';
-const STATIC_CACHE = 'gpe-static-v20260425h';
+const CACHE_NAME   = 'gpe-v20260425i';
+const STATIC_CACHE = 'gpe-static-v20260425i';
 
 /* Assets à pré-cacher à l'installation */
 const PRECACHE_URLS = [
