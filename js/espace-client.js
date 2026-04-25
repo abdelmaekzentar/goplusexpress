@@ -277,6 +277,7 @@ function ecShowModule(name){
   if(mod) mod.classList.add('active');
   if(nav) nav.classList.add('active');
   window.scrollTo(0,0);
+  if(name === 'navires') setTimeout(initVesselMap, 120);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
@@ -546,10 +547,59 @@ function simProCalc(){
   transitEl.innerHTML = `<i class="fa-solid fa-clock"></i> Délai estimé depuis <strong>${fromText}</strong> : <strong>${escapeHTML(transit)}</strong>`;
 }
 
-/* ── VesselFinder zone switcher ─────────────────────── */
+/* ── Vessel Map — Leaflet + Esri Satellite ───────────── */
+let _vesselMap = null;
+
+const VESSEL_PORTS = [
+  { name:'Tanger Med',  lat:35.884, lon:-5.498,  zoom:12, note:'1er port africain' },
+  { name:'Casablanca',  lat:33.603, lon:-7.617,  zoom:11, note:'Port Autonome de Casablanca' },
+  { name:'Agadir',      lat:30.427, lon:-9.641,  zoom:11, note:'Pêche & conteneurs' },
+  { name:'Nador',       lat:35.270, lon:-2.943,  zoom:12, note:'Port Nador West Med' },
+  { name:'Mohammedia',  lat:33.728, lon:-7.384,  zoom:12, note:'Hydrocarbures' },
+  { name:'Safi',        lat:32.304, lon:-9.233,  zoom:12, note:'Phosphates & vrac' },
+  { name:'Kenitra',     lat:34.261, lon:-6.590,  zoom:12, note:'Port fluvial' },
+  { name:'Laâyoune',    lat:27.162, lon:-13.201, zoom:12, note:'Provinces du Sud' },
+  { name:'Dakhla',      lat:23.714, lon:-15.935, zoom:12, note:'Provinces du Sud' },
+  { name:'Tanger Ville',lat:35.790, lon:-5.816,  zoom:12, note:'Port historique' },
+];
+
+function initVesselMap(){
+  if(_vesselMap){ _vesselMap.invalidateSize(); return; }
+  if(typeof L === 'undefined') return;
+
+  _vesselMap = L.map('vessel-map', { zoomControl:true, attributionControl:true })
+    .setView([32.0, -6.0], 6);
+
+  /* Esri World Imagery — satellite pur, AUCUN label politique */
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution:'Tiles &copy; <a href="https://www.esri.com">Esri</a>', maxZoom:18 }
+  ).addTo(_vesselMap);
+
+  /* Marqueurs ports */
+  VESSEL_PORTS.forEach(p => {
+    const ic = L.divIcon({
+      className:'',
+      html:`<div style="width:14px;height:14px;background:#00a99d;border:2.5px solid #fff;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,.6);cursor:pointer"></div>`,
+      iconSize:[14,14], iconAnchor:[7,7]
+    });
+    const vfUrl = `https://www.vesselfinder.com/aismap?zoom=${p.zoom}&lat=${p.lat}&lon=${p.lon}&names=true`;
+    L.marker([p.lat,p.lon],{icon:ic}).addTo(_vesselMap).bindPopup(
+      `<div style="min-width:180px;text-align:center;font-family:Inter,sans-serif;padding:4px 0">
+        <div style="font-size:1rem;font-weight:800;color:#0f4c81;margin-bottom:3px">⚓ ${p.name}</div>
+        <div style="font-size:.78rem;color:#64748b;margin-bottom:10px">${p.note}</div>
+        <a href="${vfUrl}" target="_blank" rel="noopener"
+           style="display:inline-block;padding:8px 18px;background:#00a99d;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.85rem;letter-spacing:.01em">
+          🚢 Navires en temps réel ↗
+        </a>
+      </div>`,
+      {minWidth:200, maxWidth:240}
+    );
+  });
+}
+
 function vesselZone(lat,lon,zoom,btn){
-  const iframe = document.getElementById('vessel-iframe');
-  if(iframe) iframe.src = `https://www.marinetraffic.com/en/ais/embed/maptype:0/zoom:${zoom}/cenX:${lon}/cenY:${lat}/width:100/height:580/shownames:true/mtcenter:0`;
+  if(_vesselMap) _vesselMap.setView([lat,lon],zoom);
   document.querySelectorAll('.vessel-zone-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }

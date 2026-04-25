@@ -6,7 +6,8 @@
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425f"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425g"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -2683,28 +2684,27 @@
     <!-- ── Module: Trafic Maritime ── -->
     <div class="ec-module" id="ecmod-navires">
       <div class="ec-module-header">
-        <h1><i class="fa-solid fa-ship"></i> Trafic Maritime en Temps Réel</h1>
-        <p>Positions des navires en direct — Méditerranée · Tanger Med · Casablanca · Monde</p>
+        <h1><i class="fa-solid fa-ship"></i> Ports du Maroc — Trafic Maritime</h1>
+        <p>Carte satellite · Cliquez sur un port pour voir les navires en temps réel</p>
       </div>
+
+      <!-- Boutons zones -->
       <div class="vessel-zone-row">
-        <button class="vessel-zone-btn active" onclick="vesselZone(35.88,-5.5,10,this)"><i class="fa-solid fa-anchor"></i> Tanger Med</button>
-        <button class="vessel-zone-btn" onclick="vesselZone(33.6,-7.6,10,this)"><i class="fa-solid fa-anchor"></i> Casablanca</button>
-        <button class="vessel-zone-btn" onclick="vesselZone(35.5,-5.0,9,this)"><i class="fa-solid fa-water"></i> Détroit de Gibraltar</button>
-        <button class="vessel-zone-btn" onclick="vesselZone(36.8,3.0,6,this)"><i class="fa-solid fa-water"></i> Méditerranée Ouest</button>
-        <button class="vessel-zone-btn" onclick="vesselZone(35.2,-3.9,11,this)"><i class="fa-solid fa-anchor"></i> Nador</button>
+        <button class="vessel-zone-btn active" onclick="vesselZone(32.0,-6.0,6,this)"><i class="fa-solid fa-map"></i> Vue Maroc</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(35.884,-5.498,12,this)"><i class="fa-solid fa-anchor"></i> Tanger Med</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(33.603,-7.617,11,this)"><i class="fa-solid fa-anchor"></i> Casablanca</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(30.427,-9.641,11,this)"><i class="fa-solid fa-anchor"></i> Agadir</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(35.270,-2.943,12,this)"><i class="fa-solid fa-anchor"></i> Nador</button>
       </div>
+
+      <!-- Carte Leaflet -->
       <div class="vessel-map-wrap">
-        <iframe id="vessel-iframe"
-          src="https://www.vesselfinder.com/aismap?zoom=10&lat=35.88&lon=-5.5&names=true&fleet=&mmsi="
-          width="100%" height="580" style="border:none;border-radius:12px;display:block"
-          title="VesselFinder — Trafic Maritime" loading="lazy">
-        </iframe>
+        <div id="vessel-map" style="width:100%;height:560px;border-radius:12px"></div>
       </div>
+
       <p class="vessel-credit">
-        <i class="fa-solid fa-circle-info"></i>
-        Données AIS en temps réel par <a href="https://www.vesselfinder.com" target="_blank" rel="noopener">VesselFinder</a> — Mise à jour toutes les 2 min.
-        &nbsp;·&nbsp; <i class="fa-solid fa-circle-info" style="color:#f59e0b"></i>
-        Pour voir la carte complète : <a href="https://www.marinetraffic.com/en/ais/home/centerx:-5.5/centery:32/zoom:6" target="_blank" rel="noopener">Ouvrir MarineTraffic ↗</a>
+        <i class="fa-solid fa-satellite"></i> Imagerie satellite Esri — aucune frontière politique · aucun label RASD
+        &nbsp;·&nbsp; Cliquez sur un port <span style="display:inline-block;width:10px;height:10px;background:#00a99d;border-radius:50%;border:2px solid #fff;vertical-align:middle"></span> pour accéder aux navires en temps réel
       </p>
     </div><!-- /#ecmod-navires -->
 
@@ -2718,6 +2718,7 @@
 <script src="js/express-tarifs.js?v=20260423c"></script>
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
-<script src="js/espace-client.js?v=20260425f"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/espace-client.js?v=20260425g"></script>
 </body>
 </html>
