@@ -1294,40 +1294,6 @@
   </div>
 </section>
 
-<!-- ═══════════════════════ TRAFIC MARITIME ═══════════════════════ -->
-<section id="maritime" style="padding:80px 0 60px;background:#06101e">
-  <div class="section-header">
-    <span class="section-label" style="color:#00a99d;background:rgba(0,169,157,.12)">TRAFIC MARITIME</span>
-    <h2 style="color:#fff">Navires en temps réel</h2>
-    <p style="color:#94a3b8">Positions AIS en direct — Méditerranée · Tanger Med · Casablanca · Atlantique</p>
-  </div>
-  <div style="max-width:1200px;margin:0 auto;padding:0 24px">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;justify-content:center">
-      <button onclick="hvZone(35.9,-5.5,8,this)" style="padding:9px 18px;border-radius:22px;border:2px solid #00a99d;background:#00a99d;color:#fff;font-weight:700;font-size:.85rem;cursor:pointer"><i class="fa-solid fa-anchor"></i> Tanger Med</button>
-      <button onclick="hvZone(33.6,-7.6,9,this)" style="padding:9px 18px;border-radius:22px;border:2px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-weight:600;font-size:.85rem;cursor:pointer"><i class="fa-solid fa-anchor"></i> Casablanca</button>
-      <button onclick="hvZone(36.5,14.0,5,this)" style="padding:9px 18px;border-radius:22px;border:2px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-weight:600;font-size:.85rem;cursor:pointer"><i class="fa-solid fa-water"></i> Méditerranée</button>
-      <button onclick="hvZone(29.0,-14.0,4,this)" style="padding:9px 18px;border-radius:22px;border:2px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-weight:600;font-size:.85rem;cursor:pointer"><i class="fa-solid fa-globe-africa"></i> Côte Atlantique</button>
-    </div>
-    <div style="border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1)">
-      <iframe id="hv-iframe"
-        src="https://www.vesselfinder.com/aismap?zoom=8&lat=35.9&lon=-5.5&names=true&fleet=&mmsi="
-        width="100%" height="520" style="border:none;display:block"
-        title="VesselFinder — Trafic Maritime en temps réel" loading="lazy">
-      </iframe>
-    </div>
-    <p style="text-align:center;color:#475569;font-size:.78rem;margin-top:12px">
-      <i class="fa-solid fa-circle-info"></i> Données AIS en temps réel par
-      <a href="https://www.vesselfinder.com" target="_blank" rel="noopener" style="color:#00a99d">VesselFinder</a> — Mise à jour toutes les 2 min.
-    </p>
-  </div>
-  <script>
-  function hvZone(lat,lon,zoom,btn){
-    document.getElementById('hv-iframe').src='https://www.vesselfinder.com/aismap?zoom='+zoom+'&lat='+lat+'&lon='+lon+'&names=true&fleet=&mmsi=';
-    document.querySelectorAll('#maritime button').forEach(b=>{b.style.background='transparent';b.style.borderColor='rgba(255,255,255,.2)';});
-    btn.style.background='#00a99d';btn.style.borderColor='#00a99d';
-  }
-  </script>
-</section>
 
 <!-- ═══════════════════════════ GUIDES ═══════════════════════════ -->
 <section id="guides" style="background:#f4f8ff">
