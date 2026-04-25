@@ -85,6 +85,8 @@ function resetRateLimit(email) {
 
 /* ── Auth ──────────────────────────────────────────── */
 // Compte de démonstration — identifiants intentionnellement visibles pour la démo
+// Accepte les deux domaines .ma et .com pour la démo
+const EC_DEMO_EMAILS = ['demo@goplusexpress.ma','demo@goplusexpress.com'];
 const EC_DEMO = { email:'demo@goplusexpress.ma', passHash:'__DEMO__', first:'Demo', last:'GO PLUS', company:'GO PLUS EXPRESS' };
 
 function ecInit(){
@@ -172,8 +174,8 @@ async function ecLogin(){
   // Désactiver le bouton pendant la vérification
   if(btn){ btn.disabled = true; btn.textContent = '…'; }
 
-  // Compte de démonstration
-  if(email === EC_DEMO.email && pass === 'demo2024'){
+  // Compte de démonstration (accepte .ma et .com)
+  if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
     resetRateLimit(email);
     const user = {email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company};
     ecSetUser(user);
