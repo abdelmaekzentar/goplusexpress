@@ -28,28 +28,142 @@ const ADM_DEF = {
     aramex: { 1:10, 2:10, 3:10, 4:10, 5:10, 6:10 }
   },
   maritime: {
-    routes: [
-      { id:'ma-es', from:'Casablanca', to:'Espagne (Algésiras)',        transit:3,  currency:'EUR' },
-      { id:'ma-fr', from:'Casablanca', to:'France (Sète / Marseille)',   transit:5,  currency:'EUR' },
-      { id:'ma-it', from:'Casablanca', to:'Italie (Gênes)',              transit:7,  currency:'EUR' },
-      { id:'ma-be', from:'Casablanca', to:'Belgique (Anvers)',           transit:8,  currency:'EUR' },
-      { id:'ma-nl', from:'Casablanca', to:'Pays-Bas (Rotterdam)',        transit:9,  currency:'EUR' },
-      { id:'ma-uk', from:'Casablanca', to:'Royaume-Uni (Southampton)',   transit:10, currency:'EUR' },
-      { id:'ma-de', from:'Casablanca', to:'Allemagne (Hambourg)',        transit:10, currency:'EUR' },
-      { id:'ma-us', from:'Casablanca', to:'USA (New York)',              transit:18, currency:'USD' },
-      { id:'ma-cn', from:'Casablanca', to:'Chine (Shanghai)',            transit:30, currency:'USD' },
-      { id:'ma-ae', from:'Casablanca', to:'EAU (Jebel Ali)',            transit:20, currency:'USD' },
-      { id:'ma-br', from:'Casablanca', to:'Brésil (Santos)',             transit:21, currency:'USD' },
-      { id:'ma-sg', from:'Casablanca', to:'Singapour',                  transit:25, currency:'USD' }
+    // Ports d'origine (Maroc)
+    originPorts: [
+      { code:'CAS', label:'Casablanca (APMC)',     flag:'🇲🇦' },
+      { code:'TNG', label:'Tanger Med',            flag:'🇲🇦' },
+      { code:'AGD', label:'Agadir',                flag:'🇲🇦' },
+      { code:'NDR', label:'Nador West Med',        flag:'🇲🇦' },
+      { code:'SAF', label:'Safi',                  flag:'🇲🇦' },
+      { code:'LAY', label:'Laâyoune',              flag:'🇲🇦' }
     ],
+    // Pays de destination avec leurs ports
+    destinations: [
+      { country:'Espagne', code:'ES', flag:'🇪🇸', ports:[
+        { code:'ALG', label:'Algésiras',    transit:3  },
+        { code:'BCN', label:'Barcelone',    transit:4  },
+        { code:'VAL', label:'Valencia',     transit:4  },
+        { code:'BIL', label:'Bilbao',       transit:4  }
+      ]},
+      { country:'France', code:'FR', flag:'🇫🇷', ports:[
+        { code:'MRS', label:'Marseille',    transit:5  },
+        { code:'LHV', label:'Le Havre',     transit:8  },
+        { code:'STE', label:'Sète',         transit:5  },
+        { code:'FOS', label:'Fos-sur-Mer',  transit:5  }
+      ]},
+      { country:'Italie', code:'IT', flag:'🇮🇹', ports:[
+        { code:'GEN', label:'Gênes',        transit:7  },
+        { code:'LIV', label:'Livourne',     transit:7  },
+        { code:'NAP', label:'Naples',       transit:8  },
+        { code:'GIO', label:'Gioia Tauro',  transit:7  }
+      ]},
+      { country:'Belgique', code:'BE', flag:'🇧🇪', ports:[
+        { code:'ANT', label:'Anvers',       transit:9  }
+      ]},
+      { country:'Pays-Bas', code:'NL', flag:'🇳🇱', ports:[
+        { code:'RTM', label:'Rotterdam',    transit:9  }
+      ]},
+      { country:'Allemagne', code:'DE', flag:'🇩🇪', ports:[
+        { code:'HAM', label:'Hambourg',     transit:11 },
+        { code:'BRE', label:'Brême',        transit:11 }
+      ]},
+      { country:'Royaume-Uni', code:'GB', flag:'🇬🇧', ports:[
+        { code:'FEL', label:'Felixstowe',   transit:11 },
+        { code:'SOT', label:'Southampton',  transit:11 },
+        { code:'LIV2',label:'Liverpool',    transit:12 }
+      ]},
+      { country:'Portugal', code:'PT', flag:'🇵🇹', ports:[
+        { code:'LIS', label:'Lisbonne (Setúbal)', transit:4 },
+        { code:'SIN', label:'Sines',        transit:4  }
+      ]},
+      { country:'USA', code:'US', flag:'🇺🇸', ports:[
+        { code:'NYC', label:'New York',     transit:18 },
+        { code:'SAV', label:'Savannah',     transit:19 },
+        { code:'LAX', label:'Los Angeles',  transit:22 },
+        { code:'MIA', label:'Miami',        transit:18 }
+      ]},
+      { country:'Canada', code:'CA', flag:'🇨🇦', ports:[
+        { code:'MTR', label:'Montréal',     transit:19 },
+        { code:'VAN', label:'Vancouver',    transit:25 }
+      ]},
+      { country:'Chine', code:'CN', flag:'🇨🇳', ports:[
+        { code:'SHA', label:'Shanghai',     transit:30 },
+        { code:'NGB', label:'Ningbo',       transit:30 },
+        { code:'QIN', label:'Qingdao',      transit:32 },
+        { code:'GZH', label:'Guangzhou',    transit:32 }
+      ]},
+      { country:'EAU', code:'AE', flag:'🇦🇪', ports:[
+        { code:'JBA', label:'Jebel Ali (Dubai)', transit:20 },
+        { code:'ABD', label:'Abu Dhabi',    transit:20 }
+      ]},
+      { country:'Arabie Saoudite', code:'SA', flag:'🇸🇦', ports:[
+        { code:'JED', label:'Jeddah',       transit:20 },
+        { code:'DAM', label:'Dammam',       transit:22 }
+      ]},
+      { country:'Turquie', code:'TR', flag:'🇹🇷', ports:[
+        { code:'IST', label:'Istanbul (Ambarli)', transit:8 },
+        { code:'MER', label:'Mersin',       transit:8  }
+      ]},
+      { country:'Inde', code:'IN', flag:'🇮🇳', ports:[
+        { code:'NHV', label:'Nhava Sheva (Mumbai)', transit:22 },
+        { code:'CHN2',label:'Chennai',      transit:23 }
+      ]},
+      { country:'Brésil', code:'BR', flag:'🇧🇷', ports:[
+        { code:'SNT', label:'Santos',       transit:21 },
+        { code:'ITA', label:'Itajaí',       transit:22 }
+      ]},
+      { country:'Singapour', code:'SG', flag:'🇸🇬', ports:[
+        { code:'SGP', label:'Singapour PSA',transit:25 }
+      ]},
+      { country:'Afrique du Sud', code:'ZA', flag:'🇿🇦', ports:[
+        { code:'CPT', label:'Le Cap',       transit:18 },
+        { code:'DBN', label:'Durban',       transit:18 }
+      ]},
+      { country:'Sénégal', code:'SN', flag:'🇸🇳', ports:[
+        { code:'DKR', label:'Dakar',        transit:7  }
+      ]},
+      { country:'Côte d\'Ivoire', code:'CI', flag:'🇨🇮', ports:[
+        { code:'ABJ', label:'Abidjan',      transit:8  }
+      ]}
+    ],
+    // Types de conteneurs
     containers: [
-      { code:'20GP', label:"Conteneur 20' GP",          rate:1200, unit:'USD' },
-      { code:'40GP', label:"Conteneur 40' GP",          rate:1900, unit:'USD' },
-      { code:'40HC', label:"Conteneur 40' HC",          rate:2100, unit:'USD' },
-      { code:'45HC', label:"Conteneur 45' HC",          rate:2400, unit:'USD' },
-      { code:'LCL',  label:"Groupage LCL (par CBM)",   rate:95,   unit:'USD' }
+      { code:'20GP', label:"20' GP — Standard",     unit:'USD' },
+      { code:'40GP', label:"40' GP — Standard",     unit:'USD' },
+      { code:'40HC', label:"40' HC — High Cube",    unit:'USD' },
+      { code:'45HC', label:"45' HC — High Cube",    unit:'USD' },
+      { code:'LCL',  label:'LCL — par CBM (m³)',    unit:'USD' }
     ],
-    routeOverrides: {}
+    // Grille tarifaire: rates[originPort][destPort][containerCode] = USD
+    rates: {
+      CAS: {
+        ALG:{ '20GP':900,  '40GP':1400, '40HC':1600, '45HC':1800, LCL:60  },
+        MRS:{ '20GP':1100, '40GP':1700, '40HC':1950, '45HC':2200, LCL:75  },
+        LHV:{ '20GP':1400, '40GP':2100, '40HC':2400, '45HC':2700, LCL:90  },
+        ANT:{ '20GP':1300, '40GP':2000, '40HC':2300, '45HC':2600, LCL:85  },
+        RTM:{ '20GP':1350, '40GP':2050, '40HC':2350, '45HC':2650, LCL:88  },
+        HAM:{ '20GP':1500, '40GP':2200, '40HC':2500, '45HC':2800, LCL:95  },
+        NYC:{ '20GP':2200, '40GP':3500, '40HC':3900, '45HC':4300, LCL:140 },
+        JBA:{ '20GP':1800, '40GP':2900, '40HC':3200, '45HC':3600, LCL:120 },
+        SHA:{ '20GP':2800, '40GP':4500, '40HC':5000, '45HC':5600, LCL:180 }
+      },
+      TNG: {
+        ALG:{ '20GP':700,  '40GP':1100, '40HC':1300, '45HC':1500, LCL:50  },
+        MRS:{ '20GP':900,  '40GP':1400, '40HC':1650, '45HC':1900, LCL:65  },
+        ANT:{ '20GP':1100, '40GP':1700, '40HC':2000, '45HC':2300, LCL:75  },
+        RTM:{ '20GP':1150, '40GP':1750, '40HC':2050, '45HC':2350, LCL:78  },
+        NYC:{ '20GP':2000, '40GP':3200, '40HC':3600, '45HC':4000, LCL:130 }
+      }
+    },
+    // Surcharges
+    surcharges: [
+      { code:'BAF',  label:'Surcharge carburant (BAF)',  amount:150, unit:'par conteneur' },
+      { code:'CAF',  label:'Surcharge change (CAF)',     amount:50,  unit:'par conteneur' },
+      { code:'THC',  label:'Frais portuaires (THC)',     amount:120, unit:'par conteneur' },
+      { code:'BL',   label:'Connaissement (B/L)',        amount:85,  unit:'par BL'        },
+      { code:'ISPS', label:'Sécurité ISPS',              amount:25,  unit:'par conteneur' },
+      { code:'IMO',  label:'Surcharge IMO 2020',         amount:75,  unit:'par conteneur' }
+    ]
   },
   routier: {
     routes: [
@@ -452,106 +566,163 @@ function admSaveMargins() {
 /* ══════════════════════════════════════════════
    PANEL 3 — TARIFS MARITIME
 ══════════════════════════════════════════════ */
+/* ── Variable pour garder le port d'origine sélectionné ── */
+let _admMaritimeOrigin = null;
+
 function admRenderMaritime() {
   const data = admLoad('maritime');
-  if (!data.routes) data.routes = JSON.parse(JSON.stringify(ADM_DEF.maritime.routes));
-  if (!data.containers) data.containers = JSON.parse(JSON.stringify(ADM_DEF.maritime.containers));
-  if (!data.routeOverrides) data.routeOverrides = {};
+  // Migration: si ancienne structure, utiliser les defaults
+  if (!data.originPorts)   data.originPorts   = JSON.parse(JSON.stringify(ADM_DEF.maritime.originPorts));
+  if (!data.destinations)  data.destinations  = JSON.parse(JSON.stringify(ADM_DEF.maritime.destinations));
+  if (!data.containers)    data.containers    = JSON.parse(JSON.stringify(ADM_DEF.maritime.containers));
+  if (!data.rates)         data.rates         = JSON.parse(JSON.stringify(ADM_DEF.maritime.rates));
+  if (!data.surcharges)    data.surcharges    = JSON.parse(JSON.stringify(ADM_DEF.maritime.surcharges));
 
-  const contCodes = data.containers.map(c => c.code);
+  if (!_admMaritimeOrigin || !data.originPorts.find(p => p.code === _admMaritimeOrigin)) {
+    _admMaritimeOrigin = data.originPorts[0]?.code || 'CAS';
+  }
 
   let html = `
   <div class="adm-section-intro">
     <i class="fa-solid fa-ship adm-intro-icon"></i>
     <div>
-      <strong>Tarifs fret maritime par type de conteneur</strong>
-      <span>Prix de base par route — modifiez les tarifs par route ou les tarifs globaux par type de conteneur</span>
+      <strong>Tarifs fret maritime — Grille par Port · Pays · Type de conteneur</strong>
+      <span>Sélectionnez un port d'origine puis saisissez les prix pour chaque port de destination et type de conteneur</span>
     </div>
   </div>
 
   <div class="adm-sub-tabs">
-    <button class="adm-stab active" onclick="admSubTab('maritime','containers')" id="adm-stab-maritime-containers">
+    <button class="adm-stab active" id="adm-stab-maritime-grid"       onclick="admSubTab('maritime','grid')">
+      <i class="fa-solid fa-table"></i> Grille tarifaire
+    </button>
+    <button class="adm-stab" id="adm-stab-maritime-containers" onclick="admSubTab('maritime','containers')">
       <i class="fa-solid fa-boxes-stacked"></i> Types de conteneurs
     </button>
-    <button class="adm-stab" onclick="admSubTab('maritime','routes')" id="adm-stab-maritime-routes">
-      <i class="fa-solid fa-route"></i> Tarifs par route
+    <button class="adm-stab" id="adm-stab-maritime-ports"       onclick="admSubTab('maritime','ports')">
+      <i class="fa-solid fa-anchor"></i> Ports & Pays
     </button>
-    <button class="adm-stab" onclick="admSubTab('maritime','surcharges')" id="adm-stab-maritime-surcharges">
-      <i class="fa-solid fa-plus"></i> Surcharges
+    <button class="adm-stab" id="adm-stab-maritime-surcharges"  onclick="admSubTab('maritime','surcharges')">
+      <i class="fa-solid fa-plus-circle"></i> Surcharges
     </button>
   </div>
 
-  <!-- Containers base panel -->
-  <div class="adm-sub-panel active" id="adm-sub-maritime-containers">
-    <h4 class="adm-sub-title">Tarifs de base par type de conteneur (USD)</h4>
-    <table class="adm-table">
-      <thead><tr><th>Type</th><th>Description</th><th>Tarif de base</th><th>Devise</th></tr></thead>
-      <tbody>`;
+  <!-- ═══ GRILLE TARIFAIRE ═══ -->
+  <div class="adm-sub-panel active" id="adm-sub-maritime-grid">
 
-  data.containers.forEach((c, i) => {
-    html += `<tr>
-      <td><span class="adm-zone-pill">${c.code}</span></td>
-      <td><input type="text" class="adm-input" data-cont-label="${i}" value="${c.label}" style="max-width:280px"/></td>
-      <td>
-        <div class="adm-input-row-sm">
-          <input type="number" class="adm-input adm-input-sm" data-cont-rate="${i}" value="${c.rate}" min="0" step="10"/>
-        </div>
-      </td>
-      <td><input type="text" class="adm-input" data-cont-unit="${i}" value="${c.unit}" style="max-width:70px"/></td>
-    </tr>`;
-  });
+    <div class="adm-maritime-origin-bar">
+      <label><i class="fa-solid fa-anchor"></i> Port d'origine :</label>
+      <div class="adm-origin-pills">
+        ${data.originPorts.map(p => `
+          <button class="adm-origin-pill ${p.code===_admMaritimeOrigin?'active':''}"
+            onclick="admSetMaritimeOrigin('${p.code}')">
+            ${p.flag||'🇲🇦'} ${p.label}
+          </button>`).join('')}
+      </div>
+    </div>
 
-  html += `</tbody></table>
+    <div style="overflow-x:auto" id="adm-maritime-grid-wrap">
+      ${admBuildRatesGrid(data, _admMaritimeOrigin)}
+    </div>
+
+    <div class="adm-actions">
+      <button class="adm-btn adm-btn-primary" onclick="admSaveMaritimeRates()">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs
+      </button>
+      <button class="adm-btn adm-btn-ghost" onclick="admCopyRatesFromPort()">
+        <i class="fa-solid fa-copy"></i> Copier depuis…
+      </button>
+      <span style="font-size:.78rem;color:#94a3b8;margin-left:4px">
+        <i class="fa-solid fa-circle-info"></i> Laisser vide = pas de tarif pour cette route
+      </span>
+    </div>
+  </div>
+
+  <!-- ═══ TYPES DE CONTENEURS ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-maritime-containers">
+    <h4 class="adm-sub-title">Types de conteneurs — libellés et unités</h4>
+    <table class="adm-table" style="max-width:600px">
+      <thead><tr><th>Code</th><th>Libellé</th><th>Unité</th></tr></thead>
+      <tbody>
+        ${data.containers.map((c,i) => `<tr>
+          <td><span class="adm-zone-pill">${c.code}</span></td>
+          <td><input type="text" class="adm-input" data-cont-label="${i}" value="${c.label}" style="max-width:260px"/></td>
+          <td><input type="text" class="adm-input" data-cont-unit="${i}" value="${c.unit||'USD'}" style="max-width:80px"/></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
     <div class="adm-actions">
       <button class="adm-btn adm-btn-primary" onclick="admSaveMaritimeContainers()">
-        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les types de conteneurs
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer
       </button>
     </div>
   </div>
 
-  <!-- Routes panel -->
-  <div class="adm-sub-panel" id="adm-sub-maritime-routes">
-    <h4 class="adm-sub-title">Tarifs spécifiques par route (USD) — laisser vide pour utiliser le tarif de base</h4>
-    <div style="overflow-x:auto">
-    <table class="adm-table adm-routes-table">
-      <thead>
-        <tr>
-          <th>Route</th><th>Transit</th>
-          ${contCodes.map(c => `<th>${c}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>`;
+  <!-- ═══ PORTS & PAYS ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-maritime-ports">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
 
-  data.routes.forEach((r, ri) => {
-    const ov = data.routeOverrides[r.id] || {};
-    html += `<tr>
-      <td style="min-width:200px">
-        <div style="font-weight:600;font-size:.85rem">${r.from} → ${r.to}</div>
-      </td>
-      <td><input type="number" class="adm-input adm-input-sm" data-route-transit="${ri}" value="${r.transit}" min="1" style="width:60px"/> j</td>
-      ${contCodes.map(cc => `
-        <td>
-          <input type="number" class="adm-input adm-input-sm" data-route-ov="${r.id}" data-cont="${cc}"
-            value="${ov[cc]||''}" min="0" step="10" placeholder="base"/>
-        </td>`).join('')}
-    </tr>`;
-  });
+      <div>
+        <h4 class="adm-sub-title"><i class="fa-solid fa-anchor" style="color:var(--teal)"></i> Ports d'origine (Maroc)</h4>
+        <table class="adm-table" style="font-size:.82rem">
+          <thead><tr><th>Code</th><th>Nom du port</th><th>Flag</th></tr></thead>
+          <tbody>
+            ${data.originPorts.map((p,i) => `<tr>
+              <td><input type="text" class="adm-input adm-input-sm" data-orig-code="${i}" value="${p.code}" style="width:65px;text-transform:uppercase"/></td>
+              <td><input type="text" class="adm-input" data-orig-label="${i}" value="${p.label}" style="max-width:200px"/></td>
+              <td><input type="text" class="adm-input adm-input-sm" data-orig-flag="${i}" value="${p.flag||'🇲🇦'}" style="width:50px"/></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+        <div class="adm-actions">
+          <button class="adm-btn adm-btn-primary" onclick="admSaveOriginPorts()">
+            <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+          </button>
+        </div>
+      </div>
 
-  html += `</tbody></table></div>
-    <div class="adm-actions">
-      <button class="adm-btn adm-btn-primary" onclick="admSaveMaritimeRoutes()">
-        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs par route
-      </button>
+      <div>
+        <h4 class="adm-sub-title"><i class="fa-solid fa-globe" style="color:var(--teal)"></i> Pays & Ports de destination</h4>
+        <div style="max-height:480px;overflow-y:auto">
+          ${data.destinations.map((dest, di) => `
+          <div class="adm-dest-country">
+            <div class="adm-dest-header">
+              ${dest.flag} <strong>${dest.country}</strong>
+              <span class="adm-badge adm-badge-blue" style="margin-left:6px">${dest.ports.length} port(s)</span>
+            </div>
+            <table class="adm-table" style="font-size:.79rem;margin-bottom:0">
+              <thead><tr><th>Code</th><th>Nom du port</th><th>Transit (j)</th></tr></thead>
+              <tbody>
+                ${dest.ports.map((port, pi) => `<tr>
+                  <td><input type="text" class="adm-input adm-input-sm" data-dest-pcode="${di}-${pi}" value="${port.code}" style="width:60px;text-transform:uppercase"/></td>
+                  <td><input type="text" class="adm-input" data-dest-plabel="${di}-${pi}" value="${port.label}" style="max-width:180px"/></td>
+                  <td><input type="number" class="adm-input adm-input-sm" data-dest-transit="${di}-${pi}" value="${port.transit||7}" min="1" style="width:55px"/></td>
+                </tr>`).join('')}
+              </tbody>
+            </table>
+          </div>`).join('')}
+        </div>
+        <div class="adm-actions">
+          <button class="adm-btn adm-btn-primary" onclick="admSaveDestPorts()">
+            <i class="fa-solid fa-floppy-disk"></i> Enregistrer les ports
+          </button>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- Surcharges panel -->
+  <!-- ═══ SURCHARGES ═══ -->
   <div class="adm-sub-panel" id="adm-sub-maritime-surcharges">
-    <h4 class="adm-sub-title">Surcharges maritimes (USD)</h4>
-    <table class="adm-table" style="max-width:550px">
-      <thead><tr><th>Surcharge</th><th>Montant</th><th>Unité</th></tr></thead>
+    <h4 class="adm-sub-title">Surcharges maritimes (USD / par conteneur sauf mention)</h4>
+    <table class="adm-table" style="max-width:580px">
+      <thead><tr><th>Code</th><th>Libellé</th><th>Montant</th><th>Unité</th></tr></thead>
       <tbody>
-        ${admBuildMaritimeSurcharges(data)}
+        ${data.surcharges.map((s,i) => `<tr>
+          <td><span class="adm-zone-pill" style="font-size:.7rem">${s.code}</span></td>
+          <td><input type="text" class="adm-input" data-surch-label="${i}" value="${s.label}" style="max-width:240px"/></td>
+          <td><input type="number" class="adm-input adm-input-sm" data-surch-amt="${i}" value="${s.amount}" min="0" style="width:90px"/></td>
+          <td><input type="text" class="adm-input" data-surch-unit="${i}" value="${s.unit}" style="max-width:130px"/></td>
+        </tr>`).join('')}
       </tbody>
     </table>
     <div class="adm-actions">
@@ -564,20 +735,132 @@ function admRenderMaritime() {
   document.getElementById('adm-panel-maritime').innerHTML = html;
 }
 
-function admBuildMaritimeSurcharges(data) {
-  const surch = data.surcharges || [
-    {code:'BAF', label:'Surcharge carburant (BAF)', amount:150, unit:'par conteneur'},
-    {code:'CAF', label:'Surcharge change (CAF)',    amount:50,  unit:'par conteneur'},
-    {code:'THC', label:'Frais portuaires (THC)',    amount:120, unit:'par conteneur'},
-    {code:'BL',  label:'Connaissement (B/L)',       amount:85,  unit:'par BL'},
-    {code:'ISPS',label:'Sécurité ISPS',             amount:25,  unit:'par conteneur'},
-    {code:'IMO', label:'Surcharge IMO 2020',        amount:75,  unit:'par conteneur'}
-  ];
-  return surch.map((s,i) => `<tr>
-    <td><input type="text" class="adm-input" data-surch-label="${i}" value="${s.label}" style="max-width:260px"/></td>
-    <td><input type="number" class="adm-input adm-input-sm" data-surch-amt="${i}" value="${s.amount}" min="0"/></td>
-    <td><input type="text" class="adm-input" data-surch-unit="${i}" value="${s.unit}" style="max-width:140px"/></td>
-  </tr>`).join('');
+/* ── Construit la grille tarifaire pour un port d'origine ── */
+function admBuildRatesGrid(data, originCode) {
+  const conts = data.containers || ADM_DEF.maritime.containers;
+  const rates = (data.rates && data.rates[originCode]) || {};
+  const dests  = data.destinations || ADM_DEF.maritime.destinations;
+
+  let html = `
+  <table class="adm-table adm-maritime-grid" style="min-width:750px">
+    <thead>
+      <tr>
+        <th style="min-width:80px">Pays</th>
+        <th style="min-width:140px">Port de destination</th>
+        <th style="min-width:65px">Transit</th>
+        ${conts.map(c => `<th style="min-width:100px;text-align:center">
+          <span class="adm-zone-pill">${c.code}</span><br>
+          <span style="font-size:.7rem;font-weight:400">${c.unit||'USD'}</span>
+        </th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  dests.forEach(dest => {
+    dest.ports.forEach((port, pi) => {
+      const portRates = rates[port.code] || {};
+      html += `
+      <tr class="adm-grid-row">
+        ${pi === 0 ? `<td rowspan="${dest.ports.length}" class="adm-country-cell">
+          <span style="font-size:1.2rem">${dest.flag}</span><br>
+          <strong style="font-size:.82rem">${dest.country}</strong>
+        </td>` : ''}
+        <td style="font-size:.83rem;font-weight:600">${port.label}</td>
+        <td style="text-align:center">
+          <input type="number" class="adm-input adm-input-sm"
+            data-mt-transit="${originCode}|${port.code}"
+            value="${port.transit||7}" min="1" style="width:50px;text-align:center"/>j
+        </td>
+        ${conts.map(c => `
+          <td>
+            <input type="number" class="adm-input adm-input-sm adm-rate-inp"
+              data-mt-rate="${originCode}|${port.code}|${c.code}"
+              value="${portRates[c.code]||''}" min="0" step="10"
+              placeholder="—" style="width:88px;text-align:right"/>
+          </td>`).join('')}
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+  return html;
+}
+
+/* ── Changer le port d'origine sélectionné ── */
+function admSetMaritimeOrigin(code) {
+  // Sauvegarder d'abord les valeurs en cours
+  admCollectMaritimeRates();
+  _admMaritimeOrigin = code;
+
+  // Mettre à jour les pills
+  document.querySelectorAll('.adm-origin-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.trim().includes(code) ||
+      btn.getAttribute('onclick')?.includes(`'${code}'`));
+  });
+
+  // Recharger la grille
+  const data = admLoad('maritime');
+  const wrap = document.getElementById('adm-maritime-grid-wrap');
+  if (wrap) wrap.innerHTML = admBuildRatesGrid(data, code);
+}
+
+/* ── Collecter les rates depuis le DOM ── */
+function admCollectMaritimeRates() {
+  const data = admLoad('maritime');
+  if (!data.rates) data.rates = {};
+
+  document.querySelectorAll('[data-mt-rate]').forEach(inp => {
+    const [orig, dest, cont] = inp.dataset.mtRate.split('|');
+    const val = inp.value.trim();
+    if (!data.rates[orig]) data.rates[orig] = {};
+    if (!data.rates[orig][dest]) data.rates[orig][dest] = {};
+    if (val === '' || val === '0') {
+      delete data.rates[orig][dest][cont];
+    } else {
+      data.rates[orig][dest][cont] = parseFloat(val) || 0;
+    }
+  });
+
+  // Transit times
+  document.querySelectorAll('[data-mt-transit]').forEach(inp => {
+    const [orig, dest] = inp.dataset.mtTransit.split('|');
+    const days = parseInt(inp.value) || 7;
+    // Mettre à jour le transit dans les destinations
+    if (data.destinations) {
+      data.destinations.forEach(country => {
+        const port = country.ports.find(p => p.code === dest);
+        if (port) port.transit = days;
+      });
+    }
+  });
+
+  admSave('maritime', data);
+  return data;
+}
+
+/* ── Sauvegarder les rates ── */
+function admSaveMaritimeRates() {
+  admCollectMaritimeRates();
+  admToast('✅ Tarifs maritimes enregistrés !');
+}
+
+/* ── Copy rates from another origin port ── */
+function admCopyRatesFromPort() {
+  const data = admLoad('maritime');
+  const origins = data.originPorts || [];
+  const others  = origins.filter(p => p.code !== _admMaritimeOrigin);
+  if (!others.length) { admToast('Aucun autre port à copier.', false); return; }
+  const opts   = others.map(p => p.code + ' — ' + p.label).join('\n');
+  const choice = prompt(`Copier les tarifs de quel port ?\n\n${opts}\n\n(Entrez le code, ex: CAS)`);
+  if (!choice) return;
+  const src = others.find(p => p.code.toLowerCase() === choice.trim().toUpperCase());
+  if (!src) { admToast('Code port invalide.', false); return; }
+  if (!data.rates) data.rates = {};
+  data.rates[_admMaritimeOrigin] = JSON.parse(JSON.stringify(data.rates[src.code] || {}));
+  admSave('maritime', data);
+  const wrap = document.getElementById('adm-maritime-grid-wrap');
+  if (wrap) wrap.innerHTML = admBuildRatesGrid(data, _admMaritimeOrigin);
+  admToast(`✅ Tarifs copiés depuis ${src.code} vers ${_admMaritimeOrigin} !`);
 }
 
 function admSubTab(section, panel) {
@@ -594,10 +877,6 @@ function admSubTab(section, panel) {
 function admSaveMaritimeContainers() {
   const data = admLoad('maritime');
   if (!data.containers) data.containers = JSON.parse(JSON.stringify(ADM_DEF.maritime.containers));
-  document.querySelectorAll('[data-cont-rate]').forEach(inp => {
-    const i = parseInt(inp.dataset.contRate);
-    if (data.containers[i]) data.containers[i].rate = parseFloat(inp.value) || 0;
-  });
   document.querySelectorAll('[data-cont-label]').forEach(inp => {
     const i = parseInt(inp.dataset.contLabel);
     if (data.containers[i]) data.containers[i].label = inp.value;
@@ -610,44 +889,56 @@ function admSaveMaritimeContainers() {
   admToast('✅ Types de conteneurs enregistrés !');
 }
 
-function admSaveMaritimeRoutes() {
+function admSaveOriginPorts() {
   const data = admLoad('maritime');
-  if (!data.routeOverrides) data.routeOverrides = {};
-  if (!data.routes) data.routes = JSON.parse(JSON.stringify(ADM_DEF.maritime.routes));
-  document.querySelectorAll('[data-route-transit]').forEach(inp => {
-    const i = parseInt(inp.dataset.routeTransit);
-    if (data.routes[i]) data.routes[i].transit = parseInt(inp.value) || 1;
+  if (!data.originPorts) data.originPorts = JSON.parse(JSON.stringify(ADM_DEF.maritime.originPorts));
+  document.querySelectorAll('[data-orig-code]').forEach(inp => {
+    const i = parseInt(inp.dataset.origCode);
+    if (data.originPorts[i]) data.originPorts[i].code = inp.value.toUpperCase().trim();
   });
-  document.querySelectorAll('[data-route-ov]').forEach(inp => {
-    const routeId = inp.dataset.routeOv;
-    const cont = inp.dataset.cont;
-    const val = inp.value.trim();
-    if (!data.routeOverrides[routeId]) data.routeOverrides[routeId] = {};
-    if (val === '') {
-      delete data.routeOverrides[routeId][cont];
-    } else {
-      data.routeOverrides[routeId][cont] = parseFloat(val) || 0;
-    }
+  document.querySelectorAll('[data-orig-label]').forEach(inp => {
+    const i = parseInt(inp.dataset.origLabel);
+    if (data.originPorts[i]) data.originPorts[i].label = inp.value;
+  });
+  document.querySelectorAll('[data-orig-flag]').forEach(inp => {
+    const i = parseInt(inp.dataset.origFlag);
+    if (data.originPorts[i]) data.originPorts[i].flag = inp.value;
   });
   admSave('maritime', data);
-  admToast('✅ Tarifs par route enregistrés !');
+  admToast('✅ Ports d\'origine enregistrés !');
+}
+
+function admSaveDestPorts() {
+  const data = admLoad('maritime');
+  if (!data.destinations) data.destinations = JSON.parse(JSON.stringify(ADM_DEF.maritime.destinations));
+  document.querySelectorAll('[data-dest-pcode]').forEach(inp => {
+    const [di, pi] = inp.dataset.destPcode.split('-').map(Number);
+    if (data.destinations[di]?.ports[pi]) data.destinations[di].ports[pi].code = inp.value.toUpperCase().trim();
+  });
+  document.querySelectorAll('[data-dest-plabel]').forEach(inp => {
+    const [di, pi] = inp.dataset.destPlabel.split('-').map(Number);
+    if (data.destinations[di]?.ports[pi]) data.destinations[di].ports[pi].label = inp.value;
+  });
+  document.querySelectorAll('[data-dest-transit]').forEach(inp => {
+    const [di, pi] = inp.dataset.destTransit.split('-').map(Number);
+    if (data.destinations[di]?.ports[pi]) data.destinations[di].ports[pi].transit = parseInt(inp.value) || 7;
+  });
+  admSave('maritime', data);
+  admToast('✅ Ports de destination enregistrés !');
 }
 
 function admSaveMaritimeSurcharges() {
   const data = admLoad('maritime');
-  const surch = [];
+  if (!data.surcharges) data.surcharges = JSON.parse(JSON.stringify(ADM_DEF.maritime.surcharges));
   const labels  = [...document.querySelectorAll('[data-surch-label]')];
   const amounts = [...document.querySelectorAll('[data-surch-amt]')];
   const units   = [...document.querySelectorAll('[data-surch-unit]')];
-  labels.forEach((l, i) => {
-    surch.push({
-      code: String(i),
-      label: l.value,
-      amount: parseFloat(amounts[i]?.value) || 0,
-      unit: units[i]?.value || ''
-    });
-  });
-  data.surcharges = surch;
+  data.surcharges = labels.map((l, i) => ({
+    code:   data.surcharges[i]?.code || String(i),
+    label:  l.value,
+    amount: parseFloat(amounts[i]?.value) || 0,
+    unit:   units[i]?.value || ''
+  }));
   admSave('maritime', data);
   admToast('✅ Surcharges maritimes enregistrées !');
 }

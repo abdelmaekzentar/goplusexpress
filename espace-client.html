@@ -103,11 +103,12 @@
       </div>
       <div class="ec-form-group">
         <label>Mot de passe</label>
-        <input type="password" id="ec-reg-pass" placeholder="Min. 6 caractères"/>
+        <input type="password" id="ec-reg-pass" placeholder="Minimum 6 caractères"/>
+        <div style="font-size:.76rem;color:#718096;margin-top:4px;"><i class="fa-solid fa-circle-info" style="color:#00a99d"></i> Au moins 6 caractères</div>
       </div>
       <div id="ec-reg-error" class="ec-msg-error hidden"></div>
       <div id="ec-reg-success" class="ec-msg-success hidden"></div>
-      <button class="btn btn-primary ec-btn-full" onclick="ecRegister()">
+      <button id="ec-reg-btn" class="btn btn-primary ec-btn-full" onclick="ecRegister()">
         <i class="fa-solid fa-user-plus"></i> Créer mon compte
       </button>
     </div>

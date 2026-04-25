@@ -271,6 +271,7 @@ async function ecRegister(){
   const pass    = document.getElementById('ec-reg-pass').value;
   const err     = document.getElementById('ec-reg-error');
   const succ    = document.getElementById('ec-reg-success');
+  const btn     = document.getElementById('ec-reg-btn');
   err.classList.add('hidden'); succ.classList.add('hidden');
 
   // Validation des champs
@@ -282,42 +283,49 @@ async function ecRegister(){
     err.textContent='Format d\'email invalide (ex: nom@societe.ma).';
     err.classList.remove('hidden'); return;
   }
-  if(pass.length < 8){
-    err.textContent='Le mot de passe doit contenir au moins 8 caractères.';
-    err.classList.remove('hidden'); return;
-  }
-  if(!/[A-Z]/.test(pass) || !/[0-9]/.test(pass)){
-    err.textContent='Le mot de passe doit contenir au moins 1 majuscule et 1 chiffre.';
-    err.classList.remove('hidden'); return;
-  }
   if(emailRaw.length > 150){
     err.textContent='Email trop long.';
+    err.classList.remove('hidden'); return;
+  }
+  if(pass.length < 6){
+    err.textContent='Le mot de passe doit contenir au moins 6 caractères.';
     err.classList.remove('hidden'); return;
   }
 
   const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
   if(users.find(u=>u.email===emailRaw)){
-    err.textContent='Cet email est déjà enregistré.';
+    err.textContent='Cet email est déjà enregistré. Utilisez la connexion ou mot de passe oublié.';
     err.classList.remove('hidden'); return;
   }
 
-  // Hacher le mot de passe avant stockage (jamais en clair)
-  const passHash = await hashPass(pass);
+  // Désactiver le bouton pendant le traitement
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Création en cours…'; }
+  const restoreBtn = ()=>{ if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-user-plus"></i> Créer mon compte'; }};
 
-  users.push({
-    email:    emailRaw,
-    passHash: passHash,   // ← hash SHA-256, jamais le mot de passe en clair
-    first:    first,
-    last:     last,
-    company:  company || '—',
-    role:     'client',    // rôle par défaut
-    status:   'pending',   // doit être approuvé par un admin
-    createdAt: Date.now()
-  });
-  localStorage.setItem('ec_users', JSON.stringify(users));
-  succ.textContent = '✅ Demande envoyée ! Votre compte est en attente de validation par un administrateur. Vous serez contacté sous 24h.';
-  succ.classList.remove('hidden');
-  setTimeout(()=>ecShowTab('login'), 1800);
+  try {
+    // Hacher le mot de passe avant stockage (jamais en clair)
+    const passHash = await hashPass(pass);
+
+    users.push({
+      email:    emailRaw,
+      passHash: passHash,   // ← hash SHA-256, jamais le mot de passe en clair
+      first:    first,
+      last:     last,
+      company:  company || '—',
+      role:     'client',    // rôle par défaut
+      status:   'pending',   // doit être approuvé par un admin
+      createdAt: Date.now()
+    });
+    localStorage.setItem('ec_users', JSON.stringify(users));
+    restoreBtn();
+    succ.textContent = '✅ Demande envoyée ! Votre compte est en attente de validation par un administrateur. Vous serez contacté sous 24h.';
+    succ.classList.remove('hidden');
+    setTimeout(()=>ecShowTab('login'), 2500);
+  } catch(e) {
+    restoreBtn();
+    err.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+    err.classList.remove('hidden');
+  }
 }
 
 function ecLogout(){
