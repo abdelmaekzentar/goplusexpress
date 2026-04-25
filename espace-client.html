@@ -6,7 +6,7 @@
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425g"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425h"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -229,6 +229,56 @@
           <div>
             <strong>Appareils Cargo</strong>
             <span>Référentiel technique avions cargo mondiaux</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('hscode')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#11998e,#38ef7d)">
+            <i class="fa-solid fa-barcode"></i>
+          </div>
+          <div>
+            <strong>Codes SH / HS</strong>
+            <span>13 135 codes douaniers · Droits · TPI · TVA Maroc</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('express')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#f7971e,#ffd200)">
+            <i class="fa-solid fa-bolt"></i>
+          </div>
+          <div>
+            <strong>Tarifs Express</strong>
+            <span>DHL · FedEx · Aramex — tarifs en temps réel</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('expedition')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#ee0979,#ff6a00)">
+            <i class="fa-solid fa-tag"></i>
+          </div>
+          <div>
+            <strong>Nouvelle Expédition</strong>
+            <span>Créer et gérer vos expéditions</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('horloge')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460)">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+          <div>
+            <strong>Horloge Mondiale</strong>
+            <span>Heures locales · Capitales du commerce mondial</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('navires')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#005c97,#363795)">
+            <i class="fa-solid fa-ship"></i>
+          </div>
+          <div>
+            <strong>Trafic Maritime</strong>
+            <span>Carte satellite · Ports du Maroc · Navires en direct</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -2719,6 +2769,6 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/espace-client.js?v=20260425g"></script>
+<script src="js/espace-client.js?v=20260425h"></script>
 </body>
 </html>
