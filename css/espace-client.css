@@ -804,6 +804,15 @@
 .wc-time{font-size:1.5rem;font-weight:900;color:var(--teal);font-family:monospace;margin-top:6px;letter-spacing:.02em}
 .wc-date{font-size:.72rem;color:#94a3b8;text-transform:capitalize}
 .wc-utc{font-size:.7rem;color:#cbd5e1;margin-top:2px}
+/* ── VesselFinder module ── */
+.vessel-zone-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.vessel-zone-btn{padding:9px 16px;border-radius:22px;border:2px solid var(--ec-border);background:#fff;color:var(--dark);font-size:.85rem;font-weight:600;cursor:pointer;transition:var(--transition);display:flex;align-items:center;gap:7px}
+.vessel-zone-btn:hover{border-color:var(--teal);color:var(--teal)}
+.vessel-zone-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.vessel-map-wrap{border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);border:1px solid var(--ec-border)}
+.vessel-credit{margin-top:12px;font-size:.8rem;color:#94a3b8;display:flex;align-items:center;gap:6px}
+.vessel-credit a{color:var(--teal);text-decoration:none}
+.vessel-credit a:hover{text-decoration:underline}
 .shp-customs-subtitle{margin:0 0 14px;font-size:.9rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
 .shp-article-card{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px;margin-bottom:12px}
 .shp-pickup-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--ec-border)}

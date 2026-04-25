@@ -546,12 +546,27 @@ function simProCalc(){
   transitEl.innerHTML = `<i class="fa-solid fa-clock"></i> Délai estimé depuis <strong>${fromText}</strong> : <strong>${escapeHTML(transit)}</strong>`;
 }
 
+/* ── VesselFinder zone switcher ─────────────────────── */
+function vesselZone(lat,lon,zoom,btn){
+  const iframe = document.getElementById('vessel-iframe');
+  if(iframe) iframe.src = `https://www.vesselfinder.com/aismap?zoom=${zoom}&lat=${lat}&lon=${lon}&names=true&fleet=&mmsi=`;
+  document.querySelectorAll('.vessel-zone-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
 /* ── Guide / Switch panels ───────────────────────────── */
 function guideSwitch(name){
   document.querySelectorAll('.guide-tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.guide-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('gtab-'+name).classList.add('active');
   document.getElementById('gpanel-'+name).classList.add('active');
+}
+function avionSwitch(name){
+  const mod = document.getElementById('ecmod-avion');
+  mod.querySelectorAll('.guide-tab').forEach(t=>t.classList.remove('active'));
+  mod.querySelectorAll('.guide-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('atab-'+name).classList.add('active');
+  document.getElementById('apanel-'+name).classList.add('active');
 }
 
 /* ── Aircraft data & render ──────────────────────────── */

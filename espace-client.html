@@ -6,7 +6,7 @@
 <title>Espace Client — GO PLUS EXPRESS</title>
 <meta name="robots" content="noindex"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425e"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425f"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
@@ -150,6 +150,9 @@
       </button>
       <button class="ec-nav-item" onclick="ecShowModule('horloge')" id="ecnav-horloge">
         <i class="fa-solid fa-clock"></i> Horloge Mondiale
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('navires')" id="ecnav-navires">
+        <i class="fa-solid fa-ship"></i> Trafic Maritime
       </button>
     </nav>
     <div class="ec-sidebar-footer">
@@ -1694,17 +1697,238 @@
         <h1><i class="fa-solid fa-plane-up"></i> Appareils Cargo — Référentiel Technique</h1>
         <p>Capacités, dimensions et caractéristiques des principaux avions cargo utilisés sur les lignes Maroc.</p>
       </div>
-      <div class="aircraft-filter">
-        <input type="text" id="ac-search" placeholder="Rechercher un appareil…" oninput="acFilter()"/>
-        <select id="ac-type" onchange="acFilter()">
-          <option value="">Tous types</option>
-          <option value="full">Full Freighter</option>
-          <option value="combi">Combi</option>
-          <option value="belly">Belly (soute passagers)</option>
-        </select>
+      <div class="guide-tabs">
+        <button class="guide-tab active" onclick="avionSwitch('ac')" id="atab-ac"><i class="fa-solid fa-plane"></i> Appareils Cargo</button>
+        <button class="guide-tab" onclick="avionSwitch('uld')" id="atab-uld"><i class="fa-solid fa-boxes-stacked"></i> ULD &amp; Palettes Aériennes</button>
       </div>
-      <div class="aircraft-grid" id="ac-grid"></div>
-    </div>
+
+      <!-- ── Panel Appareils ── -->
+      <div class="guide-panel active" id="apanel-ac">
+        <div class="aircraft-filter">
+          <input type="text" id="ac-search" placeholder="Rechercher un appareil…" oninput="acFilter()"/>
+          <select id="ac-type" onchange="acFilter()">
+            <option value="">Tous types</option>
+            <option value="full">Full Freighter</option>
+            <option value="combi">Combi</option>
+            <option value="belly">Belly (soute passagers)</option>
+          </select>
+        </div>
+        <div class="aircraft-grid" id="ac-grid"></div>
+      </div>
+
+      <!-- ── Panel ULD & Palettes ── -->
+      <div class="guide-panel" id="apanel-uld">
+        <div class="cont-grid">
+
+          <!-- LD-2 / AKN -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#0f4c81">
+              <i class="fa-solid fa-cube"></i><strong>LD-2 (AKN)</strong><span>Demi-largeur — compact</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="145" cy="116" rx="52" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="80,22 145,22 173,4 108,4" fill="#1565c0"/>
+                <polygon points="145,22 145,100 173,82 173,4" fill="#0d47a1"/>
+                <rect x="80" y="22" width="65" height="78" rx="1" fill="#1976d2"/>
+                <line x1="80" y1="22" x2="80" y2="100" stroke="#1565c0" stroke-width="2"/>
+                <line x1="145" y1="22" x2="145" y2="100" stroke="#1565c0" stroke-width="2"/>
+                <text x="112" y="66" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="15" font-weight="bold" font-family="monospace">LD-2</text>
+                <line x1="80" y1="110" x2="145" y2="110" stroke="#64748b" stroke-width="1"/><text x="112" y="118" text-anchor="middle" fill="#64748b" font-size="7">1 562 mm</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Largeur ext.</td><td><strong>1 562 mm</strong></td></tr>
+              <tr><td>Profondeur ext.</td><td><strong>1 194 mm</strong></td></tr>
+              <tr><td>Hauteur ext.</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Volume utile</td><td><strong>3,4 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>1 225 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>AKN</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Bagages, petits colis — B747, B767, A330</div>
+          </div>
+
+          <!-- LD-3 / AKE -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a6b3a">
+              <i class="fa-solid fa-cube"></i><strong>LD-3 (AKE)</strong><span>Demi-largeur — universel</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="148" cy="116" rx="60" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="70,24 158,24 184,6 96,6" fill="#2e7d32"/>
+                <polygon points="158,24 158,96 184,78 184,6" fill="#1b5e20"/>
+                <rect x="70" y="24" width="88" height="72" rx="1" fill="#388e3c"/>
+                <line x1="70" y1="24" x2="70" y2="96" stroke="#2e7d32" stroke-width="2"/>
+                <line x1="158" y1="24" x2="158" y2="96" stroke="#2e7d32" stroke-width="2"/>
+                <text x="114" y="65" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="15" font-weight="bold" font-family="monospace">LD-3</text>
+                <line x1="70" y1="110" x2="158" y2="110" stroke="#64748b" stroke-width="1"/><text x="114" y="118" text-anchor="middle" fill="#64748b" font-size="7">2 007 mm</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Largeur ext.</td><td><strong>2 007 mm</strong></td></tr>
+              <tr><td>Profondeur ext.</td><td><strong>1 534 mm</strong></td></tr>
+              <tr><td>Hauteur ext.</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Volume utile</td><td><strong>4,5 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>1 588 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>AKE</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Cargo général — B747, B777, A330, A380</div>
+          </div>
+
+          <!-- LD-6 / AAF -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#5a2e8a">
+              <i class="fa-solid fa-cube"></i><strong>LD-6 (AAF)</strong><span>Pleine largeur — double</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="150" cy="116" rx="116" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="22,36 246,36 262,22 38,22" fill="#6a1b9a"/>
+                <polygon points="246,36 246,96 262,82 262,22" fill="#4a148c"/>
+                <rect x="22" y="36" width="224" height="60" rx="1" fill="#7b1fa2"/>
+                <line x1="22" y1="36" x2="22" y2="96" stroke="#6a1b9a" stroke-width="2"/>
+                <line x1="246" y1="36" x2="246" y2="96" stroke="#6a1b9a" stroke-width="2"/>
+                <line x1="134" y1="36" x2="134" y2="96" stroke="#6a1b9a" stroke-width="1.5" opacity="0.4"/>
+                <text x="134" y="72" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="15" font-weight="bold" font-family="monospace">LD-6</text>
+                <line x1="22" y1="110" x2="246" y2="110" stroke="#64748b" stroke-width="1"/><text x="134" y="118" text-anchor="middle" fill="#64748b" font-size="7">4 064 mm</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Largeur ext.</td><td><strong>4 064 mm</strong></td></tr>
+              <tr><td>Profondeur ext.</td><td><strong>1 534 mm</strong></td></tr>
+              <tr><td>Hauteur ext.</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Volume utile</td><td><strong>8,9 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>3 176 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>AAF</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Gros fret — B747F, B777F, A330F</div>
+          </div>
+
+          <!-- LD-7 / P1P — Palette -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#c0392b">
+              <i class="fa-solid fa-pallet"></i><strong>LD-7 (P1P)</strong><span>Palette aluminium — grande</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="150" cy="116" rx="116" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="20,64 250,64 272,48 42,48" fill="#e53935"/>
+                <polygon points="250,64 250,80 272,64 272,48" fill="#b71c1c"/>
+                <rect x="20" y="64" width="230" height="16" rx="1" fill="#ef5350"/>
+                <rect x="20" y="80" width="230" height="8" rx="1" fill="#c62828"/>
+                <rect x="30" y="77" width="22" height="11" rx="1" fill="#b71c1c"/>
+                <rect x="139" y="77" width="22" height="11" rx="1" fill="#b71c1c"/>
+                <rect x="218" y="77" width="22" height="11" rx="1" fill="#b71c1c"/>
+                <line x1="60" y1="48" x2="60" y2="64" stroke="#ef9a9a" stroke-width="1.2" opacity="0.5"/>
+                <line x1="100" y1="48" x2="100" y2="64" stroke="#ef9a9a" stroke-width="1.2" opacity="0.5"/>
+                <line x1="140" y1="48" x2="140" y2="64" stroke="#ef9a9a" stroke-width="1.2" opacity="0.5"/>
+                <line x1="180" y1="48" x2="180" y2="64" stroke="#ef9a9a" stroke-width="1.2" opacity="0.5"/>
+                <line x1="220" y1="48" x2="220" y2="64" stroke="#ef9a9a" stroke-width="1.2" opacity="0.5"/>
+                <line x1="20" y1="53" x2="250" y2="53" stroke="#ef9a9a" stroke-width="1" opacity="0.4"/>
+                <line x1="20" y1="59" x2="250" y2="59" stroke="#ef9a9a" stroke-width="1" opacity="0.4"/>
+                <text x="135" y="61" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="10" font-weight="bold" font-family="monospace">PALETTE LD-7</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur</td><td><strong>3 175 mm</strong></td></tr>
+              <tr><td>Largeur</td><td><strong>2 235 mm</strong></td></tr>
+              <tr><td>Type</td><td><strong>Palette aluminium</strong></td></tr>
+              <tr><td>Volume max (filet)</td><td><strong>~12 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>4 626 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>P1P</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Fret vrac, colis lourds — B747F, B777F, A330F</div>
+          </div>
+
+          <!-- LD-9 / PAG -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#d35400">
+              <i class="fa-solid fa-cube"></i><strong>LD-9 (PAG)</strong><span>Pleine largeur — haute capacité</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="150" cy="116" rx="102" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="35,22 225,22 250,6 60,6" fill="#e65100"/>
+                <polygon points="225,22 225,102 250,86 250,6" fill="#bf360c"/>
+                <rect x="35" y="22" width="190" height="80" rx="1" fill="#f4511e"/>
+                <line x1="35" y1="22" x2="35" y2="102" stroke="#e65100" stroke-width="2"/>
+                <line x1="225" y1="22" x2="225" y2="102" stroke="#e65100" stroke-width="2"/>
+                <line x1="130" y1="22" x2="130" y2="102" stroke="#e65100" stroke-width="1.5" opacity="0.4"/>
+                <text x="130" y="68" text-anchor="middle" fill="rgba(255,255,255,0.55)" font-size="15" font-weight="bold" font-family="monospace">LD-9</text>
+                <line x1="35" y1="110" x2="225" y2="110" stroke="#64748b" stroke-width="1"/><text x="130" y="118" text-anchor="middle" fill="#64748b" font-size="7">3 175 mm</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur ext.</td><td><strong>3 175 mm</strong></td></tr>
+              <tr><td>Largeur ext.</td><td><strong>2 235 mm</strong></td></tr>
+              <tr><td>Hauteur ext.</td><td><strong>1 626 mm</strong></td></tr>
+              <tr><td>Volume utile</td><td><strong>~10,7 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>6 033 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>PAG</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Gros fret — B747F, B777F</div>
+          </div>
+
+          <!-- PMC / P6P — Palette standard -->
+          <div class="cont-card">
+            <div class="cont-header" style="background:#1a252f">
+              <i class="fa-solid fa-pallet"></i><strong>PMC (P6P)</strong><span>Palette standard — pleine largeur</span>
+            </div>
+            <div class="cont-truck-img">
+              <svg viewBox="0 0 300 120" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="150" cy="116" rx="116" ry="4" fill="#94a3b8" opacity="0.3"/>
+                <polygon points="16,62 254,62 274,46 36,46" fill="#37474f"/>
+                <polygon points="254,62 254,79 274,63 274,46" fill="#263238"/>
+                <rect x="16" y="62" width="238" height="16" rx="1" fill="#455a64"/>
+                <rect x="16" y="78" width="238" height="8" rx="1" fill="#37474f"/>
+                <rect x="26" y="74" width="22" height="12" rx="1" fill="#263238"/>
+                <rect x="144" y="74" width="22" height="12" rx="1" fill="#263238"/>
+                <rect x="222" y="74" width="22" height="12" rx="1" fill="#263238"/>
+                <line x1="55" y1="46" x2="55" y2="62" stroke="#90a4ae" stroke-width="1" opacity="0.5"/>
+                <line x1="95" y1="46" x2="95" y2="62" stroke="#90a4ae" stroke-width="1" opacity="0.5"/>
+                <line x1="135" y1="46" x2="135" y2="62" stroke="#90a4ae" stroke-width="1" opacity="0.5"/>
+                <line x1="175" y1="46" x2="175" y2="62" stroke="#90a4ae" stroke-width="1" opacity="0.5"/>
+                <line x1="215" y1="46" x2="215" y2="62" stroke="#90a4ae" stroke-width="1" opacity="0.5"/>
+                <line x1="16" y1="51" x2="254" y2="51" stroke="#90a4ae" stroke-width="1" opacity="0.4"/>
+                <line x1="16" y1="57" x2="254" y2="57" stroke="#90a4ae" stroke-width="1" opacity="0.4"/>
+                <text x="135" y="60" text-anchor="middle" fill="rgba(255,255,255,0.65)" font-size="10" font-weight="bold" font-family="monospace">PMC / PALETTE</text>
+              </svg>
+            </div>
+            <table class="cont-specs">
+              <tr><td>Longueur</td><td><strong>3 175 mm</strong></td></tr>
+              <tr><td>Largeur</td><td><strong>2 438 mm</strong></td></tr>
+              <tr><td>Type</td><td><strong>Palette aluminium</strong></td></tr>
+              <tr><td>Volume max (filet)</td><td><strong>~14 m³</strong></td></tr>
+              <tr><td>Poids max</td><td><strong>4 626 kg</strong></td></tr>
+              <tr><td>Code IATA</td><td><strong>PMC / P6P</strong></td></tr>
+            </table>
+            <div class="cont-usage"><i class="fa-solid fa-tag"></i> Standard tous gros-porteurs — B747, B777, A330</div>
+          </div>
+
+        </div><!-- /.cont-grid -->
+
+        <!-- Tableau comparatif ULD -->
+        <div class="cont-palettes" style="margin-top:24px">
+          <h3><i class="fa-solid fa-ruler-combined"></i> Comparatif ULD — Capacités &amp; Compatibilité</h3>
+          <div class="palette-table-wrap">
+            <table class="codes-table">
+              <thead><tr><th>ULD</th><th>Code IATA</th><th>Volume</th><th>Poids max</th><th>Avions compatibles</th></tr></thead>
+              <tbody>
+                <tr><td><strong>LD-2</strong></td><td>AKN</td><td>3,4 m³</td><td>1 225 kg</td><td>B747, B767, A330</td></tr>
+                <tr><td><strong>LD-3</strong></td><td>AKE</td><td>4,5 m³</td><td>1 588 kg</td><td>Tous gros-porteurs</td></tr>
+                <tr><td><strong>LD-6</strong></td><td>AAF</td><td>8,9 m³</td><td>3 176 kg</td><td>B747F, B777F, A330F</td></tr>
+                <tr><td><strong>LD-7</strong> (palette)</td><td>P1P</td><td>~12 m³</td><td>4 626 kg</td><td>B747F, B777F</td></tr>
+                <tr><td><strong>LD-9</strong></td><td>PAG</td><td>~10,7 m³</td><td>6 033 kg</td><td>B747F, B777F</td></tr>
+                <tr><td><strong>PMC</strong> (palette)</td><td>P6P</td><td>~14 m³</td><td>4 626 kg</td><td>Tous gros-porteurs</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /#apanel-uld -->
+
+    </div><!-- /#ecmod-avion -->
 
     <!-- ── Module: HS Codes ── -->
     <div class="ec-module" id="ecmod-hscode">
@@ -2456,6 +2680,36 @@
       <div class="wc-grid" id="wc-grid"></div>
     </div>
 
+    <!-- ── Module: Trafic Maritime ── -->
+    <div class="ec-module" id="ecmod-navires">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-ship"></i> Trafic Maritime en Temps Réel</h1>
+        <p>Positions des navires en direct — Méditerranée · Tanger Med · Casablanca · Monde</p>
+      </div>
+
+      <!-- Zone rapide -->
+      <div class="vessel-zone-row">
+        <button class="vessel-zone-btn active" onclick="vesselZone(35.9,-5.5,8,this)"><i class="fa-solid fa-anchor"></i> Tanger Med</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(33.6,-7.6,9,this)"><i class="fa-solid fa-anchor"></i> Casablanca</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(36.5,14.0,5,this)"><i class="fa-solid fa-water"></i> Méditerranée</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(29.0,-14.0,4,this)"><i class="fa-solid fa-globe-africa"></i> Côte Atlantique Maroc</button>
+        <button class="vessel-zone-btn" onclick="vesselZone(20.0,10.0,2,this)"><i class="fa-solid fa-earth-africa"></i> Vue Monde</button>
+      </div>
+
+      <div class="vessel-map-wrap">
+        <iframe id="vessel-iframe"
+          src="https://www.vesselfinder.com/aismap?zoom=8&lat=35.9&lon=-5.5&names=true&fleet=&mmsi="
+          width="100%" height="580" style="border:none;border-radius:12px;display:block"
+          title="VesselFinder — Trafic Maritime en temps réel"
+          loading="lazy">
+        </iframe>
+      </div>
+      <p class="vessel-credit">
+        <i class="fa-solid fa-circle-info"></i>
+        Données AIS en temps réel fournies par <a href="https://www.vesselfinder.com" target="_blank" rel="noopener">VesselFinder</a> — Mise à jour toutes les 2 minutes.
+      </p>
+    </div><!-- /#ecmod-navires -->
+
   </main>
 </div>
 
@@ -2466,6 +2720,6 @@
 <script src="js/express-tarifs.js?v=20260423c"></script>
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
-<script src="js/espace-client.js?v=20260425d"></script>
+<script src="js/espace-client.js?v=20260425f"></script>
 </body>
 </html>
