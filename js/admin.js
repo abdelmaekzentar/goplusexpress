@@ -153,9 +153,23 @@ function admLogExpedition(data) {
    INIT & NAVIGATION
 ══════════════════════════════════════════════ */
 let _admCurrentTab = 'fuel';
+let _admUserRole   = 'client';
 
-function admInit() {
-  admTab('fuel');
+/* Onglets réservés admin uniquement */
+const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','routier','groupage','users'];
+
+function admInit(role) {
+  _admUserRole = role || 'client';
+
+  // Masquer/afficher les onglets selon le rôle
+  ADM_ADMIN_ONLY_TABS.forEach(t => {
+    const el = document.getElementById('adm-tab-' + t);
+    if (el) el.style.display = (_admUserRole === 'admin') ? '' : 'none';
+  });
+
+  // Onglet par défaut selon le rôle
+  const startTab = (_admUserRole === 'admin') ? 'fuel' : 'expeditions';
+  admTab(startTab);
 }
 
 function admTab(name) {
@@ -174,6 +188,7 @@ function admTab(name) {
   if (name === 'groupage')    admRenderGroupage();
   if (name === 'expeditions') admRenderExpeditions();
   if (name === 'simulations') admRenderSimulations();
+  if (name === 'users')       admRenderUsers();
 }
 
 function admToast(msg, ok) {
@@ -1210,10 +1225,273 @@ function admExportCSV(type) {
 }
 
 /* ══════════════════════════════════════════════
+   PANEL 8 — GESTION UTILISATEURS
+══════════════════════════════════════════════ */
+const ROLE_META = {
+  admin:   { label:'Administrateur', color:'#dc2626', bg:'#fee2e2', icon:'fa-shield-halved' },
+  backend: { label:'Opérateur',      color:'#7c3aed', bg:'#f3e8ff', icon:'fa-eye' },
+  client:  { label:'Client',         color:'#0284c7', bg:'#dbeafe', icon:'fa-user' }
+};
+const STATUS_META = {
+  pending:  { label:'En attente', color:'#92400e', bg:'#fef3c7' },
+  active:   { label:'Actif',      color:'#166534', bg:'#dcfce7' },
+  inactive: { label:'Inactif',    color:'#6b7280', bg:'#f1f5f9' }
+};
+
+function admGetUsers() {
+  try { return JSON.parse(localStorage.getItem('ec_users') || '[]'); }
+  catch(e) { return []; }
+}
+function admSetUsers(users) {
+  try { localStorage.setItem('ec_users', JSON.stringify(users)); } catch(e) {}
+}
+
+function admRenderUsers() {
+  const users = admGetUsers();
+  const pending  = users.filter(u => u.status === 'pending');
+  const active   = users.filter(u => u.status === 'active');
+  const inactive = users.filter(u => u.status === 'inactive');
+
+  let html = `
+  <div class="adm-section-intro">
+    <i class="fa-solid fa-users-gear adm-intro-icon"></i>
+    <div>
+      <strong>Gestion des utilisateurs</strong>
+      <span>Validez les demandes d'accès, assignez les rôles et gérez les accès</span>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="adm-stats-row" style="margin-bottom:24px">
+    <div class="adm-stat-chip" style="border-color:#f59e0b">
+      <span class="adm-stat-num" style="color:#f59e0b">${pending.length}</span>
+      <span class="adm-stat-lbl">En attente</span>
+    </div>
+    <div class="adm-stat-chip" style="border-color:#22c55e">
+      <span class="adm-stat-num" style="color:#22c55e">${active.length}</span>
+      <span class="adm-stat-lbl">Actifs</span>
+    </div>
+    <div class="adm-stat-chip">
+      <span class="adm-stat-num" style="color:#94a3b8">${inactive.length}</span>
+      <span class="adm-stat-lbl">Inactifs</span>
+    </div>
+    <div class="adm-stat-chip adm-stat-total">
+      <span class="adm-stat-num">${users.length}</span>
+      <span class="adm-stat-lbl">Total</span>
+    </div>
+  </div>
+
+  <div class="adm-sub-tabs">
+    <button class="adm-stab active" onclick="admSubTab('users','pending')" id="adm-stab-users-pending">
+      <i class="fa-solid fa-clock" style="color:#f59e0b"></i> En attente (${pending.length})
+    </button>
+    <button class="adm-stab" onclick="admSubTab('users','active')" id="adm-stab-users-active">
+      <i class="fa-solid fa-circle-check" style="color:#22c55e"></i> Actifs (${active.length})
+    </button>
+    <button class="adm-stab" onclick="admSubTab('users','inactive')" id="adm-stab-users-inactive">
+      <i class="fa-solid fa-ban" style="color:#94a3b8"></i> Inactifs (${inactive.length})
+    </button>
+  </div>
+
+  <!-- Pending users -->
+  <div class="adm-sub-panel active" id="adm-sub-users-pending">`;
+
+  if (!pending.length) {
+    html += `<div class="adm-empty"><i class="fa-solid fa-inbox"></i><p>Aucune demande en attente.</p></div>`;
+  } else {
+    html += `<div class="adm-users-list">`;
+    pending.forEach(u => {
+      const date = u.createdAt ? new Date(u.createdAt).toLocaleDateString('fr-MA') : '—';
+      html += `
+      <div class="adm-user-card adm-user-pending" id="adm-ucard-${btoa(u.email)}">
+        <div class="adm-user-avatar" style="background:#fef3c7;color:#92400e">
+          ${(u.first[0]||'?').toUpperCase()}${(u.last[0]||'').toUpperCase()}
+        </div>
+        <div class="adm-user-info">
+          <div class="adm-user-name">${escapeHTML(u.first + ' ' + u.last)}</div>
+          <div class="adm-user-email">${escapeHTML(u.email)}</div>
+          <div class="adm-user-meta">
+            <span>${escapeHTML(u.company||'—')}</span>
+            <span>Inscription : ${date}</span>
+          </div>
+        </div>
+        <div class="adm-user-actions">
+          <div class="adm-approve-row">
+            <label style="font-size:.75rem;font-weight:600;color:#64748b">Rôle à attribuer :</label>
+            <select class="adm-input adm-select-sm" id="adm-role-sel-${btoa(u.email)}">
+              <option value="client">👤 Client</option>
+              <option value="backend">👁️ Opérateur</option>
+              <option value="admin">🛡️ Administrateur</option>
+            </select>
+          </div>
+          <div class="adm-approve-btns">
+            <button class="adm-btn adm-btn-primary" onclick="admApproveUser('${u.email}')">
+              <i class="fa-solid fa-check"></i> Approuver
+            </button>
+            <button class="adm-btn adm-btn-danger" onclick="admRejectUser('${u.email}')">
+              <i class="fa-solid fa-xmark"></i> Refuser
+            </button>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  html += `</div>`;
+
+  // Active users
+  html += `<div class="adm-sub-panel" id="adm-sub-users-active">`;
+  if (!active.length) {
+    html += `<div class="adm-empty"><i class="fa-solid fa-user-slash"></i><p>Aucun utilisateur actif.</p></div>`;
+  } else {
+    html += `<table class="adm-table adm-data-table"><thead><tr>
+      <th>Utilisateur</th><th>Email</th><th>Société</th><th>Rôle</th><th>Depuis</th><th>Actions</th>
+    </tr></thead><tbody>`;
+    active.forEach(u => {
+      const date = u.approvedAt ? new Date(u.approvedAt).toLocaleDateString('fr-MA') : '—';
+      const rm   = ROLE_META[u.role || 'client'] || ROLE_META.client;
+      html += `<tr>
+        <td><strong>${escapeHTML(u.first + ' ' + u.last)}</strong></td>
+        <td style="font-size:.8rem">${escapeHTML(u.email)}</td>
+        <td style="font-size:.8rem">${escapeHTML(u.company||'—')}</td>
+        <td>
+          <select class="adm-input adm-select-sm" onchange="admChangeRole('${u.email}', this.value)">
+            <option value="client"  ${(u.role||'client')==='client'  ?'selected':''}>👤 Client</option>
+            <option value="backend" ${(u.role||'client')==='backend' ?'selected':''}>👁️ Opérateur</option>
+            <option value="admin"   ${(u.role||'client')==='admin'   ?'selected':''}>🛡️ Admin</option>
+          </select>
+        </td>
+        <td style="font-size:.8rem">${date}</td>
+        <td>
+          <button class="adm-btn adm-btn-ghost" onclick="admDeactivateUser('${u.email}')" title="Désactiver">
+            <i class="fa-solid fa-user-slash"></i> Désactiver
+          </button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div>`;
+
+  // Inactive users
+  html += `<div class="adm-sub-panel" id="adm-sub-users-inactive">`;
+  if (!inactive.length) {
+    html += `<div class="adm-empty"><i class="fa-solid fa-check-circle"></i><p>Aucun utilisateur inactif.</p></div>`;
+  } else {
+    html += `<table class="adm-table adm-data-table"><thead><tr>
+      <th>Utilisateur</th><th>Email</th><th>Société</th><th>Actions</th>
+    </tr></thead><tbody>`;
+    inactive.forEach(u => {
+      html += `<tr style="opacity:.6">
+        <td>${escapeHTML(u.first + ' ' + u.last)}</td>
+        <td style="font-size:.8rem">${escapeHTML(u.email)}</td>
+        <td style="font-size:.8rem">${escapeHTML(u.company||'—')}</td>
+        <td>
+          <button class="adm-btn adm-btn-secondary" onclick="admReactivateUser('${u.email}')">
+            <i class="fa-solid fa-user-check"></i> Réactiver
+          </button>
+          <button class="adm-btn adm-btn-danger" onclick="admDeleteUser('${u.email}')" style="margin-left:6px">
+            <i class="fa-solid fa-trash"></i> Supprimer
+          </button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  html += `</div>
+
+  <!-- Comptes système (non modifiables) -->
+  <div style="margin-top:28px;padding:16px;background:#f8fafc;border-radius:12px;border:1px solid #e2e8f0">
+    <h4 style="font-size:.85rem;font-weight:700;color:#334155;margin-bottom:12px">
+      <i class="fa-solid fa-lock" style="color:#64748b"></i> Comptes système (non modifiables)
+    </h4>
+    <table class="adm-table" style="font-size:.8rem">
+      <thead><tr><th>Email</th><th>Rôle</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>admin@goplusexpress.ma</code></td>
+          <td><span class="adm-badge" style="background:#fee2e2;color:#dc2626">🛡️ Admin</span></td>
+          <td>Compte administrateur principal — accès total</td>
+        </tr>
+        <tr>
+          <td><code>demo@goplusexpress.com</code></td>
+          <td><span class="adm-badge adm-badge-blue">👤 Client</span></td>
+          <td>Compte de démonstration — accès outils uniquement</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById('adm-panel-users').innerHTML = html;
+}
+
+function admApproveUser(email) {
+  const users = admGetUsers();
+  const idx = users.findIndex(u => u.email === email);
+  if (idx < 0) return;
+  const selId = 'adm-role-sel-' + btoa(email);
+  const sel = document.getElementById(selId);
+  const role = sel ? sel.value : 'client';
+  users[idx].status     = 'active';
+  users[idx].role       = role;
+  users[idx].approvedAt = Date.now();
+  admSetUsers(users);
+  admToast(`✅ ${email} approuvé comme ${role} !`);
+  admRenderUsers();
+  admSubTab('users', 'active');
+}
+
+function admRejectUser(email) {
+  if (!confirm(`Refuser et supprimer la demande de ${email} ?`)) return;
+  const users = admGetUsers().filter(u => u.email !== email);
+  admSetUsers(users);
+  admToast(`Demande de ${email} refusée.`);
+  admRenderUsers();
+}
+
+function admChangeRole(email, newRole) {
+  const users = admGetUsers();
+  const u = users.find(x => x.email === email);
+  if (!u) return;
+  u.role = newRole;
+  admSetUsers(users);
+  admToast(`✅ Rôle de ${email} mis à jour : ${newRole}`);
+}
+
+function admDeactivateUser(email) {
+  if (!confirm(`Désactiver le compte ${email} ? L'utilisateur ne pourra plus se connecter.`)) return;
+  const users = admGetUsers();
+  const u = users.find(x => x.email === email);
+  if (!u) return;
+  u.status = 'inactive';
+  admSetUsers(users);
+  admToast(`Compte ${email} désactivé.`);
+  admRenderUsers();
+}
+
+function admReactivateUser(email) {
+  const users = admGetUsers();
+  const u = users.find(x => x.email === email);
+  if (!u) return;
+  u.status = 'active';
+  admSetUsers(users);
+  admToast(`✅ Compte ${email} réactivé.`);
+  admRenderUsers();
+}
+
+function admDeleteUser(email) {
+  if (!confirm(`SUPPRIMER définitivement le compte ${email} ? Cette action est irréversible.`)) return;
+  const users = admGetUsers().filter(u => u.email !== email);
+  admSetUsers(users);
+  admToast(`Compte ${email} supprimé.`);
+  admRenderUsers();
+}
+
+/* ══════════════════════════════════════════════
    PUBLIC API — pour les simulateurs
 ══════════════════════════════════════════════ */
-window.admGetFuelPct   = admGetFuelPct;
-window.admGetMargin    = admGetMargin;
-window.admLogSim       = admLogSim;
+window.admGetFuelPct    = admGetFuelPct;
+window.admGetMargin     = admGetMargin;
+window.admLogSim        = admLogSim;
 window.admLogExpedition = admLogExpedition;
-window.admLoad         = admLoad;
+window.admLoad          = admLoad;

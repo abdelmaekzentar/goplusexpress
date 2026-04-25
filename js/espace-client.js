@@ -84,10 +84,29 @@ function resetRateLimit(email) {
 }
 
 /* ── Auth ──────────────────────────────────────────── */
-// Compte de démonstration — identifiants intentionnellement visibles pour la démo
-// Accepte les deux domaines .ma et .com pour la démo
+// Compte Admin — accès total (tarifs, utilisateurs, ops)
+const EC_ADMIN = {
+  email: 'admin@goplusexpress.ma',
+  pass:  'Admin#GPE2026!',
+  first: 'Admin', last: 'GPE', company: 'GO PLUS EXPRESS', role: 'admin'
+};
+
+// Compte de démonstration Client — accès outils uniquement
 const EC_DEMO_EMAILS = ['demo@goplusexpress.ma','demo@goplusexpress.com'];
-const EC_DEMO = { email:'demo@goplusexpress.ma', passHash:'__DEMO__', first:'Demo', last:'GO PLUS', company:'GO PLUS EXPRESS' };
+const EC_DEMO = { email:'demo@goplusexpress.ma', first:'Demo', last:'Client', company:'GO PLUS EXPRESS', role:'client' };
+
+// Rôles disponibles
+const EC_ROLES = {
+  admin:   { label:'Administrateur', color:'#dc2626', desc:'Accès total — tarifs, utilisateurs, opérations' },
+  backend: { label:'Opérateur',      color:'#7c3aed', desc:'Visualisation expéditions & simulations' },
+  client:  { label:'Client',         color:'#0284c7', desc:'Outils logistiques uniquement' }
+};
+
+// Vérifier si l'utilisateur courant a un rôle donné
+function ecHasRole(...roles){
+  const u = ecGetUser();
+  return u && roles.includes(u.role || 'client');
+}
 
 function ecInit(){
   const user = ecGetUser();
@@ -139,8 +158,27 @@ function ecShowDashboard(user){
   const un = document.getElementById('ec-username-nav'); if(un) un.textContent = full;
   const fn = document.getElementById('ec-fullname-side'); if(fn) fn.textContent = full;
   const co = document.getElementById('ec-company-side'); if(co) co.textContent = user.company;
-  const wm = document.getElementById('ec-welcome-msg'); if(wm) wm.textContent = 'Bienvenue, ' + user.first + ' ! Sélectionnez un module pour commencer.';
   const nav = document.getElementById('ec-user-nav'); if(nav) nav.classList.remove('hidden');
+
+  // Afficher le badge de rôle
+  const role = user.role || 'client';
+  const roleInfo = EC_ROLES[role] || EC_ROLES.client;
+  const wm = document.getElementById('ec-welcome-msg');
+  if(wm) wm.innerHTML = `Bienvenue, <strong>${escapeHTML(user.first)}</strong> !
+    <span style="display:inline-flex;align-items:center;gap:5px;background:${roleInfo.color}18;border:1px solid ${roleInfo.color}40;
+    color:${roleInfo.color};padding:2px 10px;border-radius:20px;font-size:.75rem;font-weight:700;margin-left:8px">
+    <i class="fa-solid fa-shield-halved"></i> ${roleInfo.label}</span>`;
+
+  // Affichage conditionnel selon le rôle
+  const adminSep = document.getElementById('ecnav-admin-sep');
+  const adminBtn = document.getElementById('ecnav-admin');
+  const hasBackend = ['admin','backend'].includes(role);
+  if(adminSep) adminSep.style.display = hasBackend ? '' : 'none';
+  if(adminBtn) adminBtn.style.display = hasBackend ? '' : 'none';
+
+  // Card admin dans le dashboard
+  const adminCard = document.getElementById('ec-dashcard-admin');
+  if(adminCard) adminCard.style.display = hasBackend ? '' : 'none';
 }
 
 function ecShowTab(tab){
@@ -174,26 +212,41 @@ async function ecLogin(){
   // Désactiver le bouton pendant la vérification
   if(btn){ btn.disabled = true; btn.textContent = '…'; }
 
-  // Compte de démonstration (accepte .ma et .com)
-  if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
+  const restoreBtn = () => { if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Se connecter'; }};
+
+  // ── Compte Admin ──
+  if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
     resetRateLimit(email);
-    const user = {email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company};
-    ecSetUser(user);
-    ecShowDashboard(user);
-    if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Se connecter'; }
-    return;
+    const user = {email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'};
+    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
   }
 
-  // Hacher le mot de passe et comparer avec les utilisateurs enregistrés
+  // ── Compte Démo (Client) ──
+  if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
+    resetRateLimit(email);
+    const user = {email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'};
+    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
+  }
+
+  // ── Utilisateurs enregistrés ──
   const passHash = await hashPass(pass);
   const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
   const found = users.find(u => u.email === email && u.passHash === passHash);
 
-  if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Se connecter'; }
+  restoreBtn();
 
   if(found){
+    // Vérification statut
+    if(found.status === 'pending'){
+      err.textContent = '⏳ Votre compte est en attente de validation par un administrateur. Vous serez notifié par email.';
+      err.classList.remove('hidden'); incrementRateLimit(email); return;
+    }
+    if(found.status === 'inactive'){
+      err.textContent = '🚫 Votre compte a été désactivé. Contactez : contact@goplusexpress.ma';
+      err.classList.remove('hidden'); return;
+    }
     resetRateLimit(email);
-    ecSetUser({email:found.email, first:found.first, last:found.last, company:found.company});
+    ecSetUser({email:found.email, first:found.first, last:found.last, company:found.company, role:found.role||'client'});
     ecShowDashboard(ecGetUser());
     return;
   }
@@ -257,10 +310,12 @@ async function ecRegister(){
     first:    first,
     last:     last,
     company:  company || '—',
+    role:     'client',    // rôle par défaut
+    status:   'pending',   // doit être approuvé par un admin
     createdAt: Date.now()
   });
   localStorage.setItem('ec_users', JSON.stringify(users));
-  succ.textContent = 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.';
+  succ.textContent = '✅ Demande envoyée ! Votre compte est en attente de validation par un administrateur. Vous serez contacté sous 24h.';
   succ.classList.remove('hidden');
   setTimeout(()=>ecShowTab('login'), 1800);
 }
@@ -282,7 +337,14 @@ function ecShowModule(name){
   if(name === 'navires') setTimeout(initVesselMap,  120);
   if(name === 'trafic')  setTimeout(initRoadMap,    120);
   if(name === 'galerie') setTimeout(initGallery,    200);
-  if(name === 'admin')   setTimeout(admInit,        50);
+  if(name === 'admin'){
+    if(!ecHasRole('admin','backend')){
+      ecShowModule('accueil');
+      alert('🚫 Accès refusé — réservé aux administrateurs et opérateurs.');
+      return;
+    }
+    setTimeout(()=>admInit(ecGetUser()?.role), 50);
+  }
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */

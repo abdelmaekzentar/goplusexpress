@@ -1069,6 +1069,18 @@
 .adm-detail-meta{display:flex;flex-wrap:wrap;gap:10px;font-size:.82rem;border-top:1px solid #f1f5f9;padding-top:12px}
 .adm-detail-meta span{background:#f8fafc;padding:5px 10px;border-radius:6px}
 
+/* ── User management ── */
+.adm-users-list{display:flex;flex-direction:column;gap:12px}
+.adm-user-card{display:grid;grid-template-columns:52px 1fr auto;gap:16px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 20px;transition:.2s}
+.adm-user-pending{border-left:4px solid #f59e0b}
+.adm-user-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.95rem;flex-shrink:0}
+.adm-user-name{font-weight:700;font-size:.95rem;color:#0f172a;margin-bottom:2px}
+.adm-user-email{font-size:.82rem;color:#64748b;margin-bottom:4px}
+.adm-user-meta{display:flex;gap:12px;font-size:.75rem;color:#94a3b8}
+.adm-user-actions{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.adm-approve-row{display:flex;align-items:center;gap:8px;font-size:.78rem}
+.adm-approve-btns{display:flex;gap:6px}
+
 /* ── Responsive ── */
 @media(max-width:768px){
   .adm-tabs{gap:2px}
@@ -1077,4 +1089,6 @@
   .adm-detail-grid{grid-template-columns:1fr}
   .adm-toolbar{flex-direction:column;align-items:stretch}
   .adm-toolbar-right{margin-left:0}
+  .adm-user-card{grid-template-columns:1fr;gap:10px}
+  .adm-user-actions{align-items:flex-start}
 }

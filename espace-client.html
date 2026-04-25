@@ -174,7 +174,7 @@
       <a href="guide-emballage.html" target="_blank" class="ec-nav-item" style="text-decoration:none">
         <i class="fa-solid fa-book-open"></i> Guide Emballage
       </a>
-      <div style="margin:8px 20px;border-top:1px solid rgba(255,255,255,.08)"></div>
+      <div id="ecnav-admin-sep" style="margin:8px 20px;border-top:1px solid rgba(255,255,255,.08)"></div>
       <button class="ec-nav-item" onclick="ecShowModule('admin')" id="ecnav-admin"
         style="background:rgba(239,68,68,.08);color:#fca5a5;border-left:3px solid #ef4444">
         <i class="fa-solid fa-shield-halved"></i> Administration
@@ -336,7 +336,7 @@
           </div>
           <i class="fa-solid fa-arrow-up-right-from-square ec-card-arr"></i>
         </a>
-        <div class="ec-dash-card" onclick="ecShowModule('admin')" style="border:2px solid rgba(239,68,68,.3);background:linear-gradient(135deg,#fff5f5,#fff)">
+        <div class="ec-dash-card" onclick="ecShowModule('admin')" id="ec-dashcard-admin" style="border:2px solid rgba(239,68,68,.3);background:linear-gradient(135deg,#fff5f5,#fff)">
           <div class="ec-dash-icon" style="background:linear-gradient(135deg,#991b1b,#dc2626)">
             <i class="fa-solid fa-shield-halved"></i>
           </div>
@@ -2970,6 +2970,9 @@
         <button class="adm-tab" id="adm-tab-simulations" onclick="admTab('simulations')">
           <i class="fa-solid fa-chart-line"></i> Simulations
         </button>
+        <button class="adm-tab" id="adm-tab-users" onclick="admTab('users')" style="margin-left:auto;background:rgba(220,38,38,.08);color:#dc2626">
+          <i class="fa-solid fa-users-gear"></i> Utilisateurs
+        </button>
       </div>
 
       <!-- ── Panel: Surcharge fuel ── -->
@@ -3004,6 +3007,11 @@
 
       <!-- ── Panel: Simulations ── -->
       <div class="adm-panel" id="adm-panel-simulations">
+        <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
+      </div>
+
+      <!-- ── Panel: Utilisateurs ── -->
+      <div class="adm-panel" id="adm-panel-users">
         <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
       </div>
 
