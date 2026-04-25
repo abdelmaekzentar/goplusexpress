@@ -277,8 +277,9 @@ function ecShowModule(name){
   if(mod) mod.classList.add('active');
   if(nav) nav.classList.add('active');
   window.scrollTo(0,0);
-  if(name === 'navires') setTimeout(initVesselMap, 120);
-  if(name === 'trafic')  setTimeout(initRoadMap,   120);
+  if(name === 'navires') setTimeout(initVesselMap,  120);
+  if(name === 'trafic')  setTimeout(initRoadMap,    120);
+  if(name === 'galerie') setTimeout(initGallery,    200);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
@@ -603,6 +604,33 @@ function vesselZone(lat,lon,zoom,btn){
   if(_vesselMap) _vesselMap.setView([lat,lon],zoom);
   document.querySelectorAll('.vessel-zone-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
+}
+
+/* ── Galerie Navires — VesselFinder iframe ───────────────────── */
+function initGallery(){
+  const frame    = document.getElementById('gallery-frame');
+  const fallback = document.getElementById('gallery-fallback');
+  if(!frame) return;
+
+  /* Détecte si l'iframe est bloqué (erreur de chargement) */
+  frame.addEventListener('error', () => {
+    if(fallback){ fallback.style.display = 'flex'; frame.style.display = 'none'; }
+  });
+
+  /* Timeout : si après 8s le contenu n'est pas chargé → fallback */
+  const timer = setTimeout(() => {
+    try {
+      /* Cross-origin : on ne peut pas lire contentDocument, mais si la
+         hauteur est 0 ou src échoue l'iframe sera vide */
+      if(frame.contentDocument === null && frame.offsetHeight < 10){
+        if(fallback){ fallback.style.display='flex'; frame.style.display='none'; }
+      }
+    } catch(e){
+      /* contentDocument inaccessible = chargé (cross-origin ok) — pas de fallback */
+    }
+  }, 8000);
+
+  frame.addEventListener('load', () => clearTimeout(timer));
 }
 
 /* ── Trafic Routier — Leaflet satellite (aucun label politique) ── */

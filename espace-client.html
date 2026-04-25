@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425j"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425k"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -168,6 +168,9 @@
       <button class="ec-nav-item" onclick="ecShowModule('trafic')" id="ecnav-trafic">
         <i class="fa-solid fa-traffic-light"></i> Trafic Routier
       </button>
+      <button class="ec-nav-item" onclick="ecShowModule('galerie')" id="ecnav-galerie">
+        <i class="fa-solid fa-images"></i> Galerie Navires
+      </button>
     </nav>
     <div class="ec-sidebar-footer">
       <a href="index.html" class="ec-sidebar-link"><i class="fa-solid fa-globe"></i> Site principal</a>
@@ -301,7 +304,17 @@
           </div>
           <div>
             <strong>Trafic Routier</strong>
-            <span>Waze live · Embouteillages · Ports du Maroc</span>
+            <span>Carte satellite · Accès ports · Navigation Waze</span>
+          </div>
+          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
+        </div>
+        <div class="ec-dash-card" onclick="ecShowModule('galerie')">
+          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#1d6fa4,#48b1e5)">
+            <i class="fa-solid fa-images"></i>
+          </div>
+          <div>
+            <strong>Galerie Navires</strong>
+            <span>Photos de navires · VesselFinder · +1 350 000 photos</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -2851,6 +2864,49 @@
       </p>
     </div><!-- /#ecmod-trafic -->
 
+    <!-- ── Module: Galerie Navires ── -->
+    <div class="ec-module" id="ecmod-galerie">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-images"></i> Galerie Navires — VesselFinder</h1>
+        <p>+1 350 000 photos de navires · Cargo · Tanker · Porte-conteneurs · Vraquiers · RoRo</p>
+      </div>
+
+      <div class="gallery-toolbar">
+        <div class="gallery-info">
+          <i class="fa-solid fa-circle-info" style="color:#1d6fa4"></i>
+          Photos contributeurs VesselFinder — utilisez les filtres intégrés dans la galerie
+        </div>
+        <a href="https://www.vesselfinder.com/fr/gallery" target="_blank" rel="noopener" class="gallery-open-btn">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir en plein écran
+        </a>
+      </div>
+
+      <div class="gallery-frame-wrap">
+        <iframe
+          id="gallery-frame"
+          src="https://www.vesselfinder.com/fr/gallery"
+          title="Galerie de navires VesselFinder"
+          allowfullscreen
+          loading="lazy"
+        ></iframe>
+        <!-- Fallback si iframe bloqué -->
+        <div class="gallery-fallback" id="gallery-fallback">
+          <div class="gallery-fallback-inner">
+            <i class="fa-solid fa-ship" style="font-size:3rem;color:#1d6fa4;margin-bottom:16px"></i>
+            <h3>Galerie VesselFinder</h3>
+            <p>La galerie ne peut pas être affichée en mode intégré.<br>Cliquez pour l'ouvrir directement.</p>
+            <a href="https://www.vesselfinder.com/fr/gallery" target="_blank" rel="noopener" class="gallery-open-btn" style="margin-top:12px">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir la galerie ↗
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <p class="vessel-credit" style="margin-top:12px">
+        <i class="fa-solid fa-copyright"></i> Photos © leurs auteurs respectifs — VesselFinder.com · Utilisation à des fins de référence maritime uniquement
+      </p>
+    </div><!-- /#ecmod-galerie -->
+
   </main>
 </div>
 
@@ -2862,7 +2918,7 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/espace-client.js?v=20260425j"></script>
+<script src="js/espace-client.js?v=20260425k"></script>
 
 <!-- ═══ SERVICE WORKER ═══ -->
 <script>

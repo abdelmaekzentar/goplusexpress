@@ -837,6 +837,22 @@
   .road-legend{gap:12px}
   .road-port-info{display:none}
 }
+
+/* ── Galerie Navires ── */
+.gallery-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;padding:12px 16px;background:#fff;border-radius:12px;border:1px solid var(--ec-border)}
+.gallery-info{font-size:.83rem;color:#64748b;display:flex;align-items:center;gap:8px}
+.gallery-open-btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;background:#1d6fa4;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:.83rem;transition:var(--transition);white-space:nowrap}
+.gallery-open-btn:hover{background:#1558a0;transform:translateY(-1px)}
+.gallery-frame-wrap{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);border:1px solid var(--ec-border);background:#f8fafc;min-height:680px}
+.gallery-frame-wrap iframe{display:block;width:100%;height:78vh;min-height:620px;border:none}
+.gallery-fallback{display:none;position:absolute;inset:0;background:#f0f4f8;align-items:center;justify-content:center}
+.gallery-fallback-inner{text-align:center;padding:40px 24px;max-width:340px}
+.gallery-fallback-inner h3{font-size:1.2rem;font-weight:800;color:var(--dark);margin:0 0 8px}
+.gallery-fallback-inner p{font-size:.88rem;color:#64748b;line-height:1.6;margin:0}
+@media(max-width:600px){
+  .gallery-frame-wrap iframe{height:65vh;min-height:420px}
+  .gallery-toolbar{flex-direction:column;align-items:flex-start}
+}
 .shp-customs-subtitle{margin:0 0 14px;font-size:.9rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
 .shp-article-card{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px;margin-bottom:12px}
 .shp-pickup-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--ec-border)}
