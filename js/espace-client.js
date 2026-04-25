@@ -278,6 +278,7 @@ function ecShowModule(name){
   if(nav) nav.classList.add('active');
   window.scrollTo(0,0);
   if(name === 'navires') setTimeout(initVesselMap, 120);
+  if(name === 'trafic')  setTimeout(initRoadMap,   120);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
@@ -604,16 +605,85 @@ function vesselZone(lat,lon,zoom,btn){
   if(btn) btn.classList.add('active');
 }
 
-/* ── Trafic Routier — Waze ───────────────────────────── */
+/* ── Trafic Routier — Leaflet satellite (aucun label politique) ── */
+let _roadMap = null;
+let _roadMarker = null;
+
+const ROAD_PORTS = [
+  { name:'Tanger Med',   lat:35.884, lon:-5.498,  zoom:14, note:'1er port africain · N1 · A1',             routes:['A1','N1','Fnideq'] },
+  { name:'Casablanca',   lat:33.603, lon:-7.617,  zoom:14, note:'Port Autonome · Boulevard Zerktouni',      routes:['A3','N1','A1','Boulevard maritime'] },
+  { name:'Mohammedia',   lat:33.728, lon:-7.384,  zoom:14, note:'Port pétrolier · A3',                      routes:['A3','N11','Casablanca +30km'] },
+  { name:'Agadir',       lat:30.427, lon:-9.641,  zoom:14, note:'Port de pêche & conteneurs · N1',          routes:['N1','Ait Melloul','Zone industrielle'] },
+  { name:'Nador',        lat:35.270, lon:-2.943,  zoom:14, note:'Nador West Med · N2',                      routes:['N2','A2','Melilia road'] },
+  { name:'Safi',         lat:32.304, lon:-9.233,  zoom:14, note:'Port phosphatier · N1',                    routes:['N1','R207','OCP corridor'] },
+  { name:'Kénitra',      lat:34.261, lon:-6.590,  zoom:14, note:'Port fluvial · A14',                       routes:['A14','N6','Rabat +40km'] },
+  { name:'Tanger Ville', lat:35.790, lon:-5.816,  zoom:14, note:'Port historique · A4',                     routes:['A4','N1','Bab Marsa'] },
+];
+
+function initRoadMap(){
+  if(_roadMap){ _roadMap.invalidateSize(); return; }
+  if(typeof L === 'undefined') return;
+
+  const first = ROAD_PORTS[0];
+  _roadMap = L.map('road-map', { zoomControl:true, attributionControl:true })
+    .setView([first.lat, first.lon], first.zoom);
+
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution:'Tiles &copy; <a href="https://www.esri.com">Esri</a> — aucun label politique', maxZoom:19 }
+  ).addTo(_roadMap);
+
+  /* Marqueur initial */
+  _roadMarker = _makeRoadMarker(first);
+  _roadMarker.addTo(_roadMap).openPopup();
+}
+
+function _makeRoadMarker(p){
+  const ic = L.divIcon({
+    className:'',
+    html:`<div style="width:18px;height:18px;background:#e67e22;border:3px solid #fff;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.5);cursor:pointer"></div>`,
+    iconSize:[18,18], iconAnchor:[9,9]
+  });
+  const wazeUrl  = `https://waze.com/ul?ll=${p.lat},${p.lon}&navigate=yes`;
+  const gmapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}`;
+  const routeList = p.routes.map(r=>`<span style="background:#e67e22;color:#fff;padding:2px 7px;border-radius:6px;font-size:.72rem;font-weight:700">${r}</span>`).join(' ');
+  return L.marker([p.lat, p.lon], {icon:ic}).bindPopup(
+    `<div style="min-width:210px;font-family:Inter,sans-serif;padding:4px 0">
+      <div style="font-size:1rem;font-weight:800;color:#0f4c81;margin-bottom:3px">🏗️ ${p.name}</div>
+      <div style="font-size:.78rem;color:#64748b;margin-bottom:8px">${p.note}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px">${routeList}</div>
+      <div style="display:flex;gap:7px">
+        <a href="${wazeUrl}" target="_blank" rel="noopener"
+           style="flex:1;text-align:center;padding:7px 10px;background:#33ccff;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.78rem">
+          🧭 Waze
+        </a>
+        <a href="${gmapsUrl}" target="_blank" rel="noopener"
+           style="flex:1;text-align:center;padding:7px 10px;background:#4285f4;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:.78rem">
+          🗺️ G. Maps
+        </a>
+      </div>
+    </div>`,
+    {minWidth:220, maxWidth:260}
+  );
+}
+
 function roadZone(lat, lon, zoom, portName, portInfo, btn){
-  const frame = document.getElementById('waze-frame');
+  /* Mettre à jour label + lien Waze dans la légende */
   const label = document.getElementById('road-port-label');
-  if(frame){
-    frame.src = `https://embed.waze.com/iframe?zoom=${zoom}&lat=${lat}&lon=${lon}&ct=livemap&pin=1`;
+  const wazeLink = document.getElementById('road-waze-link');
+  if(label)    label.innerHTML = `<strong>${portName}</strong> — ${portInfo}`;
+  if(wazeLink) wazeLink.href   = `https://waze.com/ul?ll=${lat},${lon}&navigate=yes`;
+
+  /* Déplacer la carte Leaflet */
+  if(_roadMap){
+    _roadMap.setView([lat, lon], zoom);
+    /* Remplacer le marqueur */
+    if(_roadMarker) _roadMap.removeLayer(_roadMarker);
+    const port = ROAD_PORTS.find(p => p.name === portName) || {name:portName, lat, lon, zoom, note:portInfo, routes:[]};
+    _roadMarker = _makeRoadMarker(port);
+    _roadMarker.addTo(_roadMap).openPopup();
   }
-  if(label){
-    label.innerHTML = `<strong>${portName}</strong> — ${portInfo}`;
-  }
+
   document.querySelectorAll('.road-zone-btn').forEach(b=>b.classList.remove('active'));
   if(btn) btn.classList.add('active');
 }

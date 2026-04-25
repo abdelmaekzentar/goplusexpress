@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260425i"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260425j"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -2784,8 +2784,8 @@
     <!-- ── Module: Trafic Routier ── -->
     <div class="ec-module" id="ecmod-trafic">
       <div class="ec-module-header">
-        <h1><i class="fa-solid fa-traffic-light"></i> Trafic Routier — Accès Ports du Maroc</h1>
-        <p>Waze temps réel · Embouteillages · Incidents · Travaux · Sélectionnez un port</p>
+        <h1><i class="fa-solid fa-traffic-light"></i> Accès Routier — Ports du Maroc</h1>
+        <p>Carte satellite · Aucun label politique · Cliquez sur un port pour la navigation Waze</p>
       </div>
 
       <!-- Boutons ports -->
@@ -2824,34 +2824,31 @@
         </button>
       </div>
 
-      <!-- Carte Waze -->
+      <!-- Carte Leaflet satellite (aucun label politique) -->
       <div class="road-map-wrap">
-        <iframe
-          id="waze-frame"
-          src="https://embed.waze.com/iframe?zoom=14&lat=35.884&lon=-5.498&ct=livemap&pin=1"
-          allowfullscreen
-          loading="lazy"
-          title="Trafic Routier Waze — Tanger Med"
-        ></iframe>
+        <div id="road-map" style="width:100%;height:560px;border-radius:12px"></div>
       </div>
 
       <!-- Légende + info port -->
       <div class="road-legend">
-        <div class="road-legend-item"><div class="road-legend-dot green"></div> Trafic fluide</div>
-        <div class="road-legend-dot" style="display:none"></div>
-        <div class="road-legend-item"><div class="road-legend-dot orange"></div> Ralentissements</div>
-        <div class="road-legend-item"><div class="road-legend-dot red"></div> Embouteillages</div>
-        <div class="road-legend-item"><div class="road-legend-dot grey"></div> Données indisponibles</div>
+        <i class="fa-solid fa-satellite" style="color:#e67e22"></i>
+        <span style="font-size:.8rem;color:#64748b">Imagerie satellite Esri · <strong style="color:#0f172a">aucune frontière politique</strong></span>
         <div class="road-legend-sep"></div>
         <div class="road-port-info">
           <i class="fa-solid fa-location-dot" style="color:#e67e22"></i>
           <span id="road-port-label"><strong>Tanger Med</strong> — 1er port africain · N1 · A1</span>
         </div>
-        <a href="https://www.waze.com/live-map" target="_blank" rel="noopener"
-           style="margin-left:auto;font-size:.78rem;color:var(--teal);text-decoration:none;white-space:nowrap;display:flex;align-items:center;gap:5px">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Waze
+        <a id="road-waze-link"
+           href="https://waze.com/ul?ll=35.884,-5.498&navigate=yes" target="_blank" rel="noopener"
+           style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#33ccff;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:.8rem;white-space:nowrap">
+          <i class="fa-solid fa-diamond-turn-right"></i> Naviguer avec Waze
         </a>
       </div>
+
+      <p class="vessel-credit" style="margin-top:10px">
+        <i class="fa-solid fa-circle-info"></i>
+        Cliquez sur le marqueur <span style="display:inline-block;width:14px;height:14px;background:#e67e22;border-radius:50%;border:2px solid #fff;vertical-align:middle"></span> du port pour accéder aux détails et ouvrir Waze
+      </p>
     </div><!-- /#ecmod-trafic -->
 
   </main>
@@ -2865,7 +2862,7 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/espace-client.js?v=20260425i"></script>
+<script src="js/espace-client.js?v=20260425j"></script>
 
 <!-- ═══ SERVICE WORKER ═══ -->
 <script>
