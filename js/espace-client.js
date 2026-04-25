@@ -282,6 +282,7 @@ function ecShowModule(name){
   if(name === 'navires') setTimeout(initVesselMap,  120);
   if(name === 'trafic')  setTimeout(initRoadMap,    120);
   if(name === 'galerie') setTimeout(initGallery,    200);
+  if(name === 'admin')   setTimeout(admInit,        50);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
@@ -549,6 +550,13 @@ function simProCalc(){
   // Transit : données statiques + textContent pour la partie variable
   const transitEl = document.getElementById('simpr-transit');
   transitEl.innerHTML = `<i class="fa-solid fa-clock"></i> Délai estimé depuis <strong>${fromText}</strong> : <strong>${escapeHTML(transit)}</strong>`;
+
+  // Log simulation
+  if(typeof admLogSim === 'function'){
+    const typeMap = {express:'express', air:'avion', sea_fcl:'maritime', sea_lcl:'maritime', road:'routier'};
+    admLogSim({ type: typeMap[mode]||mode, carrier:'', from: String(from), to:'',
+      weight: billW.toFixed(1), result: fmt(total) });
+  }
 }
 
 /* ── Vessel Map — Leaflet + Esri Satellite ───────────── */
@@ -2811,6 +2819,12 @@ function runExpSim(){
 
   const res = simExpress(direction, country, type, weightNet, l, w, h);
   renderExpResult(res, direction, country, type, weightNet, l, w, h);
+  // Log simulation
+  if(typeof admLogSim === 'function'){
+    const best = Object.entries(res.carriers||{}).sort((a,b)=>(a[1].total||0)-(b[1].total||0))[0];
+    admLogSim({ type:'express', carrier: best?best[0].toUpperCase():'', from:'Maroc', to:country,
+      weight:res.weightTax, result: best ? fmtExp(best[1].total) : '—' });
+  }
 }
 
 function fmtExp(n){ return n ? n.toLocaleString('fr-FR') + ' MAD' : '—'; }
@@ -2844,7 +2858,7 @@ function renderExpResult(res, direction, country, type, weightNet, l, w, h){
       </td>
       <td>
         <div class="exp-price-base">Base HT fuel : ${fmtExp(c.base)}</div>
-        <div class="exp-price-fuel">Fuel (~${c.name==='DHL'?'46':c.name==='FedEx'?'48':'47'}%) : +${fmtExp(c.fuelAmt)}</div>
+        <div class="exp-price-fuel">Fuel (~${typeof admGetFuelPct==='function'?admGetFuelPct(c.name.toLowerCase()):(c.name==='DHL'?46:c.name==='FedEx'?48:47)}%) : +${fmtExp(c.fuelAmt)}</div>
       </td>
       <td class="exp-price-total">${fmtExp(c.total)}</td>
       <td>
@@ -3570,6 +3584,41 @@ function shpGenerateLabel(){
   };
 
   console.log('[GPE] Shipment data ready for API:', JSON.stringify(shipmentData, null, 2));
+
+  // Enregistrer l'expédition dans l'admin
+  if(typeof admLogExpedition === 'function'){
+    const totalW = shpPackages.reduce((s,p)=>s+p.weight*p.quantity,0);
+    admLogExpedition({
+      carrier:      shipmentData.carrier,
+      from: {
+        firstname: shipmentData.sender.firstName,
+        lastname:  shipmentData.sender.lastName,
+        company:   shipmentData.sender.company,
+        addr1:     shipmentData.sender.address1,
+        zip:       shipmentData.sender.zip,
+        city:      shipmentData.sender.city,
+        country:   shipmentData.sender.country,
+        email:     shipmentData.sender.email,
+        phone:     shipmentData.sender.phone
+      },
+      to: {
+        firstname: shipmentData.recipient.firstName,
+        lastname:  shipmentData.recipient.lastName,
+        company:   shipmentData.recipient.company,
+        addr1:     shipmentData.recipient.address1,
+        addr2:     shipmentData.recipient.address2,
+        zip:       shipmentData.recipient.zip,
+        city:      shipmentData.recipient.city,
+        country:   shipmentData.recipient.country,
+        email:     shipmentData.recipient.email,
+        phone:     shipmentData.recipient.phone
+      },
+      packages: shipmentData.packages,
+      weight:   totalW.toFixed(2),
+      pickup:   shipmentData.pickup.date,
+      status:   'pending'
+    });
+  }
 
   // Afficher placeholder en attendant l'intégration API
   result.style.display = 'block';

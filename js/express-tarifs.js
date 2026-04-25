@@ -398,7 +398,12 @@ function simExpress(direction, country, type, weightNet, l, w, h) {
   }
   weightTax = Math.ceil(weightTax * 2) / 2; // arrondir au 0.5 supérieur
 
-  const fuel = {dhl:0.46, fedex:0.48, aramex:0.47};
+  // Fuel surcharge : lit depuis l'admin localStorage si disponible
+  const fuel = {
+    dhl:    (typeof admGetFuelPct === 'function' ? admGetFuelPct('dhl')    : 46) / 100,
+    fedex:  (typeof admGetFuelPct === 'function' ? admGetFuelPct('fedex')  : 48) / 100,
+    aramex: (typeof admGetFuelPct === 'function' ? admGetFuelPct('aramex') : 47) / 100
+  };
 
   // Prix hors fuel
   const dhlBase = getDHLPrice(direction, country, weightTax);
