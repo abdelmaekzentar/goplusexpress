@@ -27,11 +27,32 @@ function escapeHTML(str) {
  */
 async function hashPass(password) {
   const SALT = 'GPE_$3cure_Salt_2025#!';
-  const encoder = new TextEncoder();
-  const data = encoder.encode(SALT + password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hashBuffer))
-    .map(b => b.toString(16).padStart(2, '0')).join('');
+  const salted = SALT + password;
+
+  // crypto.subtle nécessite HTTPS — fallback pur JS pour HTTP
+  if (window.crypto && window.crypto.subtle) {
+    try {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(salted);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0')).join('');
+    } catch(e) { /* fall through */ }
+  }
+
+  // Fallback : hash pur JS (FNV-1a étendu → 64 hex chars, compatible SHA-256 length)
+  let h = 0x811c9dc5 >>> 0;
+  for (let i = 0; i < salted.length; i++) {
+    h ^= salted.charCodeAt(i);
+    h  = Math.imul(h, 0x01000193) >>> 0;
+  }
+  let out = '';
+  let seed = h;
+  for (let i = 0; i < 8; i++) {
+    seed = (Math.imul(seed, 0x6b43a9b5) + 0x2d78cba4) >>> 0;
+    out += seed.toString(16).padStart(8, '0');
+  }
+  return out;
 }
 
 /**
