@@ -187,7 +187,7 @@
     <!-- ── Module: Accueil ── -->
     <div class="ec-module active" id="ecmod-accueil">
       <div class="ec-module-header">
-        <h1>Tableau de bord</h1>
+        <h1 data-cms-key="ec_dash_title">Tableau de bord</h1>
         <p id="ec-welcome-msg">Bienvenue !</p>
       </div>
       <div class="ec-cards-grid">
@@ -196,8 +196,8 @@
             <i class="fa-solid fa-file-invoice"></i>
           </div>
           <div>
-            <strong>OCR Facture Commerciale</strong>
-            <span>Extraire automatiquement les données d'une facture</span>
+            <strong data-cms-key="ec_card_ocr_title">OCR Facture Commerciale</strong>
+            <span data-cms-key="ec_card_ocr_sub">Extraire automatiquement les données d'une facture</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -206,8 +206,8 @@
             <i class="fa-solid fa-location-dot"></i>
           </div>
           <div>
-            <strong>Codes Aéroports &amp; Ports</strong>
-            <span>Base mondiale IATA + codes ports ONU</span>
+            <strong data-cms-key="ec_card_codes_title">Codes Aéroports &amp; Ports</strong>
+            <span data-cms-key="ec_card_codes_sub">Base mondiale IATA + codes ports ONU</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -216,8 +216,8 @@
             <i class="fa-solid fa-calculator"></i>
           </div>
           <div>
-            <strong>Simulation de Prix</strong>
-            <span>Tarifs express, maritime, routier en temps réel</span>
+            <strong data-cms-key="ec_card_sim_title">Simulation de Prix</strong>
+            <span data-cms-key="ec_card_sim_sub">Tarifs express, maritime, routier en temps réel</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -226,8 +226,8 @@
             <i class="fa-solid fa-box"></i>
           </div>
           <div>
-            <strong>Guide Conteneurs &amp; Remorques</strong>
-            <span>Dimensions, capacités, types standardisés</span>
+            <strong data-cms-key="ec_card_ctn_title">Guide Conteneurs &amp; Remorques</strong>
+            <span data-cms-key="ec_card_ctn_sub">Dimensions, capacités, types standardisés</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -236,8 +236,8 @@
             <i class="fa-solid fa-plane-up"></i>
           </div>
           <div>
-            <strong>Appareils Cargo</strong>
-            <span>Référentiel technique avions cargo mondiaux</span>
+            <strong data-cms-key="ec_card_avion_title">Appareils Cargo</strong>
+            <span data-cms-key="ec_card_avion_sub">Référentiel technique avions cargo mondiaux</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -246,8 +246,8 @@
             <i class="fa-solid fa-barcode"></i>
           </div>
           <div>
-            <strong>Codes SH / HS</strong>
-            <span>13 135 codes douaniers · Droits · TPI · TVA Maroc</span>
+            <strong data-cms-key="ec_card_hs_title">Codes SH / HS</strong>
+            <span data-cms-key="ec_card_hs_sub">13 135 codes douaniers · Droits · TPI · TVA Maroc</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -256,8 +256,8 @@
             <i class="fa-solid fa-bolt"></i>
           </div>
           <div>
-            <strong>Tarifs Express</strong>
-            <span>DHL · FedEx · Aramex — tarifs en temps réel</span>
+            <strong data-cms-key="ec_card_exp_title">Tarifs Express</strong>
+            <span data-cms-key="ec_card_exp_sub">DHL · FedEx · Aramex — tarifs en temps réel</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -266,8 +266,8 @@
             <i class="fa-solid fa-tag"></i>
           </div>
           <div>
-            <strong>Nouvelle Expédition</strong>
-            <span>Créer et gérer vos expéditions</span>
+            <strong data-cms-key="ec_card_shp_title">Nouvelle Expédition</strong>
+            <span data-cms-key="ec_card_shp_sub">Créer et gérer vos expéditions</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -276,8 +276,8 @@
             <i class="fa-solid fa-clock"></i>
           </div>
           <div>
-            <strong>Horloge Mondiale</strong>
-            <span>Heures locales · Capitales du commerce mondial</span>
+            <strong data-cms-key="ec_card_clock_title">Horloge Mondiale</strong>
+            <span data-cms-key="ec_card_clock_sub">Heures locales · Capitales du commerce mondial</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -2965,6 +2965,7 @@
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/admin.js?v=20260425a"></script>
+<script src="js/cms-loader.js"></script>
 <script src="js/espace-client.js?v=20260425k"></script>
 
 <!-- ═══ SERVICE WORKER ═══ -->

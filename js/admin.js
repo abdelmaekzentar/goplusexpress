@@ -208,7 +208,8 @@ const ADM_DEF = {
       { min:3000,  max:9999,  ppt:5.50, min_charge:18600},
       { min:10000, max:99999, ppt:4.80, min_charge:55000}
     ]
-  }
+  },
+  cms: {}   // objet vide par défaut (clés = data-i18n ou data-cms-key)
 };
 
 /* ══════════════════════════════════════════════
@@ -1881,6 +1882,35 @@ const CMS_PAGES = [
       },
     ]
   },
+  {
+    id: 'espace', label: '👤 Espace Client', url: 'espace-client.html',
+    sections: [
+      {
+        id: 'dashboard', label: '🏠 Tableau de bord',
+        fields: [
+          { key:'ec_dash_title',       label:'Titre du tableau de bord',   type:'text', def:'Tableau de bord', cmsCss:true },
+          { key:'ec_card_ocr_title',   label:'Carte OCR — Titre',          type:'text', def:'OCR Facture Commerciale', cmsCss:true },
+          { key:'ec_card_ocr_sub',     label:'Carte OCR — Description',    type:'text', def:'Extraire automatiquement les données d\'une facture', cmsCss:true },
+          { key:'ec_card_sim_title',   label:'Carte Simulation — Titre',   type:'text', def:'Simulation de Prix', cmsCss:true },
+          { key:'ec_card_sim_sub',     label:'Carte Simulation — Desc.',   type:'text', def:'Tarifs express, maritime, routier en temps réel', cmsCss:true },
+          { key:'ec_card_codes_title', label:'Carte Codes — Titre',        type:'text', def:'Codes Aéroports & Ports', cmsCss:true },
+          { key:'ec_card_codes_sub',   label:'Carte Codes — Description',  type:'text', def:'Base mondiale IATA + codes ports ONU', cmsCss:true },
+          { key:'ec_card_ctn_title',   label:'Carte Conteneurs — Titre',   type:'text', def:'Guide Conteneurs & Remorques', cmsCss:true },
+          { key:'ec_card_ctn_sub',     label:'Carte Conteneurs — Desc.',   type:'text', def:'Dimensions, capacités, types standardisés', cmsCss:true },
+          { key:'ec_card_avion_title', label:'Carte Appareils — Titre',    type:'text', def:'Appareils Cargo', cmsCss:true },
+          { key:'ec_card_avion_sub',   label:'Carte Appareils — Desc.',    type:'text', def:'Référentiel technique avions cargo mondiaux', cmsCss:true },
+          { key:'ec_card_hs_title',    label:'Carte Codes SH — Titre',     type:'text', def:'Codes SH / HS', cmsCss:true },
+          { key:'ec_card_hs_sub',      label:'Carte Codes SH — Desc.',     type:'text', def:'13 135 codes douaniers · Droits · TPI · TVA Maroc', cmsCss:true },
+          { key:'ec_card_exp_title',   label:'Carte Tarifs Express — Titre', type:'text', def:'Tarifs Express', cmsCss:true },
+          { key:'ec_card_exp_sub',     label:'Carte Tarifs Express — Desc.', type:'text', def:'DHL · FedEx · Aramex — tarifs en temps réel', cmsCss:true },
+          { key:'ec_card_shp_title',   label:'Carte Expédition — Titre',   type:'text', def:'Nouvelle Expédition', cmsCss:true },
+          { key:'ec_card_shp_sub',     label:'Carte Expédition — Desc.',   type:'text', def:'Créer et gérer vos expéditions', cmsCss:true },
+          { key:'ec_card_clock_title', label:'Carte Horloge — Titre',      type:'text', def:'Horloge Mondiale', cmsCss:true },
+          { key:'ec_card_clock_sub',   label:'Carte Horloge — Desc.',      type:'text', def:'Heures locales · Capitales du commerce mondial', cmsCss:true },
+        ]
+      },
+    ]
+  },
 ];
 
 /* État courant de la page CMS sélectionnée */
@@ -1892,7 +1922,7 @@ function admRenderCMS() {
   const panel = document.getElementById('adm-panel-cms');
   if (!panel) return;
 
-  const cms = admLoad(ADM_K.cms) || {};
+  const cms = admLoad('cms') || {};
   const totalOverrides = Object.keys(cms).length;
 
   panel.innerHTML = `
@@ -2014,7 +2044,7 @@ function admCMSSelectPage(pageId) {
 /* ── Ouvrir/fermer une section ───────────────────── */
 function admCMSToggleSection(sectionId) {
   _cmsOpenSections[sectionId] = !(_cmsOpenSections[sectionId] !== false);
-  const cms = admLoad(ADM_K.cms) || {};
+  const cms = admLoad('cms') || {};
   document.getElementById('cms-page-content').innerHTML = admBuildCMSPage(_cmsCurrentPage, cms);
 }
 
@@ -2025,7 +2055,7 @@ function admSaveCMSSection(sectionId) {
   const sec = page.sections.find(s => s.id === sectionId);
   if (!sec) return;
 
-  const cms = admLoad(ADM_K.cms) || {};
+  const cms = admLoad('cms') || {};
   let changed = 0;
 
   sec.fields.forEach(f => {
@@ -2040,7 +2070,7 @@ function admSaveCMSSection(sectionId) {
     }
   });
 
-  admSave(ADM_K.cms, cms);
+  admSave('cms', cms);
   admToast(`✅ Section "${sec.label}" sauvegardée (${changed} champ(s))`, 'ok');
 
   // Re-render pour mettre à jour les indicateurs
@@ -2049,9 +2079,9 @@ function admSaveCMSSection(sectionId) {
 
 /* ── Réinitialiser un champ ──────────────────────── */
 function admResetCMSField(key) {
-  const cms = admLoad(ADM_K.cms) || {};
+  const cms = admLoad('cms') || {};
   delete cms[key];
-  admSave(ADM_K.cms, cms);
+  admSave('cms', cms);
   admToast('🔄 Champ réinitialisé au défaut', 'ok');
   setTimeout(() => admRenderCMS(), 300);
 }
