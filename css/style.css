@@ -382,6 +382,22 @@ footer{background:var(--dark);color:#fff;padding:60px 5% 24px}
 .track-flight-status{margin:.75rem 0;text-align:center}
 .flight-badge{background:var(--teal);color:#fff;padding:.35rem .9rem;border-radius:20px;font-size:.85rem;font-weight:600}
 
+/* ── AWB / BL tracking card ── */
+.track-awb-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.track-awb-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--teal),#007a72);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;flex-shrink:0}
+.track-awb-num{font-size:1.05rem;font-weight:800;color:#0f172a;letter-spacing:.5px}
+.track-awb-carrier{font-size:.82rem;color:#64748b;font-weight:600;margin-top:2px}
+.track-awb-status-badge{margin-left:auto;background:#fef9c3;border:1px solid #fde68a;color:#92400e;padding:4px 10px;border-radius:20px;font-size:.73rem;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.track-awb-info{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:12px 14px;font-size:.82rem;color:#1e40af;display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;line-height:1.5}
+.track-awb-info i{flex-shrink:0;margin-top:1px}
+.track-awb-btns{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.track-awb-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;font-size:.88rem;font-weight:700;text-decoration:none;transition:.2s}
+.track-awb-btn-primary{background:var(--teal);color:#fff}
+.track-awb-btn-primary:hover{background:#007a72;color:#fff}
+.track-awb-btn-secondary{background:#f0f4f8;color:#334155;border:1px solid #e2e8f0}
+.track-awb-btn-secondary:hover{background:#e2e8f0;color:#0f172a}
+@media(max-width:500px){.track-awb-btns{flex-direction:column}.track-awb-btn{justify-content:center}}
+
 /* ═══ WHATSAPP FLOAT ═══ */
 .wa-float{position:fixed;bottom:92px;right:32px;width:54px;height:54px;background:#25d366;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 4px 20px rgba(37,211,102,.4);z-index:998;text-decoration:none;transition:var(--transition)}
 .wa-float:hover{transform:scale(1.1);background:#1ebe5d}

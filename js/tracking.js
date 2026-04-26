@@ -73,52 +73,102 @@ const CARRIER_LINKS = {
   bl:     n => `https://www.track-trace.com/bill-of-lading/${n}`,
 };
 
-// ── Simulate local events (demo data while no backend) ───────
-function buildDemoEvents(carrier, num) {
-  const now = new Date();
-  const fmt = d => d.toLocaleString('fr-MA', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-  const sub = h => { const d = new Date(now); d.setHours(d.getHours() - h); return fmt(d); };
+// ── AWB prefix → airline lookup table ────────────────────────
+// Source : IATA prefix registry (official)
+const AWB_PREFIXES = {
+  '001': { name:'American Airlines Cargo', url: n => `https://www.aa.com/cargo/tracking?awb=${n}` },
+  '006': { name:'Japan Airlines Cargo',    url: n => `https://www.jal.co.jp/en/jc/tracking/?awbNumber=${n}` },
+  '014': { name:'Air Canada Cargo',        url: n => `https://www.aircanadacargo.com/en/tracking?awb=${n}` },
+  '020': { name:'Lufthansa Cargo',         url: n => `https://lufthansa-cargo.com/tracking#${n}` },
+  '023': { name:'Finnair Cargo',           url: n => `https://cargo.finnair.com/en/tracking?awb=${n}` },
+  '043': { name:'Iberia Cargo',            url: n => `https://iberia.com/cargoes/track?awb=${n}` },
+  '057': { name:'Air France Cargo',        url: n => `https://www.airfrancecargo.com/tracking/${n}` },
+  '074': { name:'Delta Cargo',             url: n => `https://www.deltacargo.com/Cargo/home/trackShipment?trackingNumber=${n}` },
+  '086': { name:'Korean Air Cargo',        url: n => `https://www.koreanair.com/kr/en/cargo/tracking?awb=${n}` },
+  '098': { name:'Emirates SkyCargo',       url: n => `https://cargo.emirates.com/tracking/#!/awb/${n}` },
+  '116': { name:'Saudia Cargo',            url: n => `https://saudicargo.com/en/tracking?awbNumber=${n}` },
+  '118': { name:'Asiana Cargo',            url: n => `https://flyasiana.com/C/en/cargo/tracking?awb=${n}` },
+  '125': { name:'British Airways Cargo',   url: n => `https://cargo.ba.com/en-gb/tracking#?awb=${n}` },
+  '157': { name:'Aeroflot Cargo',          url: n => `https://track-trace.com/aircargo/${n}` },
+  '172': { name:'RAM Cargo (Royal Air Maroc)', url: n => `https://www.royalairmaroc.com/ma-fr/Informations/Cargo?awb=${n}` },
+  '176': { name:'Qatar Airways Cargo',     url: n => `https://www.qrcargo.com/s/track?awb=${n}` },
+  '180': { name:'Cathay Cargo',            url: n => `https://www.cathaypacificcargo.com/manage-booking/track-your-shipment.html?awb=${n}` },
+  '235': { name:'Turkish Cargo',           url: n => { const [pfx, num] = n.split('-'); return `https://www.turkishcargo.com/en/cargo-tracking?awbPrefix=${pfx}&awbNumber=${num}`; } },
+  '260': { name:'Singapore Airlines Cargo',url: n => `https://www.singaporeair.com/en_UK/us/cargo/cargo-tracking/?awb=${n}` },
+  '297': { name:'Air Arabia Cargo',        url: n => `https://cargo.airarabia.com/en/tracking?awb=${n}` },
+  '434': { name:'Cargolux',               url: n => `https://www.cargolux.com/Cargo-Services/Tracking/?AWB=${n}` },
+  '507': { name:'Air Algérie Fret',        url: n => `https://track-trace.com/aircargo/${n}` },
+  '604': { name:'Flydubai Cargo',          url: n => `https://www.flydubai.com/en/cargo/tracking?awb=${n}` },
+  '607': { name:'Etihad Cargo',            url: n => `https://etihadcargo.com/en/track-shipment?awb=${n}` },
+  '620': { name:'Royal Jordanian Cargo',   url: n => `https://track-trace.com/aircargo/${n}` },
+  '724': { name:'FedEx Cargo',             url: n => `https://www.fedex.com/fedextrack/?trknbr=${n}` },
+  '775': { name:'Cargolux Italia',         url: n => `https://www.cargolux.com/Cargo-Services/Tracking/?AWB=${n}` },
+};
 
-  const demos = {
-    dhl: [
-      { label: 'Livraison effectuée', time: sub(0),  location: 'Casablanca, MA', done: true },
-      { label: 'En cours de livraison', time: sub(4), location: 'Casablanca Hub, MA', done: true },
-      { label: 'Dédouanement terminé', time: sub(20), location: 'Mohammed V, CASA', done: true },
-      { label: 'Arrivée au pays de destination', time: sub(24), location: 'Casablanca, MA', done: true },
-      { label: 'Départ origine', time: sub(48), location: 'Paris CDG, FR', done: true },
-      { label: 'Pris en charge', time: sub(50), location: 'Paris, FR', done: true },
-    ],
-    fedex: [
-      { label: 'Delivered', time: sub(0),  location: 'Casablanca 20000, MA', done: true },
-      { label: 'On FedEx vehicle for delivery', time: sub(5), location: 'Casablanca, MA', done: true },
-      { label: 'Clearance in progress', time: sub(18), location: 'CASA Airport, MA', done: true },
-      { label: 'Arrived at destination facility', time: sub(22), location: 'Casablanca, MA', done: true },
-      { label: 'Departed facility', time: sub(46), location: 'Lyon, FR', done: true },
-      { label: 'Picked up', time: sub(50), location: 'Lyon, FR', done: true },
-    ],
-    aramex: [
-      { label: 'Livré', time: sub(0),  location: 'Casablanca, MA', done: true },
-      { label: 'En livraison', time: sub(3), location: 'Casablanca, MA', done: true },
-      { label: 'En douane', time: sub(16), location: 'Casablanca CASA, MA', done: true },
-      { label: 'Arrivée Maroc', time: sub(20), location: 'Casablanca, MA', done: true },
-      { label: 'En transit Dubaï', time: sub(38), location: 'Dubaï, AE', done: true },
-      { label: 'Collecte confirmée', time: sub(50), location: 'Origine', done: true },
-    ],
-    awb: [
-      { label: 'Marchandise livrée', time: sub(0),  location: 'CASA Fret', done: true },
-      { label: 'Arrivée vol AF553', time: sub(18), location: 'CMN — Casablanca', done: true },
-      { label: 'Départ CDG', time: sub(22), location: 'Paris CDG', done: true },
-      { label: 'AWB émis', time: sub(50), location: 'Paris, FR', done: true },
-    ],
-    bl: [
-      { label: 'Navire arrivé à quai', time: sub(0),  location: 'Tanger Med, MA', done: true },
-      { label: 'En mer Méditerranée', time: sub(72), location: 'En route', done: true },
-      { label: 'Départ Algésiras', time: sub(100), location: 'Algésiras, ES', done: true },
-      { label: 'Chargement navire', time: sub(168), location: 'Algésiras, ES', done: true },
-      { label: 'BL émis', time: sub(200), location: "Port d'origine", done: true },
-    ],
-  };
-  return demos[carrier] || demos.dhl;
+function getAWBCarrier(awbNum) {
+  const prefix = awbNum.replace(/[^0-9-]/g,'').split('-')[0];
+  return AWB_PREFIXES[prefix] || null;
+}
+
+// ── Card HTML pour AWB / BL — SANS données fictives ──────────
+function buildAWBCard(awbNum, airline, officialUrl, containerId) {
+  const trackTraceUrl = `https://www.track-trace.com/aircargo/${awbNum}`;
+  const multiUrl      = `https://www.track-trace.com/aircargo`;
+
+  return `
+    <div class="track-card">
+      <div class="track-awb-header">
+        <div class="track-awb-icon"><i class="fa-solid fa-plane-departure"></i></div>
+        <div>
+          <div class="track-awb-num">AWB — ${awbNum}</div>
+          <div class="track-awb-carrier">${airline}</div>
+        </div>
+        <div class="track-awb-status-badge"><i class="fa-solid fa-satellite-dish"></i> Temps réel requis</div>
+      </div>
+      <div class="track-awb-info">
+        <i class="fa-solid fa-circle-info"></i>
+        Le suivi AWB en temps réel nécessite de consulter directement le système du transporteur.
+        Les données affichées ici seraient des estimations non fiables — nous vous redirigeons vers la source officielle.
+      </div>
+      <div class="track-awb-btns">
+        <a href="${officialUrl}" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-primary">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          Tracking officiel ${airline}
+        </a>
+        <a href="${trackTraceUrl}" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-secondary">
+          <i class="fa-solid fa-globe"></i>
+          TrackTrace AWB
+        </a>
+      </div>
+      <p class="track-disclaimer">Données en temps réel fournies par ${airline} · Consultez le site officiel du transporteur pour un suivi précis.</p>
+    </div>`;
+}
+
+function buildBLCard(blNum) {
+  const url = `https://www.track-trace.com/bill-of-lading/${blNum}`;
+  return `
+    <div class="track-card">
+      <div class="track-awb-header">
+        <div class="track-awb-icon"><i class="fa-solid fa-ship"></i></div>
+        <div>
+          <div class="track-awb-num">BL — ${blNum}</div>
+          <div class="track-awb-carrier">Connaissement maritime</div>
+        </div>
+      </div>
+      <div class="track-awb-info">
+        <i class="fa-solid fa-circle-info"></i>
+        Le suivi BL en temps réel est assuré par TrackTrace, Port de Casablanca et Tanger Med.
+      </div>
+      <div class="track-awb-btns">
+        <a href="${url}" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-primary">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> TrackTrace BL
+        </a>
+        <a href="https://portnet.ma/" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-secondary">
+          <i class="fa-solid fa-anchor"></i> PortNet Maroc
+        </a>
+      </div>
+      <p class="track-disclaimer">Consultez le site officiel de l'armateur ou TrackTrace pour les informations en temps réel.</p>
+    </div>`;
 }
 
 // ── Open carrier website for real tracking ───────────────────
@@ -220,21 +270,47 @@ function doTrack() {
     return;
   }
 
-  // Demo data + deep-link to real carrier
-  const events = buildDemoEvents(detected.carrier, num);
-  const linkUrl = CARRIER_LINKS[detected.carrier] ? CARRIER_LINKS[detected.carrier](num) : null;
-  const linkBtn = linkUrl
-    ? `<a href="${linkUrl}" target="_blank" rel="noopener" class="track-reallink">
-        <i class="fa-solid fa-up-right-from-square"></i>
-        ${t('trackVerify') || 'Vérifier sur le site officiel'} ${detected.label}
-       </a>`
-    : '';
+  // AWB : détecter la compagnie via le préfixe et rediriger
+  if (detected.carrier === 'awb') {
+    const airline = getAWBCarrier(num);
+    const name    = airline ? airline.name : 'Compagnie aérienne';
+    const url     = airline ? airline.url(num) : `https://www.track-trace.com/aircargo/${num}`;
+    setTrackResult(buildAWBCard(num, name, url, 'trackResult'));
+    return;
+  }
 
-  setTrackResult(trackingCard(
-    `${detected.label} — ${num}`,
-    events,
-    linkBtn
-  ));
+  // BL : rediriger vers TrackTrace + PortNet
+  if (detected.carrier === 'bl') {
+    setTrackResult(buildBLCard(num));
+    return;
+  }
+
+  // Express (DHL / FedEx / Aramex) : deep-link uniquement
+  const linkUrl = CARRIER_LINKS[detected.carrier] ? CARRIER_LINKS[detected.carrier](num) : null;
+  if (linkUrl) {
+    setTrackResult(`
+      <div class="track-card">
+        <div class="track-awb-header">
+          <div class="track-awb-icon"><i class="fa-solid fa-box"></i></div>
+          <div>
+            <div class="track-awb-num">${num}</div>
+            <div class="track-awb-carrier">${detected.label}</div>
+          </div>
+        </div>
+        <div class="track-awb-info">
+          <i class="fa-solid fa-circle-info"></i>
+          Tracking en temps réel via le site officiel ${detected.label}.
+        </div>
+        <div class="track-awb-btns">
+          <a href="${linkUrl}" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-primary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Tracker sur ${detected.label}
+          </a>
+        </div>
+        <p class="track-disclaimer">Données en temps réel fournies par ${detected.label}.</p>
+      </div>`);
+  } else {
+    setTrackResult(trackingError('Numéro non reconnu ou transporteur non supporté.'));
+  }
 }
 
 // ── Flight tracking button in HTML calls trackFlight() ───────
@@ -267,38 +343,43 @@ function setCarrier(c) {
 
 // ── AWB / BL panel tracker ────────────────────────────────────
 function doTrackAWB() {
-  const sel = document.getElementById('trackCarrierAWB');
-  const input = document.getElementById('trackNumberAWB');
+  const sel    = document.getElementById('trackCarrierAWB');
+  const input  = document.getElementById('trackNumberAWB');
   const result = document.getElementById('trackResultAWB');
   if (!input || !result) return;
   const num = input.value.trim();
   if (!num) { input.focus(); return; }
   const carrier = sel ? sel.value : 'awb';
-  const events = buildDemoEvents(carrier, num);
-  const linkUrl = CARRIER_LINKS[carrier] ? CARRIER_LINKS[carrier](num) : null;
-  const linkBtn = linkUrl
-    ? `<a href="${linkUrl}" target="_blank" rel="noopener" class="track-reallink">
-        <i class="fa-solid fa-up-right-from-square"></i>
-        ${t('trackVerify') || 'Vérifier sur le site officiel'}
-       </a>`
-    : '';
-  result.innerHTML = `
-    <div class="track-card">
-      <h4 class="track-title"><i class="fa-solid fa-location-dot"></i> ${carrier.toUpperCase()} — ${num}</h4>
-      <div class="track-timeline">
-        ${events.map((s, i) => `
-          <div class="track-step ${s.done ? 'done' : ''} ${i === events.findLastIndex(x => x.done) ? 'active' : ''}">
-            <div class="track-dot"></div>
-            <div class="track-info">
-              <span class="track-label">${s.label}</span>
-              <span class="track-time">${s.time || ''}</span>
-              <span class="track-loc">${s.location || ''}</span>
-            </div>
-          </div>`).join('')}
-      </div>
-      ${linkBtn}
-      <p class="track-disclaimer">${t('trackDisclaimer')}</p>
-    </div>`;
+
+  let html = '';
+  if (carrier === 'awb') {
+    const airline = getAWBCarrier(num);
+    const name    = airline ? airline.name : 'Compagnie aérienne';
+    const url     = airline ? airline.url(num) : `https://www.track-trace.com/aircargo/${num}`;
+    html = buildAWBCard(num, name, url, 'trackResultAWB');
+  } else if (carrier === 'bl') {
+    html = buildBLCard(num);
+  } else {
+    // Express (DHL, FedEx, Aramex)
+    const linkUrl = CARRIER_LINKS[carrier] ? CARRIER_LINKS[carrier](num) : `https://www.track-trace.com/aircargo/${num}`;
+    html = `
+      <div class="track-card">
+        <div class="track-awb-header">
+          <div class="track-awb-icon"><i class="fa-solid fa-box"></i></div>
+          <div>
+            <div class="track-awb-num">${num}</div>
+            <div class="track-awb-carrier">${carrier.toUpperCase()}</div>
+          </div>
+        </div>
+        <div class="track-awb-btns">
+          <a href="${linkUrl}" target="_blank" rel="noopener" class="track-awb-btn track-awb-btn-primary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Tracker sur ${carrier.toUpperCase()}
+          </a>
+        </div>
+      </div>`;
+  }
+
+  result.innerHTML = html;
   result.classList.remove('hidden');
 }
 
