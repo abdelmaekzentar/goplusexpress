@@ -169,9 +169,6 @@
       <button class="ec-nav-item" onclick="ecShowModule('trafic')" id="ecnav-trafic">
         <i class="fa-solid fa-traffic-light"></i> Trafic Routier
       </button>
-      <button class="ec-nav-item" onclick="ecShowModule('galerie')" id="ecnav-galerie">
-        <i class="fa-solid fa-images"></i> Galerie Navires
-      </button>
       <a href="guide-emballage.html" target="_blank" class="ec-nav-item" style="text-decoration:none">
         <i class="fa-solid fa-book-open"></i> Guide Emballage
       </a>
@@ -314,16 +311,6 @@
           <div>
             <strong>Trafic Routier</strong>
             <span>Carte satellite · Accès ports · Navigation Waze</span>
-          </div>
-          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
-        </div>
-        <div class="ec-dash-card" onclick="ecShowModule('galerie')">
-          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#1d6fa4,#48b1e5)">
-            <i class="fa-solid fa-images"></i>
-          </div>
-          <div>
-            <strong>Galerie Navires</strong>
-            <span>Photos de navires · VesselFinder · +1 350 000 photos</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -2892,49 +2879,6 @@
         Cliquez sur le marqueur <span style="display:inline-block;width:14px;height:14px;background:#e67e22;border-radius:50%;border:2px solid #fff;vertical-align:middle"></span> du port pour accéder aux détails et ouvrir Waze
       </p>
     </div><!-- /#ecmod-trafic -->
-
-    <!-- ── Module: Galerie Navires ── -->
-    <div class="ec-module" id="ecmod-galerie">
-      <div class="ec-module-header">
-        <h1><i class="fa-solid fa-images"></i> Galerie Navires — VesselFinder</h1>
-        <p>+1 350 000 photos de navires · Cargo · Tanker · Porte-conteneurs · Vraquiers · RoRo</p>
-      </div>
-
-      <div class="gallery-toolbar">
-        <div class="gallery-info">
-          <i class="fa-solid fa-circle-info" style="color:#1d6fa4"></i>
-          Photos contributeurs VesselFinder — utilisez les filtres intégrés dans la galerie
-        </div>
-        <a href="https://www.vesselfinder.com/fr/gallery" target="_blank" rel="noopener" class="gallery-open-btn">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir en plein écran
-        </a>
-      </div>
-
-      <div class="gallery-frame-wrap">
-        <iframe
-          id="gallery-frame"
-          src="https://www.vesselfinder.com/fr/gallery"
-          title="Galerie de navires VesselFinder"
-          allowfullscreen
-          loading="lazy"
-        ></iframe>
-        <!-- Fallback si iframe bloqué -->
-        <div class="gallery-fallback" id="gallery-fallback">
-          <div class="gallery-fallback-inner">
-            <i class="fa-solid fa-ship" style="font-size:3rem;color:#1d6fa4;margin-bottom:16px"></i>
-            <h3>Galerie VesselFinder</h3>
-            <p>La galerie ne peut pas être affichée en mode intégré.<br>Cliquez pour l'ouvrir directement.</p>
-            <a href="https://www.vesselfinder.com/fr/gallery" target="_blank" rel="noopener" class="gallery-open-btn" style="margin-top:12px">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir la galerie ↗
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <p class="vessel-credit" style="margin-top:12px">
-        <i class="fa-solid fa-copyright"></i> Photos © leurs auteurs respectifs — VesselFinder.com · Utilisation à des fins de référence maritime uniquement
-      </p>
-    </div><!-- /#ecmod-galerie -->
 
     <!-- ══════════════════════════════════════════════
          ADMINISTRATION BACKEND
