@@ -273,6 +273,17 @@ let _admUserRole   = 'client';
 const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','routier','groupage','users'];
 
 function admInit(role) {
+  // ── GARDE DE SÉCURITÉ : bloquer tout accès non autorisé ──
+  // ecHasRole est défini dans espace-client.js (chargé avant admin.js)
+  if (typeof ecHasRole === 'function' && !ecHasRole('admin', 'backend')) {
+    // Cacher le module admin au cas où il serait visible
+    const mod = document.getElementById('ecmod-admin');
+    if (mod) mod.classList.remove('active');
+    // Retourner à l'accueil
+    if (typeof ecShowModule === 'function') ecShowModule('accueil');
+    return;
+  }
+
   _admUserRole = role || 'client';
 
   // Masquer/afficher les onglets selon le rôle

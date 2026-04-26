@@ -356,6 +356,11 @@ function ecLogout(){
 
 /* ── Module nav ─────────────────────────────────────── */
 function ecShowModule(name){
+  // ── SÉCURITÉ : vérifier le rôle AVANT toute activation ──
+  if(name === 'admin' && !ecHasRole('admin','backend')){
+    name = 'accueil'; // silencieusement redirigé
+  }
+
   document.querySelectorAll('.ec-module').forEach(m=>m.classList.remove('active'));
   document.querySelectorAll('.ec-nav-item').forEach(n=>n.classList.remove('active'));
   const mod = document.getElementById('ecmod-'+name);
@@ -366,14 +371,7 @@ function ecShowModule(name){
   if(name === 'navires') setTimeout(initVesselMap,  120);
   if(name === 'trafic')  setTimeout(initRoadMap,    120);
   if(name === 'galerie') setTimeout(initGallery,    200);
-  if(name === 'admin'){
-    if(!ecHasRole('admin','backend')){
-      ecShowModule('accueil');
-      alert('🚫 Accès refusé — réservé aux administrateurs et opérateurs.');
-      return;
-    }
-    setTimeout(()=>admInit(ecGetUser()?.role), 50);
-  }
+  if(name === 'admin')   setTimeout(()=>admInit(ecGetUser()?.role), 50);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
