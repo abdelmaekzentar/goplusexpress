@@ -2898,6 +2898,9 @@
         <button class="adm-tab" id="adm-tab-simulations" onclick="admTab('simulations')">
           <i class="fa-solid fa-chart-line"></i> Simulations
         </button>
+        <button class="adm-tab" id="adm-tab-cms" onclick="admTab('cms')" style="background:rgba(99,102,241,.08);color:#6366f1">
+          <i class="fa-solid fa-pencil"></i> Contenu du Site
+        </button>
         <button class="adm-tab" id="adm-tab-users" onclick="admTab('users')" style="margin-left:auto;background:rgba(220,38,38,.08);color:#dc2626">
           <i class="fa-solid fa-users-gear"></i> Utilisateurs
         </button>
@@ -2935,6 +2938,11 @@
 
       <!-- ── Panel: Simulations ── -->
       <div class="adm-panel" id="adm-panel-simulations">
+        <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
+      </div>
+
+      <!-- ── Panel: Contenu du Site (CMS) ── -->
+      <div class="adm-panel" id="adm-panel-cms">
         <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
       </div>
 

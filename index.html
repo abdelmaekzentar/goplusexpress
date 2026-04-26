@@ -164,9 +164,9 @@
       <a href="#tracking"   class="btn btn-outline" data-i18n="hero_btn2">Tracker un envoi</a>
     </div>
     <div class="hero-stats">
-      <div class="stat"><span dir="ltr">220+</span><small data-i18n="stat1">Pays desservis</small></div>
-      <div class="stat"><span dir="ltr">24/7</span><small data-i18n="stat3">Support client</small></div>
-      <div class="stat"><span dir="ltr">13&nbsp;135</span><small data-i18n="stat4">Codes SH intégrés</small></div>
+      <div class="stat"><span dir="ltr" data-cms-key="stat1_val">220+</span><small data-i18n="stat1">Pays desservis</small></div>
+      <div class="stat"><span dir="ltr" data-cms-key="stat2_val">24/7</span><small data-i18n="stat3">Support client</small></div>
+      <div class="stat"><span dir="ltr" data-cms-key="stat3_val">13&nbsp;135</span><small data-i18n="stat4">Codes SH intégrés</small></div>
     </div>
   </div>
 </section>
@@ -1539,9 +1539,9 @@
   <div class="contact-grid">
     <div class="contact-info">
       <div class="contact-item"><i class="fa-solid fa-location-dot"></i><div><strong>GO PLUS EXPRESS</strong><p>Casablanca, Maroc</p></div></div>
-      <div class="contact-item"><i class="fa-solid fa-phone"></i><div><strong data-i18n="lbl_phone">Téléphone</strong><p>+212(0)5 22 53 63 02</p></div></div>
-      <div class="contact-item"><i class="fa-solid fa-envelope"></i><div><strong>Email</strong><p>contact@goplusexpress.ma</p></div></div>
-      <div class="contact-item"><i class="fa-brands fa-whatsapp"></i><div><strong>WhatsApp</strong><p>+212 6 69 14 22 11</p></div></div>
+      <div class="contact-item"><i class="fa-solid fa-phone"></i><div><strong data-i18n="lbl_phone">Téléphone</strong><p data-cms-key="contact_phone">+212(0)5 22 53 63 02</p></div></div>
+      <div class="contact-item"><i class="fa-solid fa-envelope"></i><div><strong>Email</strong><p data-cms-key="contact_email">contact@goplusexpress.ma</p></div></div>
+      <div class="contact-item"><i class="fa-brands fa-whatsapp"></i><div><strong>WhatsApp</strong><p data-cms-key="contact_whatsapp">+212 6 69 14 22 11</p></div></div>
     </div>
     <form class="contact-form" onsubmit="return sendQuote(event)">
       <div class="form-grid">
@@ -1656,6 +1656,7 @@
 <!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
 <script src="hscodes_data.js"></script>
 <script src="js/i18n.js"></script>
+<script src="js/cms-loader.js"></script>
 <script src="js/simulators.js"></script>
 <script src="js/tracking.js"></script>
 <script src="js/main.js"></script>

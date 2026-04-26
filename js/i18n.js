@@ -442,6 +442,9 @@ function setLang(lang){
   // update HS search placeholder
   const hsInput = document.getElementById('hsSearchInput');
   if(hsInput && T['hs_placeholder']) hsInput.placeholder = T['hs_placeholder'];
+
+  // Re-appliquer les surcharges CMS après chaque changement de langue
+  if(typeof window.cmsApply === 'function') setTimeout(window.cmsApply, 50);
 }
 
 function t(key){

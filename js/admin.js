@@ -11,7 +11,8 @@ const ADM_K = {
   routier:     'gpe_routier',
   groupage:    'gpe_groupage',
   expeditions: 'gpe_expeditions',
-  simulations: 'gpe_simulations'
+  simulations: 'gpe_simulations',
+  cms:         'gpe_cms'
 };
 
 /* ── Données par défaut ── */
@@ -270,7 +271,7 @@ let _admCurrentTab = 'fuel';
 let _admUserRole   = 'client';
 
 /* Onglets réservés admin uniquement */
-const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','routier','groupage','users'];
+const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','routier','groupage','cms','users'];
 
 function admInit(role) {
   // ── GARDE DE SÉCURITÉ : bloquer tout accès non autorisé ──
@@ -313,6 +314,7 @@ function admTab(name) {
   if (name === 'groupage')    admRenderGroupage();
   if (name === 'expeditions') admRenderExpeditions();
   if (name === 'simulations') admRenderSimulations();
+  if (name === 'cms')         admRenderCMS();
   if (name === 'users')       admRenderUsers();
 }
 
@@ -1787,6 +1789,284 @@ function admDeleteUser(email) {
   admSetUsers(users);
   admToast(`Compte ${email} supprimé.`);
   admRenderUsers();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CMS — Éditeur de contenu du site
+   Stockage : localStorage['gpe_cms'] = { key: value, ... }
+   Les clés correspondent aux data-i18n OU data-cms-key des pages
+══════════════════════════════════════════════════════════════ */
+
+/* Définition de tous les champs éditables par page/section */
+const CMS_PAGES = [
+  {
+    id: 'accueil', label: '🏠 Page Accueil', url: 'index.html',
+    sections: [
+      {
+        id: 'hero', label: '🎯 Hero — Titre & Accroche',
+        fields: [
+          { key:'hero_badge',  label:'Badge',              type:'text',     def:'Logistics · Douane · Express · Maritime' },
+          { key:'hero_title',  label:'Titre principal',    type:'html',     def:'Votre partenaire logistique<br/><span>vers le Maroc &amp; le monde</span>' },
+          { key:'hero_sub',    label:'Sous-titre',         type:'textarea', def:'Transport aérien, maritime, routier, express et dédouanement — tout en un seul portail intelligent.' },
+          { key:'hero_btn1',   label:'Bouton 1 (Simuler)', type:'text',     def:'Simuler un tarif' },
+          { key:'hero_btn2',   label:'Bouton 2 (Tracker)', type:'text',     def:'Tracker un envoi' },
+          { key:'stat1_val',   label:'Stat 1 — Valeur',   type:'text',     def:'220+',    cmsCss:true },
+          { key:'stat1',       label:'Stat 1 — Label',    type:'text',     def:'Pays desservis' },
+          { key:'stat2_val',   label:'Stat 2 — Valeur',   type:'text',     def:'24/7',    cmsCss:true },
+          { key:'stat3',       label:'Stat 2 — Label',    type:'text',     def:'Support client' },
+          { key:'stat3_val',   label:'Stat 3 — Valeur',   type:'text',     def:'13 135',  cmsCss:true },
+          { key:'stat4',       label:'Stat 3 — Label',    type:'text',     def:'Codes SH intégrés' },
+        ]
+      },
+      {
+        id: 'services', label: '🚚 Services',
+        fields: [
+          { key:'svc_label', label:'Étiquette section',   type:'text',     def:'NOS SERVICES' },
+          { key:'svc_title', label:'Titre section',       type:'text',     def:'Solutions logistiques complètes' },
+          { key:'svc_sub',   label:'Sous-titre section',  type:'textarea', def:"De l'expéditeur au destinataire, nous gérons chaque étape de votre chaîne logistique." },
+          { key:'svc1_title',label:'Service 1 — Titre',   type:'text',     def:'Transport Aérien' },
+          { key:'svc1_desc', label:'Service 1 — Desc.',   type:'textarea', def:'Express et fret général, départ Casablanca, Paris CDG, Amsterdam, Francfort et plus.' },
+          { key:'svc2_title',label:'Service 2 — Titre',   type:'text',     def:'Fret Maritime' },
+          { key:'svc2_desc', label:'Service 2 — Desc.',   type:'textarea', def:"FCL (20' / 40') et LCL groupage, ports : Casablanca, Tanger Med, Agadir, Nador." },
+          { key:'svc3_title',label:'Service 3 — Titre',   type:'text',     def:'Transport Routier' },
+          { key:'svc3_desc', label:'Service 3 — Desc.',   type:'textarea', def:'Groupage et complet (FTL) depuis toute l\'Europe vers le Maroc — départs hebdomadaires.' },
+          { key:'svc4_title',label:'Service 4 — Titre',   type:'text',     def:'Express International' },
+          { key:'svc4_desc', label:'Service 4 — Desc.',   type:'textarea', def:'DHL, FedEx, Aramex — documents et colis express partout dans le monde.' },
+          { key:'svc5_title',label:'Service 5 — Titre',   type:'text',     def:'Entreposage & MEAD' },
+          { key:'svc5_desc', label:'Service 5 — Desc.',   type:'textarea', def:'Entrepôt sous douane (MEAD), stockage, préparation commandes, picking & packing.' },
+          { key:'svc6_title',label:'Service 6 — Titre',   type:'text',     def:'Dédouanement' },
+          { key:'svc6_desc', label:'Service 6 — Desc.',   type:'textarea', def:'Déclarations BADR, liquidation, régimes économiques, ATA Carnet et transit.' },
+        ]
+      },
+      {
+        id: 'ecom', label: '🛒 E-Commerce Transfrontalier',
+        fields: [
+          { key:'ecom_label', label:'Étiquette section',   type:'text',     def:'E-COMMERCE TRANSFRONTALIER' },
+          { key:'ecom_title', label:'Titre section',       type:'text',     def:'Vendez à l\'international depuis le Maroc' },
+          { key:'ecom_sub',   label:'Sous-titre section',  type:'textarea', def:'GO PLUS EXPRESS est votre partenaire logistique officiel pour l\'e-commerce transfrontalier.' },
+          { key:'ecom1_title',label:'Carte 1 — Titre',     type:'text',     def:'Livraison Mondiale' },
+          { key:'ecom1_desc', label:'Carte 1 — Desc.',     type:'textarea', def:'Expédiez vos commandes e-commerce vers plus de 220 pays et territoires avec DHL, FedEx et Aramex.' },
+          { key:'ecom2_title',label:'Carte 2 — Titre',     type:'text',     def:'Fulfillment & Préparation' },
+          { key:'ecom2_desc', label:'Carte 2 — Desc.',     type:'textarea', def:'Stockage, picking, packing depuis notre entrepôt MEAD agréé à Casablanca.' },
+          { key:'ecom3_title',label:'Carte 3 — Titre',     type:'text',     def:'Dédouanement E-commerce' },
+          { key:'ecom3_desc', label:'Carte 3 — Desc.',     type:'textarea', def:'Déclarations BADR simplifiées, gestion des minimis, TVA import et taxes parafiscales.' },
+          { key:'ecom4_title',label:'Carte 4 — Titre',     type:'text',     def:'Intégrations Plateformes' },
+          { key:'ecom4_desc', label:'Carte 4 — Desc.',     type:'textarea', def:'Connectez votre boutique en ligne à notre système logistique via API. Compatible Shopify, WooCommerce, PrestaShop, Magento.' },
+          { key:'ecom5_title',label:'Carte 5 — Titre',     type:'text',     def:'Conformité & Réglementation' },
+          { key:'ecom5_desc', label:'Carte 5 — Desc.',     type:'textarea', def:'Gestion de la conformité douanière et des restrictions produits par pays.' },
+          { key:'ecom6_title',label:'Carte 6 — Titre',     type:'text',     def:'Gestion des Retours' },
+          { key:'ecom6_desc', label:'Carte 6 — Desc.',     type:'textarea', def:'Reverse logistics : retour client, contrôle qualité, remise en stock.' },
+        ]
+      },
+      {
+        id: 'contact', label: '📞 Coordonnées & Contact',
+        fields: [
+          { key:'contact_title',    label:'Titre section', type:'text', def:'Obtenez un devis' },
+          { key:'contact_phone',    label:'Téléphone',     type:'text', def:'+212(0)5 22 53 63 02', cmsCss:true },
+          { key:'contact_email',    label:'Email',         type:'text', def:'contact@goplusexpress.ma', cmsCss:true },
+          { key:'contact_whatsapp', label:'WhatsApp',      type:'text', def:'+212 6 69 14 22 11', cmsCss:true },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'emballage', label: '📦 Guide Emballage', url: 'guide-emballage.html',
+    sections: [
+      {
+        id: 'intro', label: '📋 Introduction',
+        fields: [
+          { key:'ge_title',   label:'Titre page',      type:'text',     def:'Guide d\'Emballage International', cmsCss:true },
+          { key:'ge_sub',     label:'Sous-titre',      type:'textarea', def:'Règles et bonnes pratiques pour un emballage conforme aux standards DHL, FedEx et Aramex.', cmsCss:true },
+        ]
+      },
+    ]
+  },
+];
+
+/* État courant de la page CMS sélectionnée */
+let _cmsCurrentPage = 'accueil';
+let _cmsOpenSections = {};
+
+/* ── Rendu principal ──────────────────────────────── */
+function admRenderCMS() {
+  const panel = document.getElementById('adm-panel-cms');
+  if (!panel) return;
+
+  const cms = admLoad(ADM_K.cms) || {};
+  const totalOverrides = Object.keys(cms).length;
+
+  panel.innerHTML = `
+    <div class="adm-section-intro">
+      <div class="adm-intro-icon"><i class="fa-solid fa-pencil"></i></div>
+      <div>
+        <strong>Éditeur de Contenu (CMS)</strong>
+        <span>Modifiez directement le texte de vos pages. Les changements sont appliqués instantanément sur le site sans redéploiement.</span>
+      </div>
+    </div>
+
+    ${totalOverrides > 0 ? `
+    <div class="cms-global-bar">
+      <span class="cms-override-count"><i class="fa-solid fa-circle-check"></i> ${totalOverrides} champ(s) personnalisé(s)</span>
+      <a href="index.html" target="_blank" class="adm-btn adm-btn-secondary" style="font-size:.78rem;padding:6px 12px">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir le site
+      </a>
+      <button class="adm-btn adm-btn-danger" onclick="admResetAllCMS()" style="font-size:.78rem;padding:6px 12px">
+        <i class="fa-solid fa-rotate-left"></i> Réinitialiser tout
+      </button>
+    </div>` : `
+    <div class="cms-global-bar">
+      <span style="font-size:.82rem;color:#64748b"><i class="fa-solid fa-info-circle"></i> Aucune personnalisation — contenu par défaut affiché</span>
+      <a href="index.html" target="_blank" class="adm-btn adm-btn-secondary" style="font-size:.78rem;padding:6px 12px">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Voir le site
+      </a>
+    </div>`}
+
+    <!-- Sélecteur de page -->
+    <div class="cms-page-tabs">
+      ${CMS_PAGES.map(p => `
+        <button class="cms-ptab ${p.id === _cmsCurrentPage ? 'active' : ''}" onclick="admCMSSelectPage('${p.id}')">
+          ${p.label}
+        </button>
+      `).join('')}
+    </div>
+
+    <!-- Contenu de la page sélectionnée -->
+    <div id="cms-page-content">
+      ${admBuildCMSPage(_cmsCurrentPage, cms)}
+    </div>
+  `;
+}
+
+/* ── Construction du contenu d'une page CMS ──────── */
+function admBuildCMSPage(pageId, cms) {
+  const page = CMS_PAGES.find(p => p.id === pageId);
+  if (!page) return '';
+
+  return page.sections.map(sec => {
+    const isOpen = _cmsOpenSections[sec.id] !== false; // ouvert par défaut
+    const modifiedCount = sec.fields.filter(f => cms[f.key] !== undefined && cms[f.key] !== '').length;
+
+    return `
+    <div class="cms-section">
+      <div class="cms-section-header" onclick="admCMSToggleSection('${sec.id}')">
+        <div class="cms-section-title">
+          <i class="fa-solid fa-chevron-${isOpen ? 'down' : 'right'} cms-chevron"></i>
+          <span>${sec.label}</span>
+          ${modifiedCount > 0 ? `<span class="cms-mod-badge">${modifiedCount} modifié${modifiedCount>1?'s':''}</span>` : ''}
+        </div>
+        <button class="adm-btn adm-btn-primary" style="font-size:.78rem;padding:6px 14px"
+          onclick="event.stopPropagation();admSaveCMSSection('${sec.id}')">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+        </button>
+      </div>
+      ${isOpen ? `
+      <div class="cms-section-body">
+        ${sec.fields.map(f => admBuildCMSField(f, cms[f.key])).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+/* ── Construction d'un champ CMS ─────────────────── */
+function admBuildCMSField(field, currentVal) {
+  const hasOverride = currentVal !== undefined && currentVal !== '';
+  const displayVal  = hasOverride ? currentVal : '';
+
+  let inputHtml;
+  if (field.type === 'text') {
+    inputHtml = `<input type="text" class="adm-input cms-field-input"
+      id="cms-inp-${field.key}"
+      placeholder="${escapeHTML(field.def)}"
+      value="${escapeHTML(displayVal)}">`;
+  } else if (field.type === 'textarea' || field.type === 'html') {
+    inputHtml = `<textarea class="adm-input cms-field-input cms-textarea"
+      id="cms-inp-${field.key}"
+      placeholder="${escapeHTML(field.def)}"
+      rows="${field.type === 'html' ? 4 : 3}">${escapeHTML(displayVal)}</textarea>`;
+  }
+
+  return `
+  <div class="cms-field-row ${hasOverride ? 'cms-field-modified' : ''}">
+    <div class="cms-field-meta">
+      <span class="cms-field-label">${field.label}</span>
+      <span class="cms-field-key">clé : ${field.key}</span>
+    </div>
+    <div class="cms-field-inputs">
+      ${inputHtml}
+      <div class="cms-field-actions">
+        ${hasOverride ? `
+          <span class="cms-modified-indicator"><i class="fa-solid fa-circle" style="font-size:.5rem"></i> Modifié</span>
+          <button class="adm-btn-icon" title="Réinitialiser au défaut" onclick="admResetCMSField('${field.key}')">
+            <i class="fa-solid fa-rotate-left"></i>
+          </button>` : `<span class="cms-default-indicator">Défaut</span>`}
+      </div>
+    </div>
+    ${field.type === 'html' ? `<div class="cms-html-note"><i class="fa-solid fa-code"></i> Champ HTML — balises autorisées : &lt;br&gt; &lt;span&gt; &lt;strong&gt; &lt;em&gt;</div>` : ''}
+  </div>`;
+}
+
+/* ── Sélectionner une page ───────────────────────── */
+function admCMSSelectPage(pageId) {
+  _cmsCurrentPage = pageId;
+  admRenderCMS();
+}
+
+/* ── Ouvrir/fermer une section ───────────────────── */
+function admCMSToggleSection(sectionId) {
+  _cmsOpenSections[sectionId] = !(_cmsOpenSections[sectionId] !== false);
+  const cms = admLoad(ADM_K.cms) || {};
+  document.getElementById('cms-page-content').innerHTML = admBuildCMSPage(_cmsCurrentPage, cms);
+}
+
+/* ── Sauvegarder une section ─────────────────────── */
+function admSaveCMSSection(sectionId) {
+  const page = CMS_PAGES.find(p => p.id === _cmsCurrentPage);
+  if (!page) return;
+  const sec = page.sections.find(s => s.id === sectionId);
+  if (!sec) return;
+
+  const cms = admLoad(ADM_K.cms) || {};
+  let changed = 0;
+
+  sec.fields.forEach(f => {
+    const inp = document.getElementById('cms-inp-' + f.key);
+    if (!inp) return;
+    const val = inp.value.trim();
+    if (val === '') {
+      delete cms[f.key];
+    } else {
+      cms[f.key] = val;
+      changed++;
+    }
+  });
+
+  admSave(ADM_K.cms, cms);
+  admToast(`✅ Section "${sec.label}" sauvegardée (${changed} champ(s))`, 'ok');
+
+  // Re-render pour mettre à jour les indicateurs
+  setTimeout(() => admRenderCMS(), 400);
+}
+
+/* ── Réinitialiser un champ ──────────────────────── */
+function admResetCMSField(key) {
+  const cms = admLoad(ADM_K.cms) || {};
+  delete cms[key];
+  admSave(ADM_K.cms, cms);
+  admToast('🔄 Champ réinitialisé au défaut', 'ok');
+  setTimeout(() => admRenderCMS(), 300);
+}
+
+/* ── Réinitialiser tout ──────────────────────────── */
+function admResetAllCMS() {
+  if (!confirm('Réinitialiser TOUT le contenu aux valeurs par défaut ? Cette action est irréversible.')) return;
+  localStorage.removeItem(ADM_K.cms);
+  admToast('🔄 Tout le contenu réinitialisé', 'ok');
+  setTimeout(() => admRenderCMS(), 300);
+}
+
+/* ── Preview live dans le même onglet ────────────── */
+function admCMSPreview() {
+  window.open('index.html', '_blank');
 }
 
 /* ══════════════════════════════════════════════
