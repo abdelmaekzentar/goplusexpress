@@ -136,9 +136,6 @@
       <button class="ec-nav-item" onclick="ecShowModule('ocr')" id="ecnav-ocr">
         <i class="fa-solid fa-file-invoice"></i> OCR Facture Commerciale
       </button>
-      <button class="ec-nav-item" onclick="ecShowModule('transport')" id="ecnav-transport">
-        <i class="fa-solid fa-truck-fast"></i> Factures Transport
-      </button>
       <button class="ec-nav-item" onclick="ecShowModule('codes')" id="ecnav-codes">
         <i class="fa-solid fa-location-dot"></i> Codes Aéroports &amp; Ports
       </button>
@@ -201,16 +198,6 @@
           <div>
             <strong>OCR Facture Commerciale</strong>
             <span>Extraire automatiquement les données d'une facture</span>
-          </div>
-          <i class="fa-solid fa-chevron-right ec-card-arr"></i>
-        </div>
-        <div class="ec-dash-card" onclick="ecShowModule('transport')">
-          <div class="ec-dash-icon" style="background:linear-gradient(135deg,#f093fb,#f5576c)">
-            <i class="fa-solid fa-truck-fast"></i>
-          </div>
-          <div>
-            <strong>Factures Transport</strong>
-            <span>Générer et gérer vos factures de transport</span>
           </div>
           <i class="fa-solid fa-chevron-right ec-card-arr"></i>
         </div>
@@ -544,12 +531,8 @@
       </div>
     </div>
 
-    <!-- ── Module: Factures Transport ── -->
-    <div class="ec-module" id="ecmod-transport">
-      <div class="ec-module-header">
-        <h1><i class="fa-solid fa-truck-fast"></i> Factures de Transport</h1>
-        <p>Générez des factures de transport professionnelles au format PDF.</p>
-      </div>
+    <!-- ── Module: Factures Transport (supprimé) ── -->
+    <div class="ec-module" id="ecmod-transport" style="display:none!important">
       <div class="invoice-layout">
         <div class="invoice-form">
           <h3>Informations de l'envoi</h3>
