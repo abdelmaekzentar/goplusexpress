@@ -956,12 +956,10 @@ function calcFreight() {
   results.forEach((r, i) => {
     const best    = i === 0;
     const sellStr = r.sellMad.toLocaleString('fr-MA');
-    const costStr = r.costMad.toLocaleString('fr-MA');
-    const rateStr = Math.round(r.ratePerKgMad);
     html += `
     <div class="fret-al-card ${best ? 'fret-al-best' : ''}">
       ${best ? '<div class="fret-al-best-badge"><i class="fa-solid fa-crown"></i> Meilleur prix</div>' : ''}
-      ${r.isRAM ? `<div class="fret-ram-badge"><i class="fa-solid fa-certificate"></i> Tarif Officiel RAM${r.isOfficial ? '' : ' (modifié)'}</div>` : ''}
+      ${r.isRAM ? `<div class="fret-ram-badge"><i class="fa-solid fa-certificate"></i> Tarif Officiel RAM</div>` : ''}
       <div class="fret-al-top">
         <div class="fret-al-logo-wrap">
           <img src="${r.al.logo}" alt="${r.al.name}" class="fret-al-logo"
@@ -970,19 +968,18 @@ function calcFreight() {
         </div>
         <div class="fret-al-info">
           <div class="fret-al-name">${r.al.name}</div>
-          <div class="fret-al-rate">${rateStr} <span>MAD/kg</span></div>
-          ${!r.isRAM ? '<div class="fret-al-indicatif"><i class="fa-solid fa-chart-line"></i> Tarif indicatif</div>' : ''}
+          ${!r.isRAM ? '<div class="fret-al-indicatif"><i class="fa-solid fa-chart-line"></i> Tarif estimé</div>' : ''}
         </div>
         <div class="fret-al-total">
           <div class="fret-al-total-val">${sellStr} <span class="fret-currency-mad">MAD</span></div>
-          <div class="fret-al-total-label">Prix de vente TTC</div>
+          <div class="fret-al-total-label">Prix tout compris</div>
         </div>
       </div>
       <div class="fret-al-breakdown">
-        <span class="fret-al-cost"><i class="fa-solid fa-tag"></i> PA : ${costStr} MAD</span>
-        <span class="fret-al-margin"><i class="fa-solid fa-percent"></i> Marge : ${r.margin.toFixed(0)}%</span>
         <span><i class="fa-solid fa-gas-pump"></i> Fuel inclus</span>
         <span><i class="fa-solid fa-clock"></i> Transit : J+${r.transit}</span>
+        <span><i class="fa-solid fa-weight-hanging"></i> ${r.chargeableW.toFixed(1)} kg facturables</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Hors AWB & douane</span>
       </div>
     </div>`;
   });
@@ -991,7 +988,7 @@ function calcFreight() {
   html += `</div>
   <p class="fret-res-disclaimer">
     <i class="fa-solid fa-circle-info"></i>
-    Prix de vente en MAD incluant transport + surcharge fuel + marge commerciale. Hors AWB, sûreté, manutention et dédouanement.${hasIndicatif ? ' Les tarifs des compagnies partenaires sont indicatifs.' : ''}
+    Tarifs tout compris (transport + fuel). Hors AWB, sûreté aéroportuaire, manutention et dédouanement.${hasIndicatif ? ' Les tarifs des compagnies partenaires sont estimés.' : ''} Demandez un devis pour un prix ferme.
   </p>
   <a href="#contact" class="btn btn-primary fret-quote-btn">
     <i class="fa-solid fa-envelope"></i> Demander un devis précis
