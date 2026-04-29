@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260423b"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260426a"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260429a"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -763,10 +763,10 @@
             </div>
             <div class="ec-form-group">
               <label>Dimensions (cm) L × l × H</label>
-              <div style="display:flex;gap:6px">
-                <input type="number" id="simpr-l" value="40" placeholder="L" style="width:60px" oninput="simProCalc()"/>
-                <input type="number" id="simpr-w" value="30" placeholder="l" style="width:60px" oninput="simProCalc()"/>
-                <input type="number" id="simpr-h" value="30" placeholder="H" style="width:60px" oninput="simProCalc()"/>
+              <div class="ec-dims-row">
+                <input type="number" id="simpr-l" value="40" placeholder="L" oninput="simProCalc()"/>
+                <input type="number" id="simpr-w" value="30" placeholder="l" oninput="simProCalc()"/>
+                <input type="number" id="simpr-h" value="30" placeholder="H" oninput="simProCalc()"/>
               </div>
             </div>
           </div>
@@ -777,9 +777,9 @@
             </div>
             <div class="ec-form-group">
               <label>Options</label>
-              <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-                <label style="font-weight:400;font-size:.88rem"><input type="checkbox" id="simpr-ins" onchange="simProCalc()"/> Assurance marchandise</label>
-                <label style="font-weight:400;font-size:.88rem"><input type="checkbox" id="simpr-cust" onchange="simProCalc()"/> Dédouanement inclus</label>
+              <div class="ec-check-group">
+                <label class="check-label"><input type="checkbox" id="simpr-ins" onchange="simProCalc()"/> Assurance marchandise</label>
+                <label class="check-label"><input type="checkbox" id="simpr-cust" onchange="simProCalc()"/> Dédouanement inclus</label>
               </div>
             </div>
           </div>
@@ -2892,6 +2892,9 @@
         <button class="adm-tab" id="adm-tab-groupage"    onclick="admTab('groupage')">
           <i class="fa-solid fa-boxes-stacked"></i> Groupage Routier
         </button>
+        <button class="adm-tab" id="adm-tab-cargo"       onclick="admTab('cargo')">
+          <i class="fa-solid fa-plane-departure"></i> Fret Cargo
+        </button>
         <button class="adm-tab" id="adm-tab-expeditions" onclick="admTab('expeditions')">
           <i class="fa-solid fa-tag"></i> Expéditions
         </button>
@@ -2931,6 +2934,11 @@
         <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
       </div>
 
+      <!-- ── Panel: Fret Cargo Aérien ── -->
+      <div class="adm-panel" id="adm-panel-cargo">
+        <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
+      </div>
+
       <!-- ── Panel: Expéditions ── -->
       <div class="adm-panel" id="adm-panel-expeditions">
         <div class="adm-empty"><i class="fa-solid fa-spinner fa-spin"></i><p>Chargement…</p></div>
@@ -2964,7 +2972,7 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="js/admin.js?v=20260425a"></script>
+<script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
 <script src="js/espace-client.js?v=20260425k"></script>
 

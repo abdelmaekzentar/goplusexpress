@@ -39,8 +39,8 @@ input,select,textarea{font-family:inherit;font-size:.95rem}
 #navbar.scrolled{background:var(--dark);box-shadow:0 2px 20px rgba(0,0,0,.3);padding:0 5%}
 .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
 .brand-logo{height:64px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))}
-.nav-links{display:flex;list-style:none;gap:36px}
-.nav-links a{color:#fff;font-weight:500;font-size:.95rem;opacity:.9;transition:var(--transition)}
+.nav-links{display:flex;list-style:none;gap:24px;align-items:center;flex-wrap:nowrap}
+.nav-links a{color:#fff;font-weight:500;font-size:.9rem;opacity:.9;transition:var(--transition);white-space:nowrap}
 .nav-links a:hover{color:var(--gold);opacity:1}
 .nav-ec-btn{background:var(--teal)!important;color:#fff!important;padding:7px 16px!important;border-radius:20px!important;opacity:1!important;font-weight:700!important;display:inline-flex!important;align-items:center;gap:6px}
 .nav-right{display:flex;align-items:center;gap:16px}
@@ -278,6 +278,24 @@ footer{background:var(--dark);color:#fff;padding:60px 5% 24px}
   .track-input-row{flex-direction:column}
   .awb-info-grid{grid-template-columns:1fr}
   .tracking-tabs .track-tab span{display:none}
+  /* Simulateur express mobile */
+  .sim-inner{padding:16px;gap:16px}
+  .dims-row{gap:6px}
+  .dims-row input{font-size:.85rem;padding:9px 8px}
+  .form-group label{font-size:.82rem}
+  .form-group input,.form-group select{padding:10px 12px;font-size:.88rem}
+  .carrier-btns{gap:8px}
+  .carrier-btn{padding:8px 14px}
+  /* Tracking */
+  .track-card{padding:16px}
+  .track-17track-frame{min-height:80px}
+  /* Hero */
+  .hero-title{font-size:2rem}
+  .hero-sub{font-size:.95rem}
+  .hero-buttons{flex-direction:column;gap:10px}
+  /* Nav mobile */
+  .nav-links{padding:20px 5%;gap:16px}
+  .nav-links a{font-size:1rem}
 }
 
 /* ═══ RTL overrides ═══ */
@@ -398,6 +416,15 @@ footer{background:var(--dark);color:#fff;padding:60px 5% 24px}
 .track-awb-btn-secondary:hover{background:#e2e8f0;color:#0f172a}
 @media(max-width:500px){.track-awb-btns{flex-direction:column}.track-awb-btn{justify-content:center}}
 
+/* ── 17track widget inline ── */
+.track-card-inline{padding-bottom:10px}
+.track-live-badge{background:#dcfce7;border-color:#86efac;color:#166534}
+.track-17track-frame{border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;min-height:120px;margin:12px 0;background:#fafafa}
+.track-17track-frame iframe{display:block;width:100%!important;border:none}
+.track-inline-loading{display:flex;align-items:center;justify-content:center;gap:10px;padding:2.5rem 1rem;color:#64748b;font-size:.88rem}
+.spinner-sm{width:20px;height:20px;border:2.5px solid #e2e8f0;border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* ═══ WHATSAPP FLOAT ═══ */
 .wa-float{position:fixed;bottom:92px;right:32px;width:54px;height:54px;background:#25d366;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.6rem;box-shadow:0 4px 20px rgba(37,211,102,.4);z-index:998;text-decoration:none;transition:var(--transition)}
 .wa-float:hover{transform:scale(1.1);background:#1ebe5d}
@@ -453,3 +480,92 @@ footer{background:var(--dark);color:#fff;padding:60px 5% 24px}
 .prohib-warning{background:#fffde7;border:1px solid #ffe082}.prohib-warning h4{color:#e65100}.prohib-warning li::before{color:#f57c00}
 .prohib-info{background:#e3f2fd;border:1px solid #bbdefb}.prohib-info h4{color:#1565c0}.prohib-info li::before{color:#1976d2}
 .prohib-dest{background:#f3e5f5;border:1px solid #ce93d8}.prohib-dest h4{color:#6a1b9a}.prohib-dest li::before{color:#8e24aa}
+
+/* ══════════════════════════════════════════════
+   CALCULATEUR FRET CARGO AÉRIEN (home page)
+══════════════════════════════════════════════ */
+.fret-calc-wrap{display:grid;grid-template-columns:400px 1fr;gap:28px;align-items:start;width:100%}
+.fret-calc-form{background:#f8fafc;border:1px solid #e2e8f0;border-radius:16px;padding:24px}
+.fret-results-col{min-height:280px}
+
+.fret-section-label{font-size:.77rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.fret-section-label:first-child{margin-top:0}
+
+.fret-type-group,.fret-dir-group{display:flex;gap:8px;margin-bottom:4px}
+.fret-toggle-btn{flex:1;padding:9px 12px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;cursor:pointer;font-size:.82rem;font-weight:600;color:#64748b;transition:.18s;display:flex;align-items:center;justify-content:center;gap:6px}
+.fret-toggle-btn:hover{border-color:var(--teal);color:var(--teal)}
+.fret-toggle-btn.active{border-color:var(--teal);background:var(--teal);color:#fff}
+
+.fret-form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.fret-dims-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px}
+.fret-field{display:flex;flex-direction:column;gap:4px}
+.fret-field label{font-size:.74rem;font-weight:600;color:#475569}
+.fret-input,.fret-select{border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;font-size:.83rem;color:#1e293b;background:#fff;transition:.15s;width:100%;box-sizing:border-box;font-family:inherit}
+.fret-input:focus,.fret-select:focus{border-color:var(--teal);outline:none;box-shadow:0 0 0 3px rgba(0,169,157,.12)}
+
+.fret-chargeW-badge{font-size:.88rem;font-weight:800;padding:7px 10px;border-radius:8px;text-align:center;background:#f1f5f9;color:#334155;min-height:36px;display:flex;align-items:center;justify-content:center}
+.fret-chargeW-badge.fret-cw-vol{background:#fef3c7;color:#92400e}
+.fret-chargeW-badge.fret-cw-act{background:#d1fae5;color:#065f46}
+
+.fret-cargo-inputs{margin-top:4px}
+.fret-calc-btn{width:100%;padding:13px;background:var(--teal);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:14px;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.fret-calc-btn:hover{background:var(--teal-d);transform:translateY(-1px)}
+.fret-disclaimer{font-size:.72rem;color:#94a3b8;margin-top:10px;line-height:1.5;display:flex;align-items:flex-start;gap:5px}
+
+/* Results */
+.fret-results-placeholder{text-align:center;padding:60px 20px;color:#94a3b8}
+.fret-placeholder-icon{font-size:3.5rem;color:#cbd5e1;display:block;margin-bottom:16px}
+.fret-results-placeholder p{font-size:.88rem;line-height:1.6;max-width:320px;margin:0 auto}
+
+.fret-res-header{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd;border-radius:14px;padding:16px 20px;margin-bottom:16px}
+.fret-res-route{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.fret-res-airport{font-size:1.5rem;font-weight:900;color:#0c4a6e;font-family:monospace;letter-spacing:.05em}
+.fret-res-arrow{color:#0ea5e9;font-size:1.1rem}
+.fret-res-summary{font-size:.81rem;color:#475569;margin-bottom:8px}
+.fret-chargeW-note{font-size:.79rem;color:#334155;line-height:1.5;margin-bottom:6px}
+.fret-wb-note{font-size:.79rem;color:#475569;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.fret-wb-badge{background:#0ea5e9;color:#fff;padding:2px 10px;border-radius:5px;font-weight:700;font-size:.75rem;font-family:monospace}
+
+.fret-airline-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.fret-al-card{border:1.5px solid #e2e8f0;border-radius:14px;padding:14px 16px;background:#fff;position:relative;overflow:hidden;transition:.15s}
+.fret-al-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.09)}
+.fret-al-best{border-color:var(--teal)!important;border-width:2px;background:#f0fdfa}
+.fret-al-best-badge{position:absolute;top:10px;right:12px;background:var(--teal);color:#fff;font-size:.67rem;font-weight:800;padding:3px 10px;border-radius:20px;display:flex;align-items:center;gap:4px;letter-spacing:.02em}
+
+.fret-al-top{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.fret-al-logo-wrap{width:72px;flex-shrink:0;display:flex;align-items:center}
+.fret-al-logo{height:34px;max-width:72px;object-fit:contain}
+.fret-al-code-badge{width:58px;height:34px;border-radius:7px;color:#fff;font-weight:800;font-size:.77rem;font-family:monospace;justify-content:center;align-items:center}
+.fret-al-info{flex:1;min-width:0}
+.fret-al-name{font-size:.84rem;font-weight:700;color:#1e293b;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fret-al-rate{font-size:1.15rem;font-weight:900;color:var(--teal)}
+.fret-al-rate span{font-size:.70rem;font-weight:500;color:#94a3b8}
+.fret-al-total{text-align:right;flex-shrink:0}
+.fret-al-total-val{font-size:1.25rem;font-weight:900;color:#1e293b}
+.fret-al-total-label{font-size:.67rem;color:#94a3b8;font-weight:500}
+
+.fret-al-breakdown{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:.75rem;color:#64748b;border-top:1px solid #f1f5f9;padding-top:8px}
+.fret-al-breakdown i{color:#94a3b8;width:12px}
+
+/* ── Badges RAM & indicatif ── */
+.fret-ram-badge{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(90deg,#C8102E,#a00d25);color:#fff;font-size:.67rem;font-weight:700;padding:3px 9px;border-radius:5px;margin-bottom:6px;letter-spacing:.03em}
+.fret-al-indicatif{display:inline-flex;align-items:center;gap:4px;font-size:.67rem;color:#94a3b8;font-style:italic;margin-top:2px}
+.fret-al-indicatif i{font-size:.62rem}
+
+/* ── Breakdown cost/margin ── */
+.fret-al-cost{color:#ef4444;font-weight:600}
+.fret-al-margin{color:#10b981;font-weight:600}
+.fret-currency-mad{font-size:.72rem;font-weight:600;color:#64748b;vertical-align:middle}
+
+.fret-res-error{background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:24px;text-align:center;color:#dc2626}
+.fret-res-error i{font-size:1.5rem;margin-bottom:8px;display:block}
+.fret-res-disclaimer{font-size:.72rem;color:#94a3b8;line-height:1.5;margin-bottom:12px;display:flex;align-items:flex-start;gap:5px}
+.fret-quote-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 24px;font-size:.88rem}
+
+@media(max-width:1000px){.fret-calc-wrap{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .fret-form-row{grid-template-columns:1fr}
+  .fret-dims-row{grid-template-columns:1fr 1fr}
+  .fret-al-top{flex-wrap:wrap}
+  .fret-al-total{text-align:left}
+}

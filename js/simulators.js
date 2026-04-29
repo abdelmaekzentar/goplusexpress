@@ -643,4 +643,369 @@ function calcExport() {
   setTxt('ex_transit', transit);
 }
 
+/* ════════════════════════════════════════════════════════════
+   CALCULATEUR FRET CARGO AÉRIEN
+   Colis (poids volumétrique IATA ÷6000) ou Palette (poids réel)
+   Tarifs multi-compagnies — lit les grilles admin si disponibles
+   ════════════════════════════════════════════════════════════ */
+let _fcalcType = 'box';   // 'box' | 'palette'
+let _fcalcDir  = 'export'; // 'export' | 'import'
+
+/* ── Compagnies ── */
+const FCALC_AL = {
+  AT:{ name:'Royal Air Maroc',     logo:'https://pics.avs.io/200/200/AT.png',  color:'#C8102E' },
+  AF:{ name:'Air France Cargo',    logo:'https://pics.avs.io/200/200/AF.png',  color:'#002395' },
+  EK:{ name:'Emirates SkyCargo',   logo:'https://pics.avs.io/200/200/EK.png',  color:'#B8860B' },
+  SV:{ name:'Saudia Cargo',        logo:'https://pics.avs.io/200/200/SV.png',  color:'#006400' },
+  TK:{ name:'Turkish Cargo',       logo:'https://pics.avs.io/200/200/TK.png',  color:'#E30A17' },
+  DL:{ name:'Delta Air Lines',     logo:'https://pics.avs.io/200/200/DL.png',  color:'#003366' },
+  AC:{ name:'Air Canada Cargo',    logo:'https://pics.avs.io/200/200/AC.png',  color:'#D62B1F' },
+  LH:{ name:'Lufthansa Cargo',     logo:'https://pics.avs.io/200/200/LH.png',  color:'#05164D' },
+  QR:{ name:'Qatar Airways Cargo', logo:'https://pics.avs.io/200/200/QR.png',  color:'#5C0632' },
+  EY:{ name:'Etihad Cargo',        logo:'https://pics.avs.io/200/200/EY.png',  color:'#C8963C' },
+  MS:{ name:'EgyptAir Cargo',      logo:'https://pics.avs.io/200/200/MS.png',  color:'#0D2C6E' },
+  KL:{ name:'KLM Cargo',           logo:'https://pics.avs.io/200/200/KL.png',  color:'#009FDF' },
+  IB:{ name:'Iberia Cargo',        logo:'https://pics.avs.io/200/200/IB.png',  color:'#D82027' },
+  CX:{ name:'Cathay Cargo',        logo:'https://pics.avs.io/200/200/CX.png',  color:'#006564' },
+};
+
+/* ── Surcharge fuel (USD/kg, s'ajoute au taux de base) ── */
+const FCALC_FUEL = {
+  AT:0.55, AF:0.60, EK:0.65, SV:0.50, TK:0.50,
+  DL:0.58, AC:0.56, LH:0.62, QR:0.58, EY:0.52,
+  MS:0.45, KL:0.58, IB:0.48, CX:0.70
+};
+
+/* ── Transit (jours depuis CMN) ── */
+const FCALC_TRANSIT = {
+  CDG:1,LYS:2,MRS:2,MAD:1,BCN:1,FRA:2,MUC:2,LHR:2,AMS:2,LGG:2,BRU:2,FCO:2,MXP:2,LIS:1,IST:1,
+  DXB:2,AUH:2,SHJ:2,DOH:2,RUH:2,JED:2,
+  PVG:3,PEK:3,HKG:3,SIN:3,BOM:3,DEL:3,
+  JFK:3,LAX:3,MIA:3,YUL:4,
+  CAI:2,ABJ:3,LOS:3,
+};
+
+/* ── Taux de change USD → MAD (paramétrable en admin) ── */
+const FCALC_USD_MAD_DEFAULT = 10;
+
+/* ── Royal Air Maroc — tarifs d'ACHAT officiels (MAD/kg) — Grille Ex Maroc (Prepaid) ──
+   Tranches : N (<45 kg) | +45 | +100 | +250 | +500 | +1000   MIN = minimum de facturation MAD ── */
+const AT_COST_MAD = {
+  CDG:{ MIN:850, N:17, '+45':15, '+100':13, '+250':12, '+500':12, '+1000':5  },
+  LYS:{ MIN:850, N:17, '+45':16, '+100':14, '+250':13, '+500':13, '+1000':12 },
+  MRS:{ MIN:850, N:17, '+45':16, '+100':14, '+250':13, '+500':13, '+1000':12 },
+  MAD:{ MIN:850, N:14, '+45':13, '+100':11, '+250':9,  '+500':9,  '+1000':5  },
+  BCN:{ MIN:850, N:14, '+45':13, '+100':11, '+250':9,  '+500':9,  '+1000':9  },
+  FRA:{ MIN:850, N:20, '+45':18, '+100':17, '+250':13, '+500':12, '+1000':6  },
+  MUC:{ MIN:850, N:20, '+45':18, '+100':17, '+250':13, '+500':12, '+1000':6  },
+  LHR:{ MIN:850, N:20, '+45':19, '+100':18, '+250':15, '+500':14, '+1000':10 },
+  AMS:{ MIN:850, N:20, '+45':18, '+100':17, '+250':14, '+500':13, '+1000':12 },
+  LGG:{ MIN:850, N:20, '+45':18, '+100':17, '+250':14, '+500':13, '+1000':12 },
+  BRU:{ MIN:850, N:20, '+45':18, '+100':17, '+250':13, '+500':12, '+1000':5  },
+  FCO:{ MIN:850, N:17, '+45':17, '+100':16, '+250':15, '+500':15, '+1000':15 },
+  MXP:{ MIN:850, N:17, '+45':17, '+100':16, '+250':15, '+500':15, '+1000':15 },
+  LIS:{ MIN:850, N:14, '+45':13, '+100':11, '+250':9,  '+500':9,  '+1000':9  },
+  IST:{ MIN:850, N:14, '+45':14, '+100':13, '+250':12, '+500':11, '+1000':10 },
+  DXB:{ MIN:935, N:18, '+45':17, '+100':15, '+250':10, '+500':9,  '+1000':8  },
+  AUH:{ MIN:935, N:18, '+45':17, '+100':15, '+250':10, '+500':9,  '+1000':8  },
+  SHJ:{ MIN:935, N:18, '+45':17, '+100':15, '+250':10, '+500':9,  '+1000':8  },
+  DOH:{ MIN:850, N:15, '+45':13, '+100':12, '+250':11, '+500':10, '+1000':9  },
+  RUH:{ MIN:850, N:15, '+45':13, '+100':12, '+250':11, '+500':10, '+1000':9  },
+  JED:{ MIN:850, N:15, '+45':13, '+100':12, '+250':11, '+500':10, '+1000':9  },
+  PEK:{ MIN:900, N:27, '+45':23, '+100':18, '+250':18, '+500':17, '+1000':16 },
+  PVG:{ MIN:900, N:27, '+45':23, '+100':18, '+250':18, '+500':17, '+1000':16 },
+  JFK:{ MIN:900, N:27, '+45':23, '+100':18, '+250':18, '+500':17, '+1000':16 },
+  LAX:{ MIN:900, N:27, '+45':23, '+100':18, '+250':18, '+500':17, '+1000':16 },
+  MIA:{ MIN:900, N:27, '+45':23, '+100':18, '+250':18, '+500':17, '+1000':16 },
+  YUL:{ MIN:900, N:27, '+45':23, '+100':17, '+250':16, '+500':15, '+1000':14 },
+  CAI:{ MIN:850, N:15, '+45':13, '+100':10, '+250':8,  '+500':8,  '+1000':7  },
+  ABJ:{ MIN:900, N:25, '+45':21, '+100':20, '+250':19, '+500':18, '+1000':16 },
+  LOS:{ MIN:900, N:25, '+45':21, '+100':20, '+250':19, '+500':18, '+1000':16 },
+};
+
+/* ── Lire le taux USD→MAD depuis l'admin (ou valeur par défaut) ── */
+function fcalcGetExchangeRate() {
+  try { return parseFloat(JSON.parse(localStorage.getItem('gpe_cargo') || '{}').usdToMad) || FCALC_USD_MAD_DEFAULT; }
+  catch(e) { return FCALC_USD_MAD_DEFAULT; }
+}
+
+/* ── Lire la marge commerciale par compagnie (défaut 30%) ── */
+function fcalcGetMargin(code) {
+  try {
+    const v = JSON.parse(localStorage.getItem('gpe_cargo') || '{}').margins?.[code];
+    return (v !== undefined && v !== null && v !== '') ? parseFloat(v) : 30;
+  } catch(e) { return 30; }
+}
+
+/* ── Grilles tarifaires partenaires (USD/kg) — prix d'ACHAT — par dest / airline / tranche IATA
+   AT (RAM) est géré séparément via AT_COST_MAD (tarifs officiels en MAD)               ── */
+const FCALC_RATES = {
+  /* ── FRANCE ── */
+  CDG:{AF:{N:4.80,'+45':4.20,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50},TK:{N:4.60,'+45':4.00,'+100':3.35,'+250':2.85,'+500':2.60,'+1000':2.40},LH:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},EK:{N:5.50,'+45':4.80,'+100':4.10,'+250':3.50,'+500':3.20,'+1000':2.95},KL:{N:4.90,'+45':4.30,'+100':3.60,'+250':3.05,'+500':2.80,'+1000':2.55},IB:{N:4.70,'+45':4.10,'+100':3.45,'+250':2.90,'+500':2.65,'+1000':2.45},DL:{N:4.90,'+45':4.25,'+100':3.55,'+250':3.00,'+500':2.75,'+1000':2.55}},
+  LYS:{AF:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},TK:{N:4.80,'+45':4.15,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50}},
+  MRS:{AF:{N:4.90,'+45':4.25,'+100':3.55,'+250':3.00,'+500':2.75,'+1000':2.55},TK:{N:4.70,'+45':4.10,'+100':3.45,'+250':2.90,'+500':2.65,'+1000':2.45}},
+  /* ── ESPAGNE ── */
+  MAD:{IB:{N:3.80,'+45':3.30,'+100':2.75,'+250':2.35,'+500':2.10,'+1000':1.95},TK:{N:4.00,'+45':3.50,'+100':2.90,'+250':2.50,'+500':2.25,'+1000':2.05},LH:{N:4.30,'+45':3.75,'+100':3.15,'+250':2.65,'+500':2.40,'+1000':2.20}},
+  BCN:{IB:{N:3.90,'+45':3.40,'+100':2.85,'+250':2.40,'+500':2.15,'+1000':2.00},TK:{N:4.10,'+45':3.55,'+100':2.95,'+250':2.50,'+500':2.25,'+1000':2.10}},
+  /* ── ALLEMAGNE ── */
+  FRA:{LH:{N:4.60,'+45':4.00,'+100':3.35,'+250':2.85,'+500':2.60,'+1000':2.40},TK:{N:4.80,'+45':4.15,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50},AF:{N:5.20,'+45':4.50,'+100':3.80,'+250':3.20,'+500':2.95,'+1000':2.70},EK:{N:5.80,'+45':5.05,'+100':4.25,'+250':3.65,'+500':3.35,'+1000':3.05}},
+  MUC:{LH:{N:4.70,'+45':4.10,'+100':3.45,'+250':2.95,'+500':2.70,'+1000':2.50},TK:{N:4.90,'+45':4.25,'+100':3.60,'+250':3.05,'+500':2.80,'+1000':2.55}},
+  /* ── ROYAUME-UNI ── */
+  LHR:{LH:{N:5.20,'+45':4.55,'+100':3.80,'+250':3.25,'+500':2.95,'+1000':2.70},TK:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},EK:{N:6.00,'+45':5.25,'+100':4.40,'+250':3.80,'+500':3.50,'+1000':3.20},KL:{N:5.40,'+45':4.70,'+100':3.95,'+250':3.35,'+500':3.05,'+1000':2.80},AF:{N:5.30,'+45':4.60,'+100':3.85,'+250':3.30,'+500':3.00,'+1000':2.75}},
+  /* ── BENELUX ── */
+  AMS:{KL:{N:4.50,'+45':3.90,'+100':3.30,'+250':2.80,'+500':2.55,'+1000':2.35},TK:{N:4.80,'+45':4.15,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50},LH:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},DL:{N:5.10,'+45':4.45,'+100':3.75,'+250':3.20,'+500':2.90,'+1000':2.65}},
+  LGG:{TK:{N:4.90,'+45':4.25,'+100':3.60,'+250':3.05,'+500':2.80,'+1000':2.55},LH:{N:5.10,'+45':4.45,'+100':3.75,'+250':3.20,'+500':2.90,'+1000':2.65}},
+  BRU:{TK:{N:4.80,'+45':4.15,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50},LH:{N:5.10,'+45':4.45,'+100':3.75,'+250':3.20,'+500':2.90,'+1000':2.65},AF:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60}},
+  /* ── ITALIE ── */
+  FCO:{TK:{N:4.60,'+45':4.00,'+100':3.35,'+250':2.85,'+500':2.60,'+1000':2.40},LH:{N:4.80,'+45':4.20,'+100':3.55,'+250':3.00,'+500':2.75,'+1000':2.55},AF:{N:5.10,'+45':4.45,'+100':3.75,'+250':3.20,'+500':2.90,'+1000':2.65}},
+  MXP:{TK:{N:4.70,'+45':4.10,'+100':3.45,'+250':2.90,'+500':2.65,'+1000':2.45},LH:{N:4.90,'+45':4.25,'+100':3.60,'+250':3.05,'+500':2.80,'+1000':2.55}},
+  /* ── PORTUGAL / TURQUIE ── */
+  LIS:{IB:{N:3.90,'+45':3.40,'+100':2.85,'+250':2.40,'+500':2.15,'+1000':2.00},TK:{N:4.10,'+45':3.55,'+100':2.95,'+250':2.50,'+500':2.25,'+1000':2.10}},
+  IST:{TK:{N:2.80,'+45':2.45,'+100':2.05,'+250':1.75,'+500':1.60,'+1000':1.45},LH:{N:3.60,'+45':3.15,'+100':2.65,'+250':2.25,'+500':2.05,'+1000':1.90}},
+  /* ── EAU ── */
+  DXB:{EK:{N:4.50,'+45':3.90,'+100':3.30,'+250':2.80,'+500':2.55,'+1000':2.35},QR:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},EY:{N:4.80,'+45':4.15,'+100':3.50,'+250':2.95,'+500':2.70,'+1000':2.50},TK:{N:5.20,'+45':4.50,'+100':3.80,'+250':3.20,'+500':2.95,'+1000':2.70},LH:{N:5.60,'+45':4.90,'+100':4.10,'+250':3.50,'+500':3.20,'+1000':2.95}},
+  AUH:{EY:{N:4.70,'+45':4.10,'+100':3.45,'+250':2.90,'+500':2.65,'+1000':2.45},EK:{N:4.80,'+45':4.20,'+100':3.55,'+250':3.00,'+500':2.75,'+1000':2.55},QR:{N:5.10,'+45':4.45,'+100':3.75,'+250':3.20,'+500':2.90,'+1000':2.65}},
+  SHJ:{EK:{N:4.60,'+45':4.00,'+100':3.35,'+250':2.85,'+500':2.60,'+1000':2.40},TK:{N:5.30,'+45':4.60,'+100':3.85,'+250':3.30,'+500':3.00,'+1000':2.75}},
+  /* ── MOYEN-ORIENT ── */
+  DOH:{QR:{N:4.20,'+45':3.65,'+100':3.05,'+250':2.60,'+500':2.35,'+1000':2.15},EK:{N:5.20,'+45':4.50,'+100':3.80,'+250':3.25,'+500':2.95,'+1000':2.70},TK:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60}},
+  RUH:{SV:{N:5.20,'+45':4.50,'+100':3.80,'+250':3.20,'+500':2.95,'+1000':2.70},EK:{N:5.60,'+45':4.85,'+100':4.10,'+250':3.50,'+500':3.20,'+1000':2.95},QR:{N:5.40,'+45':4.70,'+100':3.95,'+250':3.35,'+500':3.05,'+1000':2.80}},
+  JED:{SV:{N:5.00,'+45':4.35,'+100':3.65,'+250':3.10,'+500':2.85,'+1000':2.60},EK:{N:5.40,'+45':4.70,'+100':3.95,'+250':3.35,'+500':3.05,'+1000':2.80},QR:{N:5.20,'+45':4.50,'+100':3.80,'+250':3.25,'+500':2.95,'+1000':2.70},TK:{N:5.60,'+45':4.90,'+100':4.10,'+250':3.50,'+500':3.20,'+1000':2.95}},
+  /* ── ASIE ── */
+  PVG:{EK:{N:8.50,'+45':7.40,'+100':6.20,'+250':5.30,'+500':4.85,'+1000':4.45},QR:{N:8.20,'+45':7.15,'+100':6.00,'+250':5.10,'+500':4.65,'+1000':4.25},TK:{N:8.80,'+45':7.65,'+100':6.45,'+250':5.50,'+500':5.00,'+1000':4.60},LH:{N:9.00,'+45':7.85,'+100':6.60,'+250':5.60,'+500':5.10,'+1000':4.70},AF:{N:9.20,'+45':8.00,'+100':6.75,'+250':5.75,'+500':5.25,'+1000':4.80}},
+  PEK:{EK:{N:8.80,'+45':7.65,'+100':6.45,'+250':5.50,'+500':5.00,'+1000':4.60},QR:{N:8.50,'+45':7.40,'+100':6.20,'+250':5.30,'+500':4.85,'+1000':4.45},TK:{N:9.00,'+45':7.85,'+100':6.60,'+250':5.60,'+500':5.10,'+1000':4.70},LH:{N:9.20,'+45':8.00,'+100':6.75,'+250':5.75,'+500':5.25,'+1000':4.80}},
+  HKG:{EK:{N:8.20,'+45':7.15,'+100':6.00,'+250':5.10,'+500':4.65,'+1000':4.25},CX:{N:8.00,'+45':6.95,'+100':5.85,'+250':4.95,'+500':4.55,'+1000':4.15},QR:{N:8.00,'+45':6.95,'+100':5.85,'+250':4.95,'+500':4.55,'+1000':4.15},TK:{N:8.50,'+45':7.40,'+100':6.20,'+250':5.30,'+500':4.85,'+1000':4.45},LH:{N:8.80,'+45':7.65,'+100':6.45,'+250':5.50,'+500':5.00,'+1000':4.60}},
+  SIN:{EK:{N:8.50,'+45':7.40,'+100':6.20,'+250':5.30,'+500':4.85,'+1000':4.45},QR:{N:8.20,'+45':7.15,'+100':6.00,'+250':5.10,'+500':4.65,'+1000':4.25},TK:{N:8.80,'+45':7.65,'+100':6.45,'+250':5.50,'+500':5.00,'+1000':4.60},CX:{N:8.30,'+45':7.25,'+100':6.10,'+250':5.20,'+500':4.75,'+1000':4.35},LH:{N:9.00,'+45':7.85,'+100':6.60,'+250':5.60,'+500':5.10,'+1000':4.70}},
+  BOM:{EK:{N:7.20,'+45':6.25,'+100':5.25,'+250':4.50,'+500':4.10,'+1000':3.75},QR:{N:7.00,'+45':6.10,'+100':5.10,'+250':4.35,'+500':3.95,'+1000':3.65},EY:{N:6.80,'+45':5.90,'+100':4.95,'+250':4.20,'+500':3.85,'+1000':3.55},TK:{N:7.40,'+45':6.45,'+100':5.40,'+250':4.60,'+500':4.20,'+1000':3.85}},
+  DEL:{EK:{N:7.40,'+45':6.45,'+100':5.40,'+250':4.60,'+500':4.20,'+1000':3.85},QR:{N:7.20,'+45':6.25,'+100':5.25,'+250':4.50,'+500':4.10,'+1000':3.75},TK:{N:7.60,'+45':6.60,'+100':5.55,'+250':4.75,'+500':4.35,'+1000':4.00},EY:{N:7.00,'+45':6.10,'+100':5.10,'+250':4.35,'+500':3.95,'+1000':3.65}},
+  /* ── AMÉRIQUES ── */
+  JFK:{AF:{N:9.80,'+45':8.55,'+100':7.20,'+250':6.10,'+500':5.55,'+1000':5.15},LH:{N:10.00,'+45':8.70,'+100':7.35,'+250':6.25,'+500':5.70,'+1000':5.25},EK:{N:10.20,'+45':8.90,'+100':7.50,'+250':6.40,'+500':5.80,'+1000':5.35},QR:{N:10.00,'+45':8.70,'+100':7.35,'+250':6.25,'+500':5.70,'+1000':5.25},DL:{N:9.50,'+45':8.30,'+100':7.00,'+250':5.95,'+500':5.40,'+1000':5.00}},
+  LAX:{EK:{N:11.00,'+45':9.60,'+100':8.05,'+250':6.85,'+500':6.25,'+1000':5.75},QR:{N:10.80,'+45':9.40,'+100':7.90,'+250':6.75,'+500':6.15,'+1000':5.65},LH:{N:11.20,'+45':9.75,'+100':8.20,'+250':6.97,'+500':6.35,'+1000':5.85},DL:{N:10.80,'+45':9.40,'+100':7.90,'+250':6.75,'+500':6.15,'+1000':5.65}},
+  MIA:{AF:{N:10.50,'+45':9.15,'+100':7.70,'+250':6.55,'+500':5.95,'+1000':5.50},LH:{N:10.80,'+45':9.40,'+100':7.90,'+250':6.75,'+500':6.15,'+1000':5.65},QR:{N:10.60,'+45':9.25,'+100':7.75,'+250':6.60,'+500':6.00,'+1000':5.55},DL:{N:10.20,'+45':8.90,'+100':7.50,'+250':6.40,'+500':5.80,'+1000':5.35}},
+  YUL:{AF:{N:10.50,'+45':9.15,'+100':7.70,'+250':6.55,'+500':5.95,'+1000':5.50},LH:{N:10.80,'+45':9.40,'+100':7.90,'+250':6.75,'+500':6.15,'+1000':5.65},AC:{N:10.00,'+45':8.70,'+100':7.35,'+250':6.25,'+500':5.70,'+1000':5.25}},
+  /* ── AFRIQUE ── */
+  CAI:{MS:{N:3.50,'+45':3.05,'+100':2.55,'+250':2.15,'+500':1.95,'+1000':1.80},EK:{N:4.80,'+45':4.20,'+100':3.55,'+250':3.00,'+500':2.75,'+1000':2.55},TK:{N:4.00,'+45':3.50,'+100':2.90,'+250':2.50,'+500':2.25,'+1000':2.05}},
+  ABJ:{AF:{N:5.40,'+45':4.70,'+100':3.95,'+250':3.35,'+500':3.05,'+1000':2.80},TK:{N:5.60,'+45':4.90,'+100':4.10,'+250':3.50,'+500':3.20,'+1000':2.95}},
+  LOS:{AF:{N:6.00,'+45':5.20,'+100':4.40,'+250':3.75,'+500':3.40,'+1000':3.15},EK:{N:6.80,'+45':5.90,'+100':4.95,'+250':4.25,'+500':3.85,'+1000':3.55},TK:{N:6.20,'+45':5.40,'+100':4.55,'+250':3.85,'+500':3.50,'+1000':3.25}},
+};
+
+/* ── Bascule type cargo ── */
+function fcalcSetType(type, btn) {
+  _fcalcType = type;
+  document.querySelectorAll('.fret-type-group .fret-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const boxEl = el('fcalc-box-inputs'), palEl = el('fcalc-pal-inputs');
+  if (boxEl) boxEl.style.display = type === 'box' ? '' : 'none';
+  if (palEl) palEl.style.display = type === 'palette' ? '' : 'none';
+  el('fcalc-results').innerHTML = _fcalcPlaceholder();
+}
+
+/* ── Bascule direction ── */
+function fcalcSetDir(dir, btn) {
+  _fcalcDir = dir;
+  document.querySelectorAll('.fret-dir-group .fret-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── Mise à jour en temps réel du poids facturable ── */
+function fcalcUpdateVolW() {
+  const L  = parseFloat(el('fcalc-L')?.value)  || 0;
+  const W  = parseFloat(el('fcalc-W')?.value)  || 0;
+  const H  = parseFloat(el('fcalc-H')?.value)  || 0;
+  const kg = parseFloat(el('fcalc-weight')?.value) || 0;
+  const qty = parseInt(el('fcalc-qty')?.value) || 1;
+  const prev = el('fcalc-chargeW-preview');
+  if (!prev) return;
+  if (!kg) { prev.textContent = '—'; prev.className = 'fret-chargeW-badge'; return; }
+  const act = kg * qty;
+  const vol = (L && W && H) ? (L * W * H / 6000) * qty : 0;
+  const cw  = Math.max(act, vol || act);
+  prev.textContent = cw.toFixed(1) + ' kg';
+  prev.className   = 'fret-chargeW-badge ' + (vol > act ? 'fret-cw-vol' : 'fret-cw-act');
+}
+
+/* ── Détermination de la tranche IATA ── */
+function fcalcGetWB(cw) {
+  if (cw >= 1000) return '+1000';
+  if (cw >= 500)  return '+500';
+  if (cw >= 250)  return '+250';
+  if (cw >= 100)  return '+100';
+  if (cw >= 45)   return '+45';
+  return 'N';
+}
+
+/* ── Lecture des tarifs admin (localStorage gpe_cargo) si disponibles ── */
+function fcalcGetAdminRate(dest, airlineCode, origin, dir, wb) {
+  try {
+    const d = JSON.parse(localStorage.getItem('gpe_cargo') || '{}');
+    const store = dir === 'export' ? (d.exportRates || {}) : (d.importRates || {});
+    return store[origin]?.[airlineCode]?.[dest]?.[wb] ?? null;
+  } catch(e) { return null; }
+}
+
+function _fcalcPlaceholder() {
+  return `<div class="fret-results-placeholder">
+    <i class="fa-solid fa-plane-departure fret-placeholder-icon"></i>
+    <p>Renseignez votre fret ci-contre et cliquez sur <strong>Calculer &amp; Comparer</strong> pour voir les tarifs par compagnie.</p>
+  </div>`;
+}
+
+/* ── CALCUL PRINCIPAL ── */
+function calcFreight() {
+  let chargeableW = 0, actualW = 0, volW = 0, qty = 1, qtyLabel = '';
+
+  if (_fcalcType === 'box') {
+    const L  = parseFloat(el('fcalc-L')?.value)  || 0;
+    const W  = parseFloat(el('fcalc-W')?.value)  || 0;
+    const H  = parseFloat(el('fcalc-H')?.value)  || 0;
+    const kg = parseFloat(el('fcalc-weight')?.value) || 0;
+    qty = parseInt(el('fcalc-qty')?.value) || 1;
+    if (!kg) { fcalcShowError('Renseignez le poids du colis.'); return; }
+    actualW     = kg * qty;
+    volW        = (L && W && H) ? (L * W * H / 6000) * qty : 0;
+    chargeableW = Math.max(actualW, volW || actualW);
+    qtyLabel    = qty + ' colis';
+  } else {
+    const kg      = parseFloat(el('fcalc-pal-weight')?.value) || 0;
+    const palType = el('fcalc-pal-type')?.value || 'PMC';
+    qty = parseInt(el('fcalc-pal-qty')?.value) || 1;
+    if (!kg) { fcalcShowError('Renseignez le poids par palette.'); return; }
+    actualW     = kg * qty;
+    chargeableW = actualW;
+    volW        = 0;
+    qtyLabel    = qty + ' palette(s) ' + palType;
+  }
+
+  const destSel   = el('fcalc-dest');
+  const originSel = el('fcalc-origin');
+  const dest      = destSel?.value   || 'CDG';
+  const origin    = originSel?.value || 'CMN';
+  const destLabel = destSel?.options[destSel.selectedIndex]?.text    || dest;
+  const origLabel = originSel?.options[originSel.selectedIndex]?.text || origin;
+  const wb        = fcalcGetWB(chargeableW);
+  const transit   = FCALC_TRANSIT[dest] || 2;
+  const destRates = FCALC_RATES[dest] || {};
+  const usdToMad  = fcalcGetExchangeRate();
+
+  const results = [];
+
+  Object.entries(FCALC_AL).forEach(([code, al]) => {
+    const marginRate = fcalcGetMargin(code) / 100;
+    const fuelUsdPerKg = FCALC_FUEL[code] || 0.55;
+
+    if (code === 'AT') {
+      /* ── Royal Air Maroc : grille officielle en MAD/kg ── */
+      const destData = AT_COST_MAD[dest];
+      if (!destData) return;
+      /* Priorité : override admin → grille officielle RAM */
+      const adminRate    = fcalcGetAdminRate(dest, 'AT', origin, _fcalcDir, wb);
+      const ratePerKgMad = adminRate !== null ? adminRate : destData[wb];
+      if (!ratePerKgMad) return;
+      const baseMad  = ratePerKgMad * chargeableW;
+      const fuelMad  = fuelUsdPerKg * usdToMad * chargeableW;
+      const minMad   = destData.MIN || 850;
+      const costMad  = Math.max(baseMad + fuelMad, minMad);
+      const sellMad  = Math.round(costMad * (1 + marginRate));
+      results.push({
+        code, al, ratePerKgMad, costMad: Math.round(costMad), sellMad,
+        margin: marginRate * 100, transit, wb, chargeableW,
+        isRAM: true, isOfficial: adminRate === null
+      });
+      return;
+    }
+
+    /* ── Autres compagnies : grille en USD → converti MAD ── */
+    const adminRate    = fcalcGetAdminRate(dest, code, origin, _fcalcDir, wb);
+    const ratePerKgUsd = adminRate !== null ? adminRate : destRates[code]?.[wb];
+    if (!ratePerKgUsd) return;
+    const ratePerKgMad = ratePerKgUsd * usdToMad;
+    const baseMad  = ratePerKgMad * chargeableW;
+    const fuelMad  = fuelUsdPerKg * usdToMad * chargeableW;
+    const minMad   = 45 * usdToMad;
+    const costMad  = Math.max(baseMad + fuelMad, minMad);
+    const sellMad  = Math.round(costMad * (1 + marginRate));
+    results.push({
+      code, al, ratePerKgMad, costMad: Math.round(costMad), sellMad,
+      margin: marginRate * 100, transit, wb, chargeableW,
+      isRAM: false, isOfficial: false
+    });
+  });
+
+  if (!results.length) {
+    fcalcShowError(`Aucune compagnie desservant <strong>${dest}</strong> depuis <strong>${origin}</strong> dans notre base de données. Contactez-nous pour un devis personnalisé.`);
+    return;
+  }
+  results.sort((a, b) => a.sellMad - b.sellMad);
+
+  const volNote = (_fcalcType === 'box' && volW > 0)
+    ? `Poids réel <strong>${actualW.toFixed(1)} kg</strong> — Poids vol. <strong>${volW.toFixed(1)} kg</strong> (÷6 000) — Facturable : <strong>${chargeableW.toFixed(1)} kg</strong>`
+    : `Poids facturable : <strong>${chargeableW.toFixed(1)} kg</strong> (${qtyLabel})`;
+
+  let html = `
+  <div class="fret-res-header">
+    <div class="fret-res-route">
+      <span class="fret-res-airport">${origin}</span>
+      <i class="fa-solid fa-arrow-right fret-res-arrow"></i>
+      <span class="fret-res-airport">${dest}</span>
+    </div>
+    <div class="fret-res-summary">${origLabel} → ${destLabel}</div>
+    <div class="fret-chargeW-note"><i class="fa-solid fa-scale-balanced"></i> ${volNote}</div>
+    <div class="fret-wb-note">Tranche IATA appliquée : <span class="fret-wb-badge">${wb} kg</span></div>
+  </div>
+  <div class="fret-airline-list">`;
+
+  results.forEach((r, i) => {
+    const best    = i === 0;
+    const sellStr = r.sellMad.toLocaleString('fr-MA');
+    const costStr = r.costMad.toLocaleString('fr-MA');
+    const rateStr = Math.round(r.ratePerKgMad);
+    html += `
+    <div class="fret-al-card ${best ? 'fret-al-best' : ''}">
+      ${best ? '<div class="fret-al-best-badge"><i class="fa-solid fa-crown"></i> Meilleur prix</div>' : ''}
+      ${r.isRAM ? `<div class="fret-ram-badge"><i class="fa-solid fa-certificate"></i> Tarif Officiel RAM${r.isOfficial ? '' : ' (modifié)'}</div>` : ''}
+      <div class="fret-al-top">
+        <div class="fret-al-logo-wrap">
+          <img src="${r.al.logo}" alt="${r.al.name}" class="fret-al-logo"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="fret-al-code-badge" style="background:${r.al.color};display:none">${r.code}</div>
+        </div>
+        <div class="fret-al-info">
+          <div class="fret-al-name">${r.al.name}</div>
+          <div class="fret-al-rate">${rateStr} <span>MAD/kg</span></div>
+          ${!r.isRAM ? '<div class="fret-al-indicatif"><i class="fa-solid fa-chart-line"></i> Tarif indicatif</div>' : ''}
+        </div>
+        <div class="fret-al-total">
+          <div class="fret-al-total-val">${sellStr} <span class="fret-currency-mad">MAD</span></div>
+          <div class="fret-al-total-label">Prix de vente TTC</div>
+        </div>
+      </div>
+      <div class="fret-al-breakdown">
+        <span class="fret-al-cost"><i class="fa-solid fa-tag"></i> PA : ${costStr} MAD</span>
+        <span class="fret-al-margin"><i class="fa-solid fa-percent"></i> Marge : ${r.margin.toFixed(0)}%</span>
+        <span><i class="fa-solid fa-gas-pump"></i> Fuel inclus</span>
+        <span><i class="fa-solid fa-clock"></i> Transit : J+${r.transit}</span>
+      </div>
+    </div>`;
+  });
+
+  const hasIndicatif = results.some(r => !r.isRAM);
+  html += `</div>
+  <p class="fret-res-disclaimer">
+    <i class="fa-solid fa-circle-info"></i>
+    Prix de vente en MAD incluant transport + surcharge fuel + marge commerciale. Hors AWB, sûreté, manutention et dédouanement.${hasIndicatif ? ' Les tarifs des compagnies partenaires sont indicatifs.' : ''}
+  </p>
+  <a href="#contact" class="btn btn-primary fret-quote-btn">
+    <i class="fa-solid fa-envelope"></i> Demander un devis précis
+  </a>`;
+
+  el('fcalc-results').innerHTML = html;
+}
+
+function fcalcShowError(msg) {
+  el('fcalc-results').innerHTML = `
+    <div class="fret-res-error">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>${msg}</p>
+    </div>`;
+}
+
 // showSim handles all tabs — defined earlier in this file.

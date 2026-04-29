@@ -110,7 +110,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<link rel="stylesheet" href="css/style.css"/>
+<link rel="stylesheet" href="css/style.css?v=20260429a"/>
 </head>
 <body>
 
@@ -125,7 +125,6 @@
       <li><a href="#simulators"  data-i18n="nav_sim">Simulateurs</a></li>
       <li><a href="#ecommerce"   data-i18n="nav_ecom">E-commerce</a></li>
       <li><a href="#guides"      data-i18n="nav_guides">Guides</a></li>
-      <li><a href="guide-emballage.html" target="_blank" style="color:var(--teal-d);font-weight:700"><i class="fa-solid fa-box" style="font-size:.8em"></i> Guide Emballage</a></li>
       <li><a href="#tracking"    data-i18n="nav_track">Tracking</a></li>
       <li><a href="#contact"     data-i18n="nav_contact">Contact</a></li>
       <li><a href="espace-client.html" class="nav-ec-btn" data-i18n="nav_ec"><i class="fa-solid fa-user-circle"></i> Espace Client</a></li>
@@ -324,7 +323,7 @@
     <button class="sim-tab"        id="tab-road"     onclick="showSim('road')"     data-i18n="tab_road">🚛 Groupage Routier</button>
     <button class="sim-tab"        id="tab-export"   onclick="showSim('export')"   data-i18n="tab_export">📤 Export Express</button>
     <button class="sim-tab"        id="tab-packing"  onclick="showSim('packing')"  data-i18n="tab_packing">📦 Chargement</button>
-    <button class="sim-tab"        id="tab-aircraft" onclick="showSim('aircraft')" data-i18n="tab_aircraft">✈ Avions Cargo</button>
+    <button class="sim-tab"        id="tab-aircraft" onclick="showSim('aircraft')" data-i18n="tab_aircraft">✈ Fret Cargo</button>
   </div>
 
   <!-- ── Customs Simulator ── -->
@@ -923,175 +922,199 @@
     </div>
   </div>
 
-  <!-- ── Aircraft Cargo Reference ── -->
+  <!-- ── Fret Cargo Calculator ── -->
   <div class="sim-panel" id="sim-aircraft">
-    <div class="sim-inner" style="flex-direction:column">
-      <h3 data-i18n="aircraft_title" style="margin-bottom:.5rem">Avions Cargo — Caractéristiques Techniques</h3>
-      <p class="sim-desc" data-i18n="aircraft_desc" style="margin-bottom:1.5rem">Référence technique des principaux appareils cargo utilisés sur les routes internationales vers et depuis le Maroc.</p>
+    <div class="sim-inner" style="display:flex;flex-direction:column;grid-template-columns:unset">
+      <h3 style="margin-bottom:.4rem"><i class="fa-solid fa-plane-departure" style="color:var(--teal)"></i> Calculateur Fret Cargo Aérien</h3>
+      <p class="sim-desc" style="margin-bottom:1.5rem">Estimez le coût de votre envoi (colis ou palette) en fret aérien vers les principales destinations — comparaison instantanée par compagnie avec surcharge fuel incluse.</p>
 
-      <div class="aircraft-grid">
+      <div class="fret-calc-wrap">
 
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#1a237e,#283593)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Boeing 747-8F</strong>
-              <span>Gros porteur cargo</span>
+        <!-- ══ FORMULAIRE ══ -->
+        <div class="fret-calc-form">
+
+          <!-- Type -->
+          <div class="fret-section-label"><i class="fa-solid fa-box"></i> Type de cargaison</div>
+          <div class="fret-type-group">
+            <button class="fret-toggle-btn active" onclick="fcalcSetType('box',this)">
+              <i class="fa-solid fa-box"></i> Colis / Box
+            </button>
+            <button class="fret-toggle-btn" onclick="fcalcSetType('palette',this)">
+              <i class="fa-solid fa-pallet"></i> Palette / ULD
+            </button>
+          </div>
+
+          <!-- Direction -->
+          <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-arrows-left-right"></i> Direction</div>
+          <div class="fret-dir-group">
+            <button class="fret-toggle-btn active" onclick="fcalcSetDir('export',this)">
+              <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
+            </button>
+            <button class="fret-toggle-btn" onclick="fcalcSetDir('import',this)">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
+            </button>
+          </div>
+
+          <!-- Itinéraire -->
+          <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-route"></i> Itinéraire</div>
+          <div class="fret-form-row">
+            <div class="fret-field">
+              <label>Aéroport d'origine (Maroc)</label>
+              <select id="fcalc-origin" class="fret-select">
+                <option value="CMN">🇲🇦 Casablanca CMN</option>
+                <option value="RAK">🇲🇦 Marrakech RAK</option>
+                <option value="AGA">🇲🇦 Agadir AGA</option>
+                <option value="TNG">🇲🇦 Tanger TNG</option>
+                <option value="FEZ">🇲🇦 Fès FEZ</option>
+              </select>
+            </div>
+            <div class="fret-field">
+              <label>Destination</label>
+              <select id="fcalc-dest" class="fret-select">
+                <optgroup label="🇫🇷 France">
+                  <option value="CDG">Paris Charles de Gaulle</option>
+                  <option value="LYS">Lyon Saint-Exupéry</option>
+                  <option value="MRS">Marseille Provence</option>
+                </optgroup>
+                <optgroup label="🇪🇸 Espagne">
+                  <option value="MAD">Madrid Barajas</option>
+                  <option value="BCN">Barcelone El Prat</option>
+                </optgroup>
+                <optgroup label="🇩🇪 Allemagne">
+                  <option value="FRA">Frankfurt am Main</option>
+                  <option value="MUC">Munich</option>
+                </optgroup>
+                <optgroup label="🇬🇧 Royaume-Uni">
+                  <option value="LHR">Londres Heathrow</option>
+                </optgroup>
+                <optgroup label="🇳🇱 Pays-Bas / 🇧🇪 Belgique">
+                  <option value="AMS">Amsterdam Schiphol</option>
+                  <option value="LGG">Liège (Cargo Hub)</option>
+                  <option value="BRU">Bruxelles Zaventem</option>
+                </optgroup>
+                <optgroup label="🇮🇹 Italie">
+                  <option value="FCO">Rome Fiumicino</option>
+                  <option value="MXP">Milan Malpensa</option>
+                </optgroup>
+                <optgroup label="🇵🇹 Portugal / 🇹🇷 Turquie">
+                  <option value="LIS">Lisbonne</option>
+                  <option value="IST">Istanbul</option>
+                </optgroup>
+                <optgroup label="🇦🇪 Émirats Arabes Unis">
+                  <option value="DXB">Dubaï International</option>
+                  <option value="AUH">Abu Dhabi</option>
+                  <option value="SHJ">Sharjah (Cargo)</option>
+                </optgroup>
+                <optgroup label="🇶🇦 Qatar / 🇸🇦 Arabie Saoudite">
+                  <option value="DOH">Doha Hamad</option>
+                  <option value="RUH">Riyad</option>
+                  <option value="JED">Jeddah</option>
+                </optgroup>
+                <optgroup label="🇨🇳 Chine / 🇭🇰 Hong Kong">
+                  <option value="PVG">Shanghai Pudong</option>
+                  <option value="PEK">Pékin Capital</option>
+                  <option value="HKG">Hong Kong International</option>
+                </optgroup>
+                <optgroup label="🇸🇬 Asie du Sud-Est / 🇮🇳 Inde">
+                  <option value="SIN">Singapour Changi</option>
+                  <option value="BOM">Mumbai</option>
+                  <option value="DEL">Delhi</option>
+                </optgroup>
+                <optgroup label="🇺🇸 États-Unis / 🇨🇦 Canada">
+                  <option value="JFK">New York JFK</option>
+                  <option value="LAX">Los Angeles</option>
+                  <option value="MIA">Miami</option>
+                  <option value="YUL">Montréal Trudeau</option>
+                </optgroup>
+                <optgroup label="🌍 Afrique">
+                  <option value="CAI">Le Caire</option>
+                  <option value="ABJ">Abidjan</option>
+                  <option value="LOS">Lagos</option>
+                </optgroup>
+              </select>
             </div>
           </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>137 756 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>858 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>30 × ULD 96"</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>20 × LD-1 + vrac</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>8 130 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>Lufthansa Cargo, Atlas Air, Cargolux</strong></div>
-          </div>
-        </div>
 
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#00695c,#00796b)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Boeing 777F</strong>
-              <span>Long-courrier cargo</span>
+          <!-- ── INPUTS COLIS ── -->
+          <div id="fcalc-box-inputs" class="fret-cargo-inputs">
+            <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-ruler-combined"></i> Dimensions par colis (cm)</div>
+            <div class="fret-dims-row">
+              <div class="fret-field">
+                <label>Longueur</label>
+                <input type="number" id="fcalc-L" class="fret-input" placeholder="100" min="1" step="1" oninput="fcalcUpdateVolW()"/>
+              </div>
+              <div class="fret-field">
+                <label>Largeur</label>
+                <input type="number" id="fcalc-W" class="fret-input" placeholder="80" min="1" step="1" oninput="fcalcUpdateVolW()"/>
+              </div>
+              <div class="fret-field">
+                <label>Hauteur</label>
+                <input type="number" id="fcalc-H" class="fret-input" placeholder="60" min="1" step="1" oninput="fcalcUpdateVolW()"/>
+              </div>
+            </div>
+            <div class="fret-dims-row">
+              <div class="fret-field">
+                <label>Poids réel (kg/colis)</label>
+                <input type="number" id="fcalc-weight" class="fret-input" placeholder="50" min="0.1" step="0.1" oninput="fcalcUpdateVolW()"/>
+              </div>
+              <div class="fret-field">
+                <label>Quantité (nb colis)</label>
+                <input type="number" id="fcalc-qty" class="fret-input" value="1" min="1" step="1" oninput="fcalcUpdateVolW()"/>
+              </div>
+              <div class="fret-field">
+                <label>Poids facturable estimé</label>
+                <div class="fret-chargeW-badge" id="fcalc-chargeW-preview">—</div>
+              </div>
             </div>
           </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>103 000 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>653 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>27 × ULD 96"</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>10 × LD-3</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>9 045 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>FedEx, Emirates SkyCargo, Air France Cargo</strong></div>
-          </div>
-        </div>
 
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#4a148c,#6a1b9a)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Airbus A330-200F</strong>
-              <span>Moyen/long-courrier cargo</span>
+          <!-- ── INPUTS PALETTE ── -->
+          <div id="fcalc-pal-inputs" class="fret-cargo-inputs" style="display:none">
+            <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-pallet"></i> Détails palette / ULD</div>
+            <div class="fret-form-row" style="grid-template-columns:1fr 1fr">
+              <div class="fret-field">
+                <label>Type de palette</label>
+                <select id="fcalc-pal-type" class="fret-select">
+                  <option value="PMC">PMC / 96" — 317×244 cm (max 6 804 kg)</option>
+                  <option value="PAG">PAG / 88" — 317×224 cm (max 6 804 kg)</option>
+                  <option value="AKE">AKE / LD-3 — 153×162 cm (max 1 588 kg)</option>
+                  <option value="AAP">AAP / LD-2 — 119×153 cm (max 1 225 kg)</option>
+                  <option value="AMA">AMA / LD-1 — 198×244 cm (max 3 175 kg)</option>
+                </select>
+              </div>
+              <div class="fret-field" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div class="fret-field">
+                  <label>Poids / palette (kg)</label>
+                  <input type="number" id="fcalc-pal-weight" class="fret-input" placeholder="500" min="1" step="1"/>
+                </div>
+                <div class="fret-field">
+                  <label>Nombre de palettes</label>
+                  <input type="number" id="fcalc-pal-qty" class="fret-input" value="1" min="1" step="1"/>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>70 000 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>475 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>23 × ULD 88"</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>8 × LD-3</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>7 400 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>Etihad Cargo, DHL, Martinair</strong></div>
+
+          <!-- Bouton -->
+          <button class="fret-calc-btn" onclick="calcFreight()">
+            <i class="fa-solid fa-calculator"></i> Calculer &amp; Comparer les compagnies
+          </button>
+
+          <p class="fret-disclaimer">
+            <i class="fa-solid fa-circle-info"></i>
+            Poids facturable = max(poids réel, poids volumétrique). Diviseur IATA aérien : 6 000 cm³/kg. Surcharge fuel incluse.
+          </p>
+        </div>
+
+        <!-- ══ RÉSULTATS ══ -->
+        <div class="fret-results-col" id="fcalc-results">
+          <div class="fret-results-placeholder">
+            <i class="fa-solid fa-plane-departure fret-placeholder-icon"></i>
+            <p>Renseignez votre fret et cliquez sur <strong>Calculer</strong> pour comparer les tarifs de 12 compagnies aériennes cargo.</p>
           </div>
         </div>
 
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#bf360c,#d84315)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Boeing 767-300F</strong>
-              <span>Moyen-courrier cargo</span>
-            </div>
-          </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>54 886 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>438 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>24 × ULD 88"</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>6 × LD-2</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>6 025 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>UPS, FedEx, Amazon Air</strong></div>
-          </div>
-        </div>
-
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#1565c0,#1976d2)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Airbus A320-200P2F</strong>
-              <span>Court/moyen-courrier cargo converti</span>
-            </div>
-          </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>20 000 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>150 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>9 × PMC / AKE</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>4 × LD-3</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>3 300 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>Wizz Air Cargo, easyJet Cargo, DHL</strong></div>
-          </div>
-        </div>
-
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#2e7d32,#388e3c)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>ATR 72-600F</strong>
-              <span>Court-courrier / régional cargo</span>
-            </div>
-          </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>7 500 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>76 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>9 × LD-3</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>Vrac uniquement</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>1 528 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>Royal Air Maroc Cargo, Amelia Cargo</strong></div>
-          </div>
-        </div>
-
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#880e4f,#ad1457)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Antonov AN-124</strong>
-              <span>Cargo surdimensionné / outsize</span>
-            </div>
-          </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>150 000 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>1 050 m³</strong></div>
-            <div class="spec-row"><span>Dimensions soute</span><strong>36,5×6,4×4,4 m</strong></div>
-            <div class="spec-row"><span>Particularités</span><strong>Outsize, équipements lourds, chars</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>5 400 km (pleine charge)</strong></div>
-            <div class="spec-row"><span>Usage typique</span><strong>Projets industriels, turbines, engins</strong></div>
-          </div>
-        </div>
-
-        <div class="aircraft-card">
-          <div class="aircraft-header" style="background:linear-gradient(135deg,#e65100,#f57c00)">
-            <i class="fa-solid fa-plane" style="font-size:2rem"></i>
-            <div>
-              <strong>Boeing 737-800BCF</strong>
-              <span>Cargo converti court-courrier</span>
-            </div>
-          </div>
-          <div class="aircraft-specs">
-            <div class="spec-row"><span>Charge utile max</span><strong>23 900 kg</strong></div>
-            <div class="spec-row"><span>Volume total</span><strong>215 m³</strong></div>
-            <div class="spec-row"><span>Pont principal (palettes)</span><strong>11 × LD-3 ou 9 × 88"</strong></div>
-            <div class="spec-row"><span>Pont inférieur</span><strong>Vrac</strong></div>
-            <div class="spec-row"><span>Autonomie</span><strong>3 060 km</strong></div>
-            <div class="spec-row"><span>Opérateurs typiques</span><strong>FedEx, West Atlantic, ASL Airlines</strong></div>
-          </div>
-        </div>
-
-      </div>
-
-      <div class="aircraft-uld-note">
-        <h4><i class="fa-solid fa-info-circle"></i> Types d'ULD (Unit Load Devices)</h4>
-        <div class="uld-table-wrap">
-          <table class="uld-table">
-            <thead><tr><th>Code</th><th>Nom</th><th>Dimensions (L×l×H cm)</th><th>Poids max (kg)</th><th>Usage</th></tr></thead>
-            <tbody>
-              <tr><td>PMC / P6P</td><td>Palette 96"</td><td>317×244×160</td><td>6 804</td><td>Gros porteurs 747/777</td></tr>
-              <tr><td>PAG / P1P</td><td>Palette 88"</td><td>317×224×160</td><td>6 804</td><td>A330/767</td></tr>
-              <tr><td>AKE / LD-3</td><td>Conteneur demi-large</td><td>153×162×163</td><td>1 588</td><td>Soutes standard</td></tr>
-              <tr><td>AAP / LD-2</td><td>Conteneur étroit</td><td>119×153×163</td><td>1 225</td><td>B737/A320</td></tr>
-              <tr><td>AMA / LD-1</td><td>Conteneur large</td><td>198×244×163</td><td>3 175</td><td>747 pont inférieur</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </div><!-- /.fret-calc-wrap -->
     </div>
   </div>
 
@@ -1655,9 +1678,9 @@
 
 <!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
 <script src="hscodes_data.js"></script>
-<script src="js/i18n.js"></script>
+<script src="js/i18n.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/simulators.js"></script>
+<script src="js/simulators.js?v=20260429a"></script>
 <script src="js/tracking.js"></script>
 <script src="js/main.js"></script>
 

@@ -23,9 +23,19 @@
 .ec-tab-panel{display:none}
 .ec-tab-panel.active{display:block}
 .ec-form-group{margin-bottom:14px}
-.ec-form-group label{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:5px}
-.ec-form-group input,.ec-form-group select,.ec-form-group textarea{width:100%;padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;transition:var(--transition);background:#fff}
+.ec-form-group>label{display:flex;align-items:center;gap:6px;font-size:.82rem;font-weight:600;color:var(--dark);margin-bottom:5px}
+.ec-form-group input:not([type="checkbox"]):not([type="radio"]),
+.ec-form-group select,
+.ec-form-group textarea{width:100%;padding:11px 14px;border:2px solid var(--ec-border);border-radius:10px;font-size:.9rem;transition:var(--transition);background:#fff;box-sizing:border-box}
+.ec-form-group input[type="checkbox"],
+.ec-form-group input[type="radio"]{width:16px;height:16px;padding:0;border:none;box-shadow:none;flex-shrink:0;cursor:pointer;accent-color:var(--teal)}
 .ec-form-group input:focus,.ec-form-group select:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,169,157,.12)}
+/* Labels inline pour checkboxes — ne pas hériter du style de label principal */
+.ec-form-group .check-label{display:flex;align-items:center;gap:8px;font-size:.88rem;font-weight:400;color:var(--text);cursor:pointer;padding:4px 0;margin-bottom:0;user-select:none}
+.ec-form-group .check-label:hover{color:var(--teal)}
+.ec-check-group{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.ec-dims-row{display:flex;gap:8px;align-items:center}
+.ec-dims-row input{flex:1;min-width:0;text-align:center}
 .ec-form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .ec-btn-full{width:100%;justify-content:center;display:flex;gap:8px;align-items:center;padding:13px;font-size:.95rem;margin-top:4px}
 .ec-msg-error{background:#fff5f5;border:1.5px solid #fc8181;color:#c53030;padding:10px 14px;border-radius:8px;font-size:.83rem;margin-bottom:12px}
@@ -631,16 +641,82 @@
 
 /* ── Responsive ── */
 @media(max-width:900px){
+  /* Sidebar & main */
   .ec-sidebar{display:none}
-  .ec-main{margin-left:0;padding:20px}
+  .ec-topbar{padding:0 16px}
+  .ec-main{margin-left:0;padding:16px}
+
+  /* Grilles globales */
   .ocr-layout,.invoice-layout,.sim-pro-layout{grid-template-columns:1fr}
   .ec-form-row{grid-template-columns:1fr}
-  .ec-cards-grid{grid-template-columns:1fr}
-  .cont-grid,.aircraft-grid{grid-template-columns:1fr}
+  .ec-cards-grid{grid-template-columns:1fr 1fr}
+  .cont-grid,.aircraft-grid{grid-template-columns:1fr 1fr}
   .ocr2-summary-grid{grid-template-columns:1fr}
   .ocr-fret-grid{grid-template-columns:1fr}
   .ocr-transport-grid{grid-template-columns:1fr}
   .ocr2-info-grid{grid-template-columns:1fr 1fr}
+
+  /* Simulateur Pro */
+  .sim-pro-form{padding:16px}
+  .simpr-card{padding:16px;position:static}
+  .simpr-total{font-size:1rem}
+  #simpr-total-val{font-size:1.3rem}
+
+  /* Admin */
+  .adm-tabs{flex-wrap:wrap;gap:4px}
+  .adm-tab{padding:8px 12px;font-size:.78rem}
+  .adm-sub-tabs{flex-wrap:wrap;gap:4px}
+  .adm-stab{padding:7px 12px;font-size:.77rem}
+  .adm-maritime-origin-bar{flex-direction:column;align-items:flex-start}
+  .adm-origin-pills{flex-wrap:wrap;gap:6px}
+
+  /* Formulaire module header */
+  .ec-module-header{padding:16px}
+  .ec-module-header h1{font-size:1.3rem}
+}
+
+@media(max-width:600px){
+  .ec-main{padding:12px}
+  .ec-cards-grid{grid-template-columns:1fr}
+  .cont-grid,.aircraft-grid{grid-template-columns:1fr}
+
+  /* Topbar mobile */
+  .ec-topbar{gap:8px}
+  .ec-user-name{display:none}
+
+  /* Formulaires */
+  .ec-form-row{grid-template-columns:1fr;gap:10px}
+  .ec-form-group{margin-bottom:10px}
+  .ec-form-group>label{font-size:.8rem}
+  .ec-form-group input:not([type="checkbox"]):not([type="radio"]),
+  .ec-form-group select,.ec-form-group textarea{padding:10px 12px;font-size:.88rem}
+
+  /* Dimensions (3 inputs inline) */
+  .ec-dims-row{gap:6px}
+  .ec-dims-row input{font-size:.85rem;padding:9px 8px}
+
+  /* Simulateur Pro */
+  .sim-pro-layout{gap:16px}
+  .sim-pro-form,.simpr-card{padding:14px;border-radius:12px}
+  .simpr-header h3{font-size:1rem}
+  .simpr-total strong{font-size:1.2rem}
+  .simpr-line{font-size:.83rem}
+
+  /* Boutons */
+  .ec-btn-full{padding:12px;font-size:.9rem}
+
+  /* Expédition stepper */
+  .shp-stepper{padding:12px 16px;gap:0}
+  .shp-step small{font-size:.62rem}
+  .shp-pay-option{grid-template-columns:30px 1fr;gap:8px}
+
+  /* Admin tabs */
+  .adm-panel{padding:16px}
+  .adm-table th,.adm-table td{padding:8px 10px;font-size:.8rem}
+
+  /* OCR */
+  .ocr2-art-row{flex-wrap:wrap;gap:8px}
+  .ocr-manual-form{flex-wrap:wrap}
 }
 
 /* ─── EXPRESS SIMULATOR ─── */
@@ -1100,6 +1176,14 @@
 .adm-origin-pill:hover{border-color:var(--teal);color:var(--teal);background:#f0fdfa}
 .adm-origin-pill.active{border-color:var(--teal);background:var(--teal);color:#fff;box-shadow:0 2px 8px rgba(0,169,157,.3)}
 
+/* Direction badge Export/Import */
+.adm-maritime-dir-badge{display:flex;align-items:center;gap:10px;border-radius:10px;padding:10px 16px;margin-bottom:16px;font-size:.83rem;font-weight:700;letter-spacing:.2px}
+.adm-badge-export{background:#eff6ff;border:1px solid #bfdbfe;color:#1d4ed8}
+.adm-badge-export i{color:#3b82f6}
+.adm-badge-import{background:#fdf4ff;border:1px solid #e9d5ff;color:#7e22ce}
+.adm-badge-import i{color:#a855f7}
+.adm-inline-info{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:20px;text-align:center;color:#94a3b8;font-size:.85rem}
+
 /* Maritime rates table */
 .adm-maritime-grid{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .adm-maritime-table{border-collapse:collapse;background:#fff;font-size:.8rem;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;min-width:700px;width:100%}
@@ -1173,4 +1257,57 @@
   .cms-field-row{grid-template-columns:1fr}
   .cms-page-tabs{gap:4px}
   .cms-ptab{padding:7px 12px;font-size:.78rem}
+}
+
+/* ══════════════════════════════════════════════
+   FRET CARGO AÉRIEN — Admin panel
+══════════════════════════════════════════════ */
+.cargo-airline-selector{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.cargo-al-label{font-size:.82rem;font-weight:700;color:#475569;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cargo-al-cards{display:flex;flex-wrap:wrap;gap:8px}
+.cargo-al-card{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 14px;border:2px solid #e2e8f0;border-radius:10px;background:#fff;cursor:pointer;transition:.18s;min-width:90px;max-width:120px}
+.cargo-al-card:hover{border-color:var(--teal);background:#f0fdfa}
+.cargo-al-card.active{border-color:var(--teal);background:#e6fbf8;box-shadow:0 0 0 3px rgba(0,169,157,.15)}
+.cargo-al-card-name{font-size:.68rem;font-weight:600;color:#334155;text-align:center;line-height:1.2;white-space:normal;max-width:100px}
+.cargo-airline-code-badge{display:inline-flex;align-items:center;justify-content:center;padding:4px 10px;border-radius:6px;color:#fff;font-size:.78rem;font-weight:800;letter-spacing:.5px;font-family:monospace}
+
+.cargo-wb-pill{background:#0ea5e9;color:#fff;font-size:.73rem;font-weight:700;padding:2px 8px;border-radius:5px}
+.cargo-ap-code{display:inline-block;background:#334155;color:#fff;font-size:.68rem;font-weight:800;font-family:monospace;padding:1px 6px;border-radius:4px;margin-right:4px;letter-spacing:.5px}
+.cargo-rates-table td,.cargo-rates-table th{padding:8px 10px!important}
+.cargo-rate-inp:focus{border-color:#0ea5e9;box-shadow:0 0 0 2px rgba(14,165,233,.2)}
+
+.cargo-airlines-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.cargo-airline-row{display:grid;grid-template-columns:60px 1fr 1fr 80px 100px auto;gap:10px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px}
+.cargo-airline-row-logo{height:36px;max-width:80px;object-fit:contain}
+.cargo-airline-row-code{font-size:.85rem;font-weight:800;font-family:monospace;color:#334155}
+.cargo-airline-row-name{font-size:.83rem;color:#334155}
+.cargo-airline-row-awb{font-size:.8rem;font-family:monospace;color:#64748b}
+
+.cargo-airports-grid{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.cargo-airport-row{display:grid;grid-template-columns:80px 1fr 80px 50px auto;gap:10px;align-items:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 12px;font-size:.82rem}
+
+.cargo-surcharges-table{width:100%;border-collapse:collapse;margin-bottom:14px}
+.cargo-surcharges-table th{background:#f1f5f9;font-size:.78rem;font-weight:700;padding:8px 12px;text-align:left;border-bottom:2px solid #e2e8f0}
+.cargo-surcharges-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;font-size:.82rem}
+
+/* ── Marges & Tarification ── */
+.cargo-exchange-box{display:flex;align-items:center;flex-wrap:wrap;gap:16px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:14px 18px;margin-bottom:20px}
+.cargo-exchange-label{display:flex;align-items:center;gap:8px;font-size:.85rem;flex:1;min-width:200px}
+.cargo-margins-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.cargo-margins-table th{background:#f1f5f9;font-size:.78rem;font-weight:700;padding:9px 12px;text-align:left;border-bottom:2px solid #e2e8f0}
+.cargo-margins-table td{padding:9px 12px;border-bottom:1px solid #f1f5f9;font-size:.83rem;vertical-align:middle}
+.cargo-margin-row:hover td{background:#f8fafc}
+.cargo-margin-row-ram td{background:#fff8f8}
+.cargo-margin-row-ram:hover td{background:#fff0f0}
+.cargo-margin-preview{display:flex;align-items:center;gap:6px;font-size:.80rem}
+.cargo-margin-info-box{display:flex;gap:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-top:14px;font-size:.83rem;color:#475569;line-height:1.6}
+.cargo-margin-info-box i{font-size:1.1rem;margin-top:2px;flex-shrink:0}
+
+@media(max-width:768px){
+  .cargo-al-cards{gap:6px}
+  .cargo-al-card{min-width:70px;padding:7px 8px}
+  .cargo-al-card-name{font-size:.64rem}
+  .cargo-airline-row{grid-template-columns:1fr 1fr;gap:8px}
+  .cargo-airport-row{grid-template-columns:1fr 1fr}
+  .cargo-margins-table th:nth-child(5),.cargo-margins-table td:nth-child(5){display:none}
 }

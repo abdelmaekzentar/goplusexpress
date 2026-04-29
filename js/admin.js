@@ -8,6 +8,7 @@ const ADM_K = {
   fuel:        'gpe_fuel',
   margins:     'gpe_express_margins',
   maritime:    'gpe_maritime',
+  cargo:       'gpe_cargo',
   routier:     'gpe_routier',
   groupage:    'gpe_groupage',
   expeditions: 'gpe_expeditions',
@@ -24,9 +25,14 @@ const ADM_DEF = {
     updatedMonth: ''
   },
   margins: {
-    dhl:    { 1:10, 2:10, 3:10, 4:10, 5:10, 6:10, 7:10, 8:10, 9:10 },
-    fedex:  { A:10, B:10, C:10, D:10, E:10, F:10, G:10, H:10, I:10 },
-    aramex: { 1:10, 2:10, 3:10, 4:10, 5:10, 6:10 }
+    // Export (Maroc → Monde)
+    dhl:        { 1:10, 2:10, 3:10, 4:10, 5:10, 6:10, 7:10, 8:10, 9:10 },
+    fedex:      { A:10, B:10, C:10, D:10, E:10, F:10, G:10, H:10, I:10 },
+    aramex:     { 1:10, 2:10, 3:10, 4:10, 5:10, 6:10 },
+    // Import (Monde → Maroc) — mêmes zones, marges distinctes
+    dhl_imp:    { 1:12, 2:12, 3:12, 4:12, 5:12, 6:12, 7:12, 8:12, 9:12 },
+    fedex_imp:  { A:12, B:12, C:12, D:12, E:12, F:12, G:12, H:12, I:12 },
+    aramex_imp: { 1:12, 2:12, 3:12, 4:12, 5:12, 6:12 }
   },
   maritime: {
     // Ports d'origine (Maroc)
@@ -166,7 +172,138 @@ const ADM_DEF = {
       { code:'IMO',  label:'Surcharge IMO 2020',         amount:75,  unit:'par conteneur' }
     ]
   },
+  cargo: {
+    airlines: [
+      { code:'AT',  name:'Royal Air Maroc',      logo:'https://pics.avs.io/200/200/AT.png',  color:'#C8102E', awb:'147' },
+      { code:'AF',  name:'Air France Cargo',     logo:'https://pics.avs.io/200/200/AF.png',  color:'#002395', awb:'057' },
+      { code:'EK',  name:'Emirates SkyCargo',    logo:'https://pics.avs.io/200/200/EK.png',  color:'#C8A951', awb:'098' },
+      { code:'TK',  name:'Turkish Cargo',        logo:'https://pics.avs.io/200/200/TK.png',  color:'#E30A17', awb:'235' },
+      { code:'LH',  name:'Lufthansa Cargo',      logo:'https://pics.avs.io/200/200/LH.png',  color:'#05164D', awb:'020' },
+      { code:'QR',  name:'Qatar Airways Cargo',  logo:'https://pics.avs.io/200/200/QR.png',  color:'#5C0632', awb:'157' },
+      { code:'EY',  name:'Etihad Cargo',         logo:'https://pics.avs.io/200/200/EY.png',  color:'#C8963C', awb:'607' },
+      { code:'MS',  name:'EgyptAir Cargo',       logo:'https://pics.avs.io/200/200/MS.png',  color:'#0D2C6E', awb:'077' },
+      { code:'SV',  name:'Saudia Cargo',         logo:'https://pics.avs.io/200/200/SV.png',  color:'#006400', awb:'116' },
+      { code:'DL',  name:'Delta Air Lines',       logo:'https://pics.avs.io/200/200/DL.png',  color:'#003366', awb:'006' },
+      { code:'AC',  name:'Air Canada Cargo',      logo:'https://pics.avs.io/200/200/AC.png',  color:'#D62B1F', awb:'014' },
+      { code:'KL',  name:'KLM Cargo',             logo:'https://pics.avs.io/200/200/KL.png',  color:'#009FDF', awb:'074' },
+      { code:'IB',  name:'Iberia Cargo',          logo:'https://pics.avs.io/200/200/IB.png',  color:'#D82027', awb:'075' },
+      { code:'CX',  name:'Cathay Cargo',          logo:'https://pics.avs.io/200/200/CX.png',  color:'#006564', awb:'160' },
+    ],
+    origins: [
+      { code:'CMN', label:'Casablanca Mohammed V', flag:'🇲🇦' },
+      { code:'RAK', label:'Marrakech Ménara',      flag:'🇲🇦' },
+      { code:'AGA', label:'Agadir Al Massira',     flag:'🇲🇦' },
+      { code:'TNG', label:'Tanger Ibn Battouta',   flag:'🇲🇦' },
+      { code:'FEZ', label:'Fès Saïss',             flag:'🇲🇦' },
+    ],
+    weightBreaks: [
+      { code:'N',     label:'< 45 kg',   minKg:0    },
+      { code:'+45',   label:'+ 45 kg',   minKg:45   },
+      { code:'+100',  label:'+ 100 kg',  minKg:100  },
+      { code:'+250',  label:'+ 250 kg',  minKg:250  },
+      { code:'+500',  label:'+ 500 kg',  minKg:500  },
+      { code:'+1000', label:'+ 1000 kg', minKg:1000 },
+    ],
+    exportDests: [
+      { country:'France',         code:'FR', flag:'🇫🇷', airports:[
+        { code:'CDG', label:'Paris Charles de Gaulle', transit:1 },
+        { code:'LYS', label:'Lyon Saint-Exupéry',      transit:2 },
+        { code:'MRS', label:'Marseille Provence',       transit:2 },
+      ]},
+      { country:'Espagne',        code:'ES', flag:'🇪🇸', airports:[
+        { code:'MAD', label:'Madrid Barajas',           transit:1 },
+        { code:'BCN', label:'Barcelone El Prat',        transit:1 },
+      ]},
+      { country:'Allemagne',      code:'DE', flag:'🇩🇪', airports:[
+        { code:'FRA', label:'Frankfurt am Main',        transit:2 },
+        { code:'MUC', label:'Munich',                   transit:2 },
+      ]},
+      { country:'Royaume-Uni',    code:'GB', flag:'🇬🇧', airports:[
+        { code:'LHR', label:'Londres Heathrow',         transit:2 },
+        { code:'STN', label:'Londres Stansted',         transit:2 },
+      ]},
+      { country:'Pays-Bas',       code:'NL', flag:'🇳🇱', airports:[
+        { code:'AMS', label:'Amsterdam Schiphol',       transit:2 },
+        { code:'LGG', label:'Liège (Cargo)',             transit:2 },
+      ]},
+      { country:'Belgique',       code:'BE', flag:'🇧🇪', airports:[
+        { code:'BRU', label:'Bruxelles Zaventem',       transit:2 },
+      ]},
+      { country:'Italie',         code:'IT', flag:'🇮🇹', airports:[
+        { code:'FCO', label:'Rome Fiumicino',           transit:2 },
+        { code:'MXP', label:'Milan Malpensa',           transit:2 },
+      ]},
+      { country:'Portugal',       code:'PT', flag:'🇵🇹', airports:[
+        { code:'LIS', label:'Lisbonne',                 transit:1 },
+      ]},
+      { country:'Turquie',        code:'TR', flag:'🇹🇷', airports:[
+        { code:'IST', label:'Istanbul',                 transit:1 },
+      ]},
+      { country:'EAU',            code:'AE', flag:'🇦🇪', airports:[
+        { code:'DXB', label:'Dubaï International',      transit:1 },
+        { code:'AUH', label:'Abu Dhabi',                transit:1 },
+        { code:'SHJ', label:'Sharjah (Cargo)',           transit:1 },
+      ]},
+      { country:'Qatar',          code:'QA', flag:'🇶🇦', airports:[
+        { code:'DOH', label:'Doha Hamad',               transit:1 },
+      ]},
+      { country:'Arabie Saoudite',code:'SA', flag:'🇸🇦', airports:[
+        { code:'RUH', label:'Riyad',                    transit:2 },
+        { code:'JED', label:'Jeddah',                   transit:2 },
+      ]},
+      { country:'Chine',          code:'CN', flag:'🇨🇳', airports:[
+        { code:'PVG', label:'Shanghai Pudong',          transit:2 },
+        { code:'PEK', label:'Pékin Capital',            transit:2 },
+        { code:'CAN', label:'Guangzhou Baiyun',         transit:2 },
+      ]},
+      { country:'Hong Kong',      code:'HK', flag:'🇭🇰', airports:[
+        { code:'HKG', label:'Hong Kong International',  transit:2 },
+      ]},
+      { country:'Singapour',      code:'SG', flag:'🇸🇬', airports:[
+        { code:'SIN', label:'Singapour Changi',         transit:2 },
+      ]},
+      { country:'Inde',           code:'IN', flag:'🇮🇳', airports:[
+        { code:'BOM', label:'Mumbai',                   transit:2 },
+        { code:'DEL', label:'Delhi',                    transit:2 },
+      ]},
+      { country:'USA',            code:'US', flag:'🇺🇸', airports:[
+        { code:'JFK', label:'New York JFK',             transit:2 },
+        { code:'LAX', label:'Los Angeles',              transit:2 },
+        { code:'MIA', label:'Miami',                    transit:2 },
+        { code:'ORD', label:"Chicago O'Hare",           transit:2 },
+      ]},
+      { country:'Canada',         code:'CA', flag:'🇨🇦', airports:[
+        { code:'YUL', label:'Montréal Trudeau',         transit:2 },
+        { code:'YYZ', label:'Toronto Pearson',          transit:2 },
+      ]},
+      { country:'Égypte',         code:'EG', flag:'🇪🇬', airports:[
+        { code:'CAI', label:'Le Caire',                 transit:1 },
+      ]},
+      { country:'Sénégal',        code:'SN', flag:'🇸🇳', airports:[
+        { code:'DKR', label:'Dakar',                    transit:1 },
+      ]},
+      { country:"Côte d'Ivoire",  code:'CI', flag:'🇨🇮', airports:[
+        { code:'ABJ', label:'Abidjan',                  transit:1 },
+      ]},
+      { country:'Afrique du Sud', code:'ZA', flag:'🇿🇦', airports:[
+        { code:'JNB', label:'Johannesburg',             transit:2 },
+      ]},
+      { country:'Kenya',          code:'KE', flag:'🇰🇪', airports:[
+        { code:'NBO', label:'Nairobi',                  transit:2 },
+      ]},
+    ],
+    exportRates: {},
+    importRates: {},
+    surcharges: [
+      { code:'FSC',  label:'Surcharge carburant (FSC)',   amount:0.45, unit:'USD/kg' },
+      { code:'SSC',  label:'Surcharge sécurité (SSC)',    amount:0.10, unit:'USD/kg' },
+      { code:'AWB',  label:'Frais LTA (AWB fee)',         amount:30,   unit:'USD/LTA' },
+      { code:'XRAY', label:'Screening / Rayon X',         amount:0.08, unit:'USD/kg' },
+      { code:'CAO',  label:'Cargo Avion seulement (CAO)', amount:0.15, unit:'USD/kg' },
+    ]
+  },
   routier: {
+    // Export : Maroc → Europe
     routes: [
       { id:'ro-es', from:'Maroc', to:'Espagne',       transit:2, currency:'EUR' },
       { id:'ro-pt', from:'Maroc', to:'Portugal',      transit:3, currency:'EUR' },
@@ -187,7 +324,23 @@ const ADM_DEF = {
       { code:'PLATEAU', label:'Plateau (hors-gabarit)',    capacity:30, rate:4800 },
       { code:'FRIGO',   label:'Frigorifique (-18°C)',      capacity:22, rate:6500 }
     ],
-    routeRates: {}
+    routeRates: {},
+    // Import : Europe → Maroc
+    importRoutes: [
+      { id:'ri-es', from:'Espagne',      to:'Maroc', transit:2, currency:'EUR' },
+      { id:'ri-pt', from:'Portugal',     to:'Maroc', transit:3, currency:'EUR' },
+      { id:'ri-fr', from:'France',       to:'Maroc', transit:4, currency:'EUR' },
+      { id:'ri-be', from:'Belgique',     to:'Maroc', transit:5, currency:'EUR' },
+      { id:'ri-nl', from:'Pays-Bas',     to:'Maroc', transit:5, currency:'EUR' },
+      { id:'ri-de', from:'Allemagne',    to:'Maroc', transit:5, currency:'EUR' },
+      { id:'ri-it', from:'Italie',       to:'Maroc', transit:6, currency:'EUR' },
+      { id:'ri-uk', from:'Royaume-Uni',  to:'Maroc', transit:7, currency:'EUR' },
+      { id:'ri-tr', from:'Turquie',      to:'Maroc', transit:8, currency:'EUR' },
+      { id:'ri-cn', from:'Chine',        to:'Maroc', transit:30, currency:'USD'},
+      { id:'ri-ae', from:'EAU (Dubaï)',  to:'Maroc', transit:12, currency:'USD'},
+      { id:'ri-us', from:'USA',          to:'Maroc', transit:15, currency:'USD'}
+    ],
+    importRouteRates: {}
   },
   groupage: {
     routes: [
@@ -272,7 +425,7 @@ let _admCurrentTab = 'fuel';
 let _admUserRole   = 'client';
 
 /* Onglets réservés admin uniquement */
-const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','routier','groupage','cms','users'];
+const ADM_ADMIN_ONLY_TABS = ['fuel','express','maritime','cargo','routier','groupage','cms','users'];
 
 function admInit(role) {
   // ── GARDE DE SÉCURITÉ : bloquer tout accès non autorisé ──
@@ -311,6 +464,7 @@ function admTab(name) {
   if (name === 'fuel')        admRenderFuel();
   if (name === 'express')     admRenderExpress();
   if (name === 'maritime')    admRenderMaritime();
+  if (name === 'cargo')       admRenderCargo();
   if (name === 'routier')     admRenderRoutier();
   if (name === 'groupage')    admRenderGroupage();
   if (name === 'expeditions') admRenderExpeditions();
@@ -473,101 +627,140 @@ const ADM_ZONE_LABELS = {
 
 function admRenderExpress() {
   const margins = admLoad('margins');
-  const fuel = admLoad('fuel');
+  const fuel    = admLoad('fuel');
   const carriers = ['dhl','fedex','aramex'];
 
-  let html = `
+  // ── helper : construit la grille de marges pour un sens ─────
+  function buildExpressMarginPanel(direction) {
+    const isImport = (direction === 'import');
+    const suffix   = isImport ? '_imp' : '';
+    const dirId    = isImport ? 'imp' : 'exp';
+    let h = `
+    <div class="adm-maritime-dir-badge ${isImport ? 'adm-badge-import' : 'adm-badge-export'}" style="margin-bottom:14px">
+      <i class="fa-solid fa-${isImport ? 'arrow-down-to-bracket' : 'arrow-up-from-bracket'}"></i>
+      ${isImport ? 'IMPORT — Envois entrants vers le Maroc (de partout dans le monde)' : 'EXPORT — Envois sortants depuis le Maroc (vers le monde entier)'}
+    </div>
+    <div class="adm-carrier-tabs">
+      <button class="adm-ctab active" id="adm-ctab-${dirId}-dhl"    onclick="admExpressCarrierTab('dhl','${dirId}')">
+        <span style="color:#d40511;font-weight:800">DHL</span>
+      </button>
+      <button class="adm-ctab" id="adm-ctab-${dirId}-fedex"  onclick="admExpressCarrierTab('fedex','${dirId}')">
+        <span style="color:#4d148c;font-weight:800">FedEx</span>
+      </button>
+      <button class="adm-ctab" id="adm-ctab-${dirId}-aramex" onclick="admExpressCarrierTab('aramex','${dirId}')">
+        <span style="color:#ef4123;font-weight:800">Aramex</span>
+      </button>
+    </div>`;
+
+    carriers.forEach(c => {
+      const key     = c + suffix;
+      const fuelPct = (fuel[c] && fuel[c].pct != null) ? fuel[c].pct : ADM_DEF.fuel[c].pct;
+      const zones   = ADM_ZONE_LABELS[c];
+      const defObj  = ADM_DEF.margins[key] || ADM_DEF.margins[c];
+      h += `<div class="adm-carrier-panel ${c==='dhl'?'active':''}" id="adm-cpanel-${dirId}-${c}">
+        <div class="adm-carrier-header">
+          <span class="adm-carrier-badge adm-carrier-${c}">${c.toUpperCase()}</span>
+          <span class="adm-fuel-badge"><i class="fa-solid fa-gas-pump"></i> Fuel actuel : <strong>${fuelPct}%</strong></span>
+        </div>
+        <table class="adm-table adm-margins-table">
+          <thead>
+            <tr>
+              <th>Zone</th><th>Description</th>
+              <th style="width:120px">Marge (%)</th>
+              <th style="width:160px">Exemple (base 500 MAD)</th>
+            </tr>
+          </thead>
+          <tbody>`;
+      Object.entries(zones).forEach(([z, desc]) => {
+        const m  = (margins[key] && margins[key][z] != null) ? margins[key][z] : (defObj[z] ?? 10);
+        const ex = (500 * (1 + fuelPct/100) * (1 + m/100)).toFixed(0);
+        h += `<tr>
+          <td><span class="adm-zone-pill">${z}</span></td>
+          <td style="font-size:.82rem">${desc}</td>
+          <td>
+            <div class="adm-input-row-sm">
+              <input type="number" class="adm-input adm-input-sm"
+                data-carrier="${key}" data-zone="${z}"
+                value="${m}" min="-50" max="500" step="0.5"
+                onchange="admUpdateMarginPreview(this,${fuelPct},'${dirId}')"/>
+              <span>%</span>
+            </div>
+          </td>
+          <td class="adm-preview-cell" id="adm-prev-${dirId}-${key}-${z}">${ex} MAD</td>
+        </tr>`;
+      });
+      h += `</tbody></table></div>`;
+    });
+
+    h += `<div class="adm-actions">
+      <button class="adm-btn adm-btn-primary" onclick="admSaveMargins()">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les marges ${isImport ? 'import' : 'export'}
+      </button>
+    </div>`;
+    return h;
+  }
+
+  const html = `
   <div class="adm-section-intro">
     <i class="fa-solid fa-percent adm-intro-icon"></i>
     <div>
-      <strong>Marges commerciales par transporteur et zone</strong>
-      <span>La marge est appliquée APRÈS la surcharge carburant. Prix final = Base × (1 + Fuel%) × (1 + Marge%)</span>
+      <strong>Marges commerciales Express — DHL · FedEx · Aramex</strong>
+      <span>Export (Maroc → Monde) et Import (Monde → Maroc) — Prix final = Base × (1 + Fuel%) × (1 + Marge%)</span>
     </div>
   </div>
 
-  <div class="adm-carrier-tabs">
-    <button class="adm-ctab active" id="adm-ctab-dhl" onclick="admExpressCarrierTab('dhl')">
-      <span style="color:#d40511;font-weight:800">DHL</span>
+  <div class="adm-sub-tabs">
+    <button class="adm-stab active" id="adm-stab-express-export" onclick="admSubTab('express','export')">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
     </button>
-    <button class="adm-ctab" id="adm-ctab-fedex" onclick="admExpressCarrierTab('fedex')">
-      <span style="color:#4d148c;font-weight:800">FedEx</span>
+    <button class="adm-stab" id="adm-stab-express-import" onclick="admSubTab('express','import')">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
     </button>
-    <button class="adm-ctab" id="adm-ctab-aramex" onclick="admExpressCarrierTab('aramex')">
-      <span style="color:#ef4123;font-weight:800">Aramex</span>
-    </button>
-  </div>`;
+  </div>
 
-  carriers.forEach(c => {
-    const fuelPct = (fuel[c] && fuel[c].pct != null) ? fuel[c].pct : ADM_DEF.fuel[c].pct;
-    const zones = ADM_ZONE_LABELS[c];
-    html += `<div class="adm-carrier-panel ${c==='dhl'?'active':''}" id="adm-cpanel-${c}">
-      <div class="adm-carrier-header">
-        <span class="adm-carrier-badge adm-carrier-${c}">${c.toUpperCase()}</span>
-        <span class="adm-fuel-badge"><i class="fa-solid fa-gas-pump"></i> Fuel actuel : <strong>${fuelPct}%</strong></span>
-      </div>
-      <table class="adm-table adm-margins-table">
-        <thead>
-          <tr>
-            <th>Zone</th>
-            <th>Description</th>
-            <th style="width:120px">Marge (%)</th>
-            <th style="width:150px">Exemple (base 500 MAD)</th>
-          </tr>
-        </thead>
-        <tbody>`;
-    Object.entries(zones).forEach(([z, desc]) => {
-      const m = (margins[c] && margins[c][z] != null) ? margins[c][z] : 10;
-      const ex = (500 * (1 + fuelPct/100) * (1 + m/100)).toFixed(0);
-      html += `<tr>
-        <td><span class="adm-zone-pill">${z}</span></td>
-        <td style="font-size:.82rem">${desc}</td>
-        <td>
-          <div class="adm-input-row-sm">
-            <input type="number" class="adm-input adm-input-sm" data-carrier="${c}" data-zone="${z}"
-              value="${m}" min="-50" max="500" step="0.5" onchange="admUpdateMarginPreview(this,${fuelPct})"/>
-            <span>%</span>
-          </div>
-        </td>
-        <td class="adm-preview-cell" id="adm-prev-${c}-${z}">${ex} MAD</td>
-      </tr>`;
-    });
-    html += `</tbody></table></div>`;
-  });
+  <div class="adm-sub-panel active" id="adm-sub-express-export">
+    ${buildExpressMarginPanel('export')}
+  </div>
 
-  html += `
-  <div class="adm-actions">
-    <button class="adm-btn adm-btn-primary" onclick="admSaveMargins()">
-      <i class="fa-solid fa-floppy-disk"></i> Enregistrer les marges
-    </button>
-    <button class="adm-btn adm-btn-ghost" onclick="admRenderExpress()">
-      <i class="fa-solid fa-rotate-right"></i> Réinitialiser
-    </button>
+  <div class="adm-sub-panel" id="adm-sub-express-import">
+    ${buildExpressMarginPanel('import')}
   </div>`;
 
   document.getElementById('adm-panel-express').innerHTML = html;
 }
 
-function admExpressCarrierTab(carrier) {
-  document.querySelectorAll('.adm-ctab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.adm-carrier-panel').forEach(p => p.classList.remove('active'));
-  const t = document.getElementById('adm-ctab-' + carrier);
-  const p = document.getElementById('adm-cpanel-' + carrier);
+function admExpressCarrierTab(carrier, dirId) {
+  // Scope dans le bon panneau de direction
+  const prefix = dirId ? `adm-ctab-${dirId}-` : 'adm-ctab-';
+  const panelPrefix = dirId ? `adm-cpanel-${dirId}-` : 'adm-cpanel-';
+  const scope = dirId
+    ? document.getElementById(`adm-sub-express-${dirId === 'imp' ? 'import' : 'export'}`)
+    : document;
+  if (!scope) return;
+  scope.querySelectorAll('.adm-ctab').forEach(t => t.classList.remove('active'));
+  scope.querySelectorAll('.adm-carrier-panel').forEach(p => p.classList.remove('active'));
+  const t = document.getElementById(prefix + carrier);
+  const p = document.getElementById(panelPrefix + carrier);
   if (t) t.classList.add('active');
   if (p) p.classList.add('active');
 }
 
-function admUpdateMarginPreview(inp, fuelPct) {
-  const m = parseFloat(inp.value) || 0;
+function admUpdateMarginPreview(inp, fuelPct, dirId) {
+  const m       = parseFloat(inp.value) || 0;
   const carrier = inp.dataset.carrier;
-  const zone = inp.dataset.zone;
-  const prev = document.getElementById('adm-prev-' + carrier + '-' + zone);
+  const zone    = inp.dataset.zone;
+  const id      = dirId
+    ? `adm-prev-${dirId}-${carrier}-${zone}`
+    : `adm-prev-${carrier}-${zone}`;
+  const prev = document.getElementById(id);
   if (prev) prev.textContent = (500 * (1 + fuelPct/100) * (1 + m/100)).toFixed(0) + ' MAD';
 }
 
 function admSaveMargins() {
   const margins = admLoad('margins');
+  // Récupère TOUS les inputs (export + import) — data-carrier contient déjà le bon suffixe
   document.querySelectorAll('[data-carrier][data-zone]').forEach(inp => {
-    const c = inp.dataset.carrier;
+    const c = inp.dataset.carrier;  // ex: 'dhl', 'dhl_imp'
     const z = inp.dataset.zone;
     const v = parseFloat(inp.value);
     if (!margins[c]) margins[c] = {};
@@ -581,7 +774,8 @@ function admSaveMargins() {
    PANEL 3 — TARIFS MARITIME
 ══════════════════════════════════════════════ */
 /* ── Variable pour garder le port d'origine sélectionné ── */
-let _admMaritimeOrigin = null;
+let _admMaritimeOrigin     = null;
+let _admMaritimeImportDest = null;
 
 function admRenderMaritime() {
   const data = admLoad('maritime');
@@ -591,9 +785,13 @@ function admRenderMaritime() {
   if (!data.containers)    data.containers    = JSON.parse(JSON.stringify(ADM_DEF.maritime.containers));
   if (!data.rates)         data.rates         = JSON.parse(JSON.stringify(ADM_DEF.maritime.rates));
   if (!data.surcharges)    data.surcharges    = JSON.parse(JSON.stringify(ADM_DEF.maritime.surcharges));
+  if (!data.importRates)   data.importRates   = {};
 
   if (!_admMaritimeOrigin || !data.originPorts.find(p => p.code === _admMaritimeOrigin)) {
     _admMaritimeOrigin = data.originPorts[0]?.code || 'CAS';
+  }
+  if (!_admMaritimeImportDest || !data.originPorts.find(p => p.code === _admMaritimeImportDest)) {
+    _admMaritimeImportDest = data.originPorts[0]?.code || 'CAS';
   }
 
   let html = `
@@ -601,30 +799,38 @@ function admRenderMaritime() {
     <i class="fa-solid fa-ship adm-intro-icon"></i>
     <div>
       <strong>Tarifs fret maritime — Grille par Port · Pays · Type de conteneur</strong>
-      <span>Sélectionnez un port d'origine puis saisissez les prix pour chaque port de destination et type de conteneur</span>
+      <span>Export : Maroc → Monde | Import : Monde → Maroc</span>
     </div>
   </div>
 
   <div class="adm-sub-tabs">
-    <button class="adm-stab active" id="adm-stab-maritime-grid"       onclick="admSubTab('maritime','grid')">
-      <i class="fa-solid fa-table"></i> Grille tarifaire
+    <button class="adm-stab active" id="adm-stab-maritime-grid" onclick="admSubTab('maritime','grid')">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
+    </button>
+    <button class="adm-stab" id="adm-stab-maritime-import" onclick="admSubTab('maritime','import');admRenderImportGrid()">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
     </button>
     <button class="adm-stab" id="adm-stab-maritime-containers" onclick="admSubTab('maritime','containers')">
       <i class="fa-solid fa-boxes-stacked"></i> Types de conteneurs
     </button>
-    <button class="adm-stab" id="adm-stab-maritime-ports"       onclick="admSubTab('maritime','ports')">
+    <button class="adm-stab" id="adm-stab-maritime-ports" onclick="admSubTab('maritime','ports')">
       <i class="fa-solid fa-anchor"></i> Ports & Pays
     </button>
-    <button class="adm-stab" id="adm-stab-maritime-surcharges"  onclick="admSubTab('maritime','surcharges')">
+    <button class="adm-stab" id="adm-stab-maritime-surcharges" onclick="admSubTab('maritime','surcharges')">
       <i class="fa-solid fa-plus-circle"></i> Surcharges
     </button>
   </div>
 
-  <!-- ═══ GRILLE TARIFAIRE ═══ -->
+  <!-- ═══ GRILLE EXPORT ═══ -->
   <div class="adm-sub-panel active" id="adm-sub-maritime-grid">
 
+    <div class="adm-maritime-dir-badge adm-badge-export">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      EXPORT — Départ depuis un port marocain vers les ports du monde
+    </div>
+
     <div class="adm-maritime-origin-bar">
-      <label><i class="fa-solid fa-anchor"></i> Port d'origine :</label>
+      <label><i class="fa-solid fa-anchor"></i> Port d'origine (Maroc) :</label>
       <div class="adm-origin-pills">
         ${data.originPorts.map(p => `
           <button class="adm-origin-pill ${p.code===_admMaritimeOrigin?'active':''}"
@@ -640,10 +846,43 @@ function admRenderMaritime() {
 
     <div class="adm-actions">
       <button class="adm-btn adm-btn-primary" onclick="admSaveMaritimeRates()">
-        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs export
       </button>
       <button class="adm-btn adm-btn-ghost" onclick="admCopyRatesFromPort()">
         <i class="fa-solid fa-copy"></i> Copier depuis…
+      </button>
+      <span style="font-size:.78rem;color:#94a3b8;margin-left:4px">
+        <i class="fa-solid fa-circle-info"></i> Laisser vide = pas de tarif pour cette route
+      </span>
+    </div>
+  </div>
+
+  <!-- ═══ GRILLE IMPORT ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-maritime-import">
+
+    <div class="adm-maritime-dir-badge adm-badge-import">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i>
+      IMPORT — Arrivée vers un port marocain depuis les ports du monde
+    </div>
+
+    <div class="adm-maritime-origin-bar">
+      <label><i class="fa-solid fa-anchor"></i> Port de destination (Maroc) :</label>
+      <div class="adm-origin-pills" id="adm-import-dest-pills">
+        ${data.originPorts.map(p => `
+          <button class="adm-origin-pill ${p.code===_admMaritimeImportDest?'active':''}"
+            onclick="admSetMaritimeImportDest('${p.code}')">
+            ${p.flag||'🇲🇦'} ${p.label}
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <div style="overflow-x:auto" id="adm-maritime-import-grid-wrap">
+      <div class="adm-inline-info"><i class="fa-solid fa-circle-info"></i> Cliquez sur l'onglet Import pour charger la grille.</div>
+    </div>
+
+    <div class="adm-actions">
+      <button class="adm-btn adm-btn-primary" onclick="admSaveMaritimeImportRates()">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs import
       </button>
       <span style="font-size:.78rem;color:#94a3b8;margin-left:4px">
         <i class="fa-solid fa-circle-info"></i> Laisser vide = pas de tarif pour cette route
@@ -800,16 +1039,123 @@ function admBuildRatesGrid(data, originCode) {
   return html;
 }
 
-/* ── Changer le port d'origine sélectionné ── */
+/* ── Construit la grille IMPORT pour un port marocain de destination ── */
+function admBuildImportGrid(data, marocPortCode) {
+  const conts = data.containers || ADM_DEF.maritime.containers;
+  const importRates = (data.importRates && data.importRates[marocPortCode]) || {};
+  const dests = data.destinations || ADM_DEF.maritime.destinations;
+
+  let html = `
+  <table class="adm-table adm-maritime-grid" style="min-width:750px">
+    <thead>
+      <tr>
+        <th style="min-width:80px">Pays d'origine</th>
+        <th style="min-width:140px">Port d'origine</th>
+        <th style="min-width:65px">Transit</th>
+        ${conts.map(c => `<th style="min-width:100px;text-align:center">
+          <span class="adm-zone-pill">${c.code}</span><br>
+          <span style="font-size:.7rem;font-weight:400">${c.unit||'USD'}</span>
+        </th>`).join('')}
+      </tr>
+    </thead>
+    <tbody>`;
+
+  dests.forEach(dest => {
+    dest.ports.forEach((port, pi) => {
+      const portRates = importRates[port.code] || {};
+      html += `
+      <tr class="adm-grid-row">
+        ${pi === 0 ? `<td rowspan="${dest.ports.length}" class="adm-country-cell">
+          <span style="font-size:1.2rem">${dest.flag}</span><br>
+          <strong style="font-size:.82rem">${dest.country}</strong>
+        </td>` : ''}
+        <td style="font-size:.83rem;font-weight:600">${port.label}</td>
+        <td style="text-align:center">
+          <input type="number" class="adm-input adm-input-sm"
+            data-mt-imp-transit="${marocPortCode}|${port.code}"
+            value="${port.transit||7}" min="1" style="width:50px;text-align:center"/>j
+        </td>
+        ${conts.map(c => `
+          <td>
+            <input type="number" class="adm-input adm-input-sm adm-rate-inp"
+              data-mt-imp-rate="${marocPortCode}|${port.code}|${c.code}"
+              value="${portRates[c.code]||''}" min="0" step="10"
+              placeholder="—" style="width:88px;text-align:right"/>
+          </td>`).join('')}
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+  return html;
+}
+
+/* ── Rendu asynchrone de la grille import (appelé quand l'onglet s'ouvre) ── */
+function admRenderImportGrid() {
+  const data = admLoad('maritime');
+  if (!data.importRates) data.importRates = {};
+  const wrap = document.getElementById('adm-maritime-import-grid-wrap');
+  if (wrap) wrap.innerHTML = admBuildImportGrid(data, _admMaritimeImportDest);
+}
+
+/* ── Changer le port de destination import sélectionné ── */
+function admSetMaritimeImportDest(code) {
+  admCollectMaritimeImportRates();
+  _admMaritimeImportDest = code;
+
+  // Mettre à jour les pills du panneau import
+  const pillsBar = document.getElementById('adm-import-dest-pills');
+  if (pillsBar) {
+    pillsBar.querySelectorAll('.adm-origin-pill').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${code}'`));
+    });
+  }
+
+  // Recharger la grille import
+  const data = admLoad('maritime');
+  const wrap = document.getElementById('adm-maritime-import-grid-wrap');
+  if (wrap) wrap.innerHTML = admBuildImportGrid(data, code);
+}
+
+/* ── Collecter les rates import depuis le DOM ── */
+function admCollectMaritimeImportRates() {
+  const inputs = document.querySelectorAll('[data-mt-imp-rate]');
+  if (!inputs.length) return;
+
+  const data = admLoad('maritime');
+  if (!data.importRates) data.importRates = {};
+
+  inputs.forEach(inp => {
+    const [marocPort, worldPort, cont] = inp.dataset.mtImpRate.split('|');
+    const val = inp.value.trim();
+    if (!data.importRates[marocPort]) data.importRates[marocPort] = {};
+    if (!data.importRates[marocPort][worldPort]) data.importRates[marocPort][worldPort] = {};
+    if (val === '' || val === '0') {
+      delete data.importRates[marocPort][worldPort][cont];
+    } else {
+      data.importRates[marocPort][worldPort][cont] = parseFloat(val) || 0;
+    }
+  });
+
+  admSave('maritime', data);
+  return data;
+}
+
+/* ── Sauvegarder les rates import ── */
+function admSaveMaritimeImportRates() {
+  admCollectMaritimeImportRates();
+  admToast('✅ Tarifs import maritimes enregistrés !');
+}
+
+/* ── Changer le port d'origine sélectionné (EXPORT) ── */
 function admSetMaritimeOrigin(code) {
   // Sauvegarder d'abord les valeurs en cours
   admCollectMaritimeRates();
   _admMaritimeOrigin = code;
 
   // Mettre à jour les pills
-  document.querySelectorAll('.adm-origin-pill').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent.trim().includes(code) ||
-      btn.getAttribute('onclick')?.includes(`'${code}'`));
+  document.querySelectorAll('#adm-sub-maritime-grid .adm-origin-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick')?.includes(`'${code}'`));
   });
 
   // Recharger la grille
@@ -958,20 +1304,769 @@ function admSaveMaritimeSurcharges() {
 }
 
 /* ══════════════════════════════════════════════
+   PANEL 3B — FRET CARGO AÉRIEN
+══════════════════════════════════════════════ */
+let _admCargoOrigin  = null;
+let _admCargoAirline = null;
+let _admCargoDir     = 'export'; // 'export' | 'import'
+
+// ── Helper : affiche le logo ou un badge coloré ───────────────
+function admCargoLogoHtml(al, size=36) {
+  if (al.logo) {
+    return `<img src="${al.logo}" alt="${al.code}" style="height:${size}px;max-width:${size*2.5}px;object-fit:contain"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'">
+      <span class="cargo-airline-code-badge" style="display:none;background:${al.color||'#334155'}">${al.code}</span>`;
+  }
+  return `<span class="cargo-airline-code-badge" style="background:${al.color||'#334155'}">${al.code}</span>`;
+}
+
+function admRenderCargo() {
+  const data = admLoad('cargo');
+  if (!data.airlines)     data.airlines     = JSON.parse(JSON.stringify(ADM_DEF.cargo.airlines));
+  if (!data.origins)      data.origins      = JSON.parse(JSON.stringify(ADM_DEF.cargo.origins));
+  if (!data.weightBreaks) data.weightBreaks = JSON.parse(JSON.stringify(ADM_DEF.cargo.weightBreaks));
+  if (!data.exportDests)  data.exportDests  = JSON.parse(JSON.stringify(ADM_DEF.cargo.exportDests));
+  if (!data.exportRates)  data.exportRates  = {};
+  if (!data.importRates)  data.importRates  = {};
+  if (!data.surcharges)   data.surcharges   = JSON.parse(JSON.stringify(ADM_DEF.cargo.surcharges));
+
+  if (!_admCargoOrigin  || !data.origins.find(o=>o.code===_admCargoOrigin))
+    _admCargoOrigin  = data.origins[0]?.code || 'CMN';
+  if (!_admCargoAirline || !data.airlines.find(a=>a.code===_admCargoAirline))
+    _admCargoAirline = data.airlines[0]?.code || 'AT';
+
+  const html = `
+  <div class="adm-section-intro">
+    <i class="fa-solid fa-plane-departure adm-intro-icon"></i>
+    <div>
+      <strong>Tarifs Fret Cargo Aérien — par Compagnie · Destination · Tranche de poids</strong>
+      <span>Export (Maroc → Monde) · Import (Monde → Maroc) · Prix en USD/kg selon tranches IATA</span>
+    </div>
+  </div>
+
+  <div class="adm-sub-tabs">
+    <button class="adm-stab active" id="adm-stab-cargo-export" onclick="admSubTab('cargo','export');admRenderCargoGrid()">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
+    </button>
+    <button class="adm-stab" id="adm-stab-cargo-import" onclick="admSubTab('cargo','import');_admCargoDir='import';admRenderCargoGrid()">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
+    </button>
+    <button class="adm-stab" id="adm-stab-cargo-airlines" onclick="admSubTab('cargo','airlines')">
+      <i class="fa-solid fa-plane-circle-check"></i> Compagnies Aériennes
+    </button>
+    <button class="adm-stab" id="adm-stab-cargo-airports" onclick="admSubTab('cargo','airports')">
+      <i class="fa-solid fa-location-dot"></i> Aéroports
+    </button>
+    <button class="adm-stab" id="adm-stab-cargo-surcharges" onclick="admSubTab('cargo','surcharges')">
+      <i class="fa-solid fa-plus-circle"></i> Surcharges
+    </button>
+    <button class="adm-stab" id="adm-stab-cargo-margins" onclick="admSubTab('cargo','margins')">
+      <i class="fa-solid fa-percent"></i> Marges & Tarification
+    </button>
+  </div>
+
+  <!-- ═══ GRILLE EXPORT ═══ -->
+  <div class="adm-sub-panel active" id="adm-sub-cargo-export">
+    ${admBuildCargoGridPanel(data, 'export')}
+  </div>
+
+  <!-- ═══ GRILLE IMPORT ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-cargo-import">
+    <div class="adm-inline-info"><i class="fa-solid fa-circle-info"></i> Cliquez sur l'onglet Import pour charger la grille.</div>
+  </div>
+
+  <!-- ═══ COMPAGNIES AÉRIENNES ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-cargo-airlines">
+    ${admBuildCargoAirlinesPanel(data)}
+  </div>
+
+  <!-- ═══ AÉROPORTS ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-cargo-airports">
+    ${admBuildCargoAirportsPanel(data)}
+  </div>
+
+  <!-- ═══ SURCHARGES ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-cargo-surcharges">
+    ${admBuildCargoSurchargesPanel(data)}
+  </div>
+
+  <!-- ═══ MARGES & TARIFICATION ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-cargo-margins">
+    ${admBuildCargoMarginsPanel(data)}
+  </div>`;
+
+  document.getElementById('adm-panel-cargo').innerHTML = html;
+  // On initialise l'état
+  _admCargoDir = 'export';
+}
+
+// ── Construit le panneau grille (export ou import) ────────────
+function admBuildCargoGridPanel(data, dir) {
+  const airlines = data.airlines || [];
+  const origins  = data.origins  || [];
+  const selAl = airlines.find(a=>a.code===_admCargoAirline) || airlines[0];
+  const selOr = _admCargoOrigin;
+
+  return `
+    <div class="adm-maritime-dir-badge ${dir==='export'?'adm-badge-export':'adm-badge-import'}">
+      <i class="fa-solid fa-${dir==='export'?'arrow-up-from-bracket':'arrow-down-to-bracket'}"></i>
+      ${dir==='export'
+        ? 'EXPORT — Départ depuis un aéroport marocain vers le monde'
+        : 'IMPORT — Arrivée vers un aéroport marocain depuis le monde'}
+    </div>
+
+    <!-- Sélection airline -->
+    <div class="cargo-airline-selector">
+      <div class="cargo-al-label"><i class="fa-solid fa-plane-up"></i> Compagnie aérienne :</div>
+      <div class="cargo-al-cards" id="cargo-al-cards-${dir}">
+        ${airlines.map(al=>`
+          <button class="cargo-al-card ${al.code===_admCargoAirline?'active':''}"
+            onclick="admSetCargoAirline('${al.code}','${dir}')"
+            title="${al.name}">
+            ${admCargoLogoHtml(al, 32)}
+            <span class="cargo-al-card-name">${al.name}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Sélection origine -->
+    <div class="adm-maritime-origin-bar">
+      <label><i class="fa-solid fa-location-dot"></i> ${dir==='export'?'Aéroport d\'origine':'Aéroport de destination'} (Maroc) :</label>
+      <div class="adm-origin-pills" id="cargo-origin-pills-${dir}">
+        ${origins.map(o=>`
+          <button class="adm-origin-pill ${o.code===selOr?'active':''}"
+            onclick="admSetCargoOrigin('${o.code}','${dir}')">
+            ${o.flag} ${o.label}
+          </button>`).join('')}
+      </div>
+    </div>
+
+    <!-- Grille tarifaire -->
+    <div style="overflow-x:auto" id="cargo-grid-wrap-${dir}">
+      ${admBuildCargoRatesTable(data, dir, _admCargoOrigin, _admCargoAirline)}
+    </div>
+
+    <div class="adm-actions">
+      <button class="adm-btn adm-btn-primary" onclick="admSaveCargoRates('${dir}')">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs ${dir==='export'?'export':'import'}
+      </button>
+      <span style="font-size:.77rem;color:#94a3b8;margin-left:8px">
+        <i class="fa-solid fa-circle-info"></i> Prix en USD/kg · Laisser vide = non desservi
+      </span>
+    </div>`;
+}
+
+// ── Construit la table de tarifs ──────────────────────────────
+function admBuildCargoRatesTable(data, dir, originCode, airlineCode) {
+  const wbs   = data.weightBreaks || ADM_DEF.cargo.weightBreaks;
+  const dests = data.exportDests  || ADM_DEF.cargo.exportDests;
+  const ratesStore = dir==='export' ? (data.exportRates||{}) : (data.importRates||{});
+  const airlineRates = (ratesStore[originCode]?.[airlineCode]) || {};
+
+  let html = `
+  <table class="adm-table cargo-rates-table" style="min-width:700px">
+    <thead>
+      <tr>
+        <th style="min-width:80px">Pays</th>
+        <th style="min-width:150px">Aéroport</th>
+        <th style="min-width:55px">Transit</th>
+        ${wbs.map(wb=>`<th style="min-width:90px;text-align:center">
+          <span class="adm-zone-pill cargo-wb-pill">${wb.code}</span><br>
+          <span style="font-size:.68rem;font-weight:400;color:#94a3b8">${wb.label}</span>
+        </th>`).join('')}
+        <th style="min-width:90px;text-align:center">
+          <span class="adm-zone-pill" style="background:#f59e0b;color:#fff">MIN CHG</span><br>
+          <span style="font-size:.68rem;font-weight:400;color:#94a3b8">USD/LTA</span>
+        </th>
+      </tr>
+    </thead>
+    <tbody>`;
+
+  dests.forEach(dest => {
+    dest.airports.forEach((ap, pi) => {
+      const apRates = airlineRates[ap.code] || {};
+      html += `
+      <tr class="adm-grid-row">
+        ${pi===0 ? `<td rowspan="${dest.airports.length}" class="adm-country-cell">
+          <span style="font-size:1.1rem">${dest.flag}</span><br>
+          <strong style="font-size:.79rem">${dest.country}</strong>
+        </td>` : ''}
+        <td style="font-size:.82rem;font-weight:600">
+          <span class="cargo-ap-code">${ap.code}</span> ${ap.label}
+        </td>
+        <td style="text-align:center">
+          <input type="number" class="adm-input adm-input-sm"
+            data-cg-transit="${dir}|${originCode}|${airlineCode}|${ap.code}"
+            value="${ap.transit||1}" min="1" style="width:45px;text-align:center"/>j
+        </td>
+        ${wbs.map(wb=>`
+          <td>
+            <input type="number" class="adm-input adm-input-sm cargo-rate-inp"
+              data-cg-rate="${dir}|${originCode}|${airlineCode}|${ap.code}|${wb.code}"
+              value="${apRates[wb.code]||''}" min="0" step="0.05"
+              placeholder="—" style="width:80px;text-align:right"/>
+          </td>`).join('')}
+        <td>
+          <input type="number" class="adm-input adm-input-sm"
+            data-cg-min="${dir}|${originCode}|${airlineCode}|${ap.code}"
+            value="${apRates['MIN']||''}" min="0" step="5"
+            placeholder="—" style="width:80px;text-align:right"/>
+        </td>
+      </tr>`;
+    });
+  });
+
+  html += `</tbody></table>`;
+  return html;
+}
+
+// ── Panel gestion des compagnies ──────────────────────────────
+function admBuildCargoAirlinesPanel(data) {
+  const airlines = data.airlines || [];
+  let html = `
+  <h4 class="adm-sub-title">Compagnies aériennes — Logos, codes IATA et préfixes AWB</h4>
+  <div class="cargo-airlines-grid" id="cargo-airlines-list">
+    ${airlines.map((al,i) => admBuildAirlineRow(al, i)).join('')}
+  </div>
+  <div class="adm-actions">
+    <button class="adm-btn adm-btn-secondary" onclick="admAddCargoAirline()">
+      <i class="fa-solid fa-plus"></i> Ajouter une compagnie
+    </button>
+    <button class="adm-btn adm-btn-primary" onclick="admSaveCargoAirlines()">
+      <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+    </button>
+  </div>`;
+  return html;
+}
+
+function admBuildAirlineRow(al, i) {
+  return `
+  <div class="cargo-airline-row" id="cargo-al-row-${i}">
+    <div class="cargo-al-logo-preview">
+      ${al.logo
+        ? `<img src="${al.logo}" alt="${al.code}" style="height:36px;max-width:90px;object-fit:contain" onerror="this.src=''">`
+        : `<span class="cargo-airline-code-badge" style="background:${al.color||'#334155'}">${al.code}</span>`}
+    </div>
+    <div class="cargo-al-fields">
+      <div class="cargo-al-field-row">
+        <div>
+          <label class="cargo-field-lbl">Code IATA</label>
+          <input type="text" class="adm-input adm-input-sm" data-al-code="${i}"
+            value="${al.code}" maxlength="3" style="width:65px;text-transform:uppercase;font-weight:700"/>
+        </div>
+        <div>
+          <label class="cargo-field-lbl">Préfixe AWB</label>
+          <input type="text" class="adm-input adm-input-sm" data-al-awb="${i}"
+            value="${al.awb||''}" maxlength="3" style="width:65px"/>
+        </div>
+        <div>
+          <label class="cargo-field-lbl">Couleur</label>
+          <input type="color" class="adm-input" data-al-color="${i}"
+            value="${al.color||'#334155'}" style="width:50px;height:36px;padding:2px;cursor:pointer"/>
+        </div>
+        <div style="margin-left:auto;align-self:flex-end">
+          <button class="adm-btn adm-btn-ghost" style="color:#ef4444;padding:7px 12px"
+            onclick="admDeleteCargoAirline(${i})">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </div>
+      </div>
+      <div>
+        <label class="cargo-field-lbl">Nom complet</label>
+        <input type="text" class="adm-input" data-al-name="${i}"
+          value="${al.name}" style="width:100%"/>
+      </div>
+      <div>
+        <label class="cargo-field-lbl">URL du logo <span style="font-weight:400;color:#94a3b8">(PNG/SVG — coller l'URL directe)</span></label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" class="adm-input" data-al-logo="${i}"
+            value="${al.logo||''}" placeholder="https://..." style="flex:1"
+            oninput="admPreviewCargoLogo(this,${i})"/>
+          <button class="adm-btn adm-btn-ghost" style="padding:8px 12px;white-space:nowrap"
+            onclick="admPreviewCargoLogo(document.querySelector('[data-al-logo=\\'${i}\\']'),${i})">
+            <i class="fa-solid fa-eye"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Panel aéroports ───────────────────────────────────────────
+function admBuildCargoAirportsPanel(data) {
+  const origins  = data.origins     || ADM_DEF.cargo.origins;
+  const dests    = data.exportDests || ADM_DEF.cargo.exportDests;
+  return `
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:24px">
+    <div>
+      <h4 class="adm-sub-title"><i class="fa-solid fa-anchor" style="color:var(--teal)"></i> Aéroports d'origine (Maroc)</h4>
+      <table class="adm-table" style="font-size:.82rem">
+        <thead><tr><th>Code</th><th>Nom</th><th>Flag</th></tr></thead>
+        <tbody>
+          ${origins.map((o,i)=>`<tr>
+            <td><input type="text" class="adm-input adm-input-sm" data-cg-or-code="${i}" value="${o.code}" style="width:60px;text-transform:uppercase"/></td>
+            <td><input type="text" class="adm-input" data-cg-or-label="${i}" value="${o.label}" style="max-width:200px"/></td>
+            <td><input type="text" class="adm-input adm-input-sm" data-cg-or-flag="${i}" value="${o.flag||'🇲🇦'}" style="width:50px"/></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      <div class="adm-actions">
+        <button class="adm-btn adm-btn-primary" onclick="admSaveCargoOrigins()">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer
+        </button>
+      </div>
+    </div>
+    <div>
+      <h4 class="adm-sub-title"><i class="fa-solid fa-globe" style="color:var(--teal)"></i> Destinations mondiales</h4>
+      <div style="max-height:500px;overflow-y:auto">
+        ${dests.map((dest,di)=>`
+        <div class="adm-dest-country">
+          <div class="adm-dest-header">
+            ${dest.flag} <strong>${dest.country}</strong>
+            <span class="adm-badge adm-badge-blue" style="margin-left:6px">${dest.airports.length} aéroport(s)</span>
+          </div>
+          <table class="adm-table" style="font-size:.78rem;margin-bottom:0">
+            <thead><tr><th>Code</th><th>Aéroport</th><th>Transit (j)</th></tr></thead>
+            <tbody>
+              ${dest.airports.map((ap,pi)=>`<tr>
+                <td><input type="text" class="adm-input adm-input-sm" data-cg-ap-code="${di}-${pi}" value="${ap.code}" style="width:55px;text-transform:uppercase"/></td>
+                <td><input type="text" class="adm-input" data-cg-ap-label="${di}-${pi}" value="${ap.label}" style="max-width:170px"/></td>
+                <td><input type="number" class="adm-input adm-input-sm" data-cg-ap-transit="${di}-${pi}" value="${ap.transit||1}" min="1" style="width:50px"/></td>
+              </tr>`).join('')}
+            </tbody>
+          </table>
+        </div>`).join('')}
+      </div>
+      <div class="adm-actions">
+        <button class="adm-btn adm-btn-primary" onclick="admSaveCargoAirports()">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer les aéroports
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Panel surcharges ──────────────────────────────────────────
+function admBuildCargoSurchargesPanel(data) {
+  const surcharges = data.surcharges || ADM_DEF.cargo.surcharges;
+  return `
+  <h4 class="adm-sub-title">Surcharges cargo aérien — s'ajoutent au tarif de base</h4>
+  <table class="adm-table" style="max-width:600px">
+    <thead><tr><th>Code</th><th>Libellé</th><th>Montant</th><th>Unité</th></tr></thead>
+    <tbody>
+      ${surcharges.map((s,i)=>`<tr>
+        <td><span class="adm-zone-pill" style="font-size:.7rem">${s.code}</span></td>
+        <td><input type="text" class="adm-input" data-cg-surch-label="${i}" value="${s.label}" style="max-width:240px"/></td>
+        <td><input type="number" class="adm-input adm-input-sm" data-cg-surch-amt="${i}" value="${s.amount}" min="0" step="0.01" style="width:90px"/></td>
+        <td><input type="text" class="adm-input" data-cg-surch-unit="${i}" value="${s.unit}" style="max-width:110px"/></td>
+      </tr>`).join('')}
+    </tbody>
+  </table>
+  <div class="adm-actions">
+    <button class="adm-btn adm-btn-primary" onclick="admSaveCargoSurcharges()">
+      <i class="fa-solid fa-floppy-disk"></i> Enregistrer les surcharges
+    </button>
+  </div>`;
+}
+
+// ── Panel Marges & Tarification ──────────────────────────────
+function admBuildCargoMarginsPanel(data) {
+  const airlines  = data.airlines || ADM_DEF.cargo.airlines;
+  const margins   = data.margins  || {};
+  const usdToMad  = data.usdToMad || 10;
+
+  const rows = airlines.map(al => {
+    const margin = margins[al.code] !== undefined ? margins[al.code] : 30;
+    const isRam  = al.code === 'AT';
+    return `
+    <tr class="cargo-margin-row${isRam ? ' cargo-margin-row-ram' : ''}">
+      <td>
+        <div style="display:flex;align-items:center;gap:8px">
+          <img src="${al.logo}" alt="${al.code}" style="height:28px;max-width:70px;object-fit:contain"
+            onerror="this.style.display='none'">
+          <span class="cargo-airline-code-badge" style="background:${al.color||'#334155'}">${al.code}</span>
+        </div>
+      </td>
+      <td style="font-weight:600;color:#1e293b">${al.name}</td>
+      <td>${isRam ? '<span class="adm-badge adm-badge-green">MAD/kg</span>' : '<span class="adm-badge adm-badge-blue">USD/kg → MAD</span>'}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px">
+          <input type="number" class="adm-input adm-input-sm cargo-margin-inp"
+            data-airline="${al.code}" value="${margin}" min="0" max="200" step="0.5"
+            style="width:70px" oninput="admPreviewCargoMargin(this,'${al.code}')">
+          <span style="color:#64748b;font-size:.82rem">%</span>
+        </div>
+      </td>
+      <td id="cargo-margin-preview-${al.code}" class="cargo-margin-preview">
+        —
+      </td>
+    </tr>`;
+  }).join('');
+
+  return `
+  <div class="adm-section-intro" style="margin-bottom:16px">
+    <i class="fa-solid fa-sliders adm-intro-icon"></i>
+    <div>
+      <strong>Marges commerciales & Paramètres de tarification</strong>
+      <span>Définissez la marge par compagnie. Le calculateur affichera le prix d'achat × (1 + marge%) au client.</span>
+    </div>
+  </div>
+
+  <!-- Taux de change -->
+  <div class="cargo-exchange-box">
+    <div class="cargo-exchange-label">
+      <i class="fa-solid fa-arrows-rotate" style="color:var(--teal)"></i>
+      <strong>Taux de change USD → MAD</strong>
+      <span style="color:#64748b;font-size:.82rem">(utilisé pour convertir les tarifs partenaires en MAD)</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-weight:600;color:#64748b">1 USD =</span>
+      <input type="number" id="cargo-usd-mad" class="adm-input adm-input-sm"
+        value="${usdToMad}" min="1" max="50" step="0.01" style="width:90px">
+      <span style="font-weight:700;color:#1e293b">MAD</span>
+    </div>
+  </div>
+
+  <!-- Tableau des marges -->
+  <table class="adm-table cargo-margins-table">
+    <thead>
+      <tr>
+        <th>Logo</th>
+        <th>Compagnie</th>
+        <th>Devise tarifs</th>
+        <th>Marge (%)</th>
+        <th>Aperçu (ex. 100 kg CDG)</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+
+  <div class="adm-actions">
+    <button class="adm-btn adm-btn-primary" onclick="admSaveCargoMargins()">
+      <i class="fa-solid fa-floppy-disk"></i> Enregistrer les marges
+    </button>
+    <button class="adm-btn" onclick="admPreviewAllCargoMargins()">
+      <i class="fa-solid fa-eye"></i> Actualiser les aperçus
+    </button>
+  </div>
+
+  <div class="cargo-margin-info-box">
+    <i class="fa-solid fa-circle-info" style="color:var(--teal)"></i>
+    <div>
+      <strong>Comment ça fonctionne :</strong>
+      <ul style="margin:6px 0 0 16px;font-size:.82rem;color:#475569;line-height:1.7">
+        <li><strong>Royal Air Maroc (AT)</strong> : tarifs officiels en MAD/kg (grille Ex Maroc Prepaid) + surcharge fuel + votre marge = Prix de vente affiché au client.</li>
+        <li><strong>Compagnies partenaires</strong> : tarifs indicatifs en USD/kg × taux USD→MAD + fuel + votre marge = Prix de vente affiché.</li>
+        <li>Les tarifs dans les onglets Export/Import permettent de personnaliser les prix d'achat par destination.</li>
+      </ul>
+    </div>
+  </div>`;
+}
+
+function admSaveCargoMargins() {
+  const data = admLoad('cargo');
+  if (!data.margins) data.margins = {};
+
+  document.querySelectorAll('.cargo-margin-inp').forEach(inp => {
+    const code = inp.dataset.airline;
+    const val  = parseFloat(inp.value);
+    if (!isNaN(val)) data.margins[code] = val;
+  });
+
+  const usdMadInp = document.getElementById('cargo-usd-mad');
+  if (usdMadInp) {
+    const v = parseFloat(usdMadInp.value);
+    if (!isNaN(v) && v > 0) data.usdToMad = v;
+  }
+
+  admSave('cargo', data);
+  admToast('✅ Marges et taux de change enregistrés !');
+}
+
+function admPreviewCargoMargin(inp, code) {
+  const margin   = parseFloat(inp.value) || 0;
+  const data     = admLoad('cargo');
+  const usdToMad = parseFloat(document.getElementById('cargo-usd-mad')?.value) || data.usdToMad || 10;
+  const preview  = document.getElementById('cargo-margin-preview-' + code);
+  if (!preview) return;
+
+  /* Exemple : 100 kg vers CDG */
+  let costMad = 0;
+  if (code === 'AT') {
+    const rate = 13; /* AT_COST_MAD CDG +100 */
+    const fuel = 0.55 * usdToMad;
+    costMad = Math.max(rate * 100 + fuel * 100, 850);
+  } else {
+    const rateUsd = FCALC_RATES_PREVIEW[code] || 3.80;
+    costMad = Math.max((rateUsd + 0.55) * usdToMad * 100, 45 * usdToMad);
+  }
+  const sellMad = Math.round(costMad * (1 + margin / 100));
+  preview.innerHTML = `<span style="color:#64748b;font-size:.78rem">PA ${Math.round(costMad).toLocaleString('fr-MA')} MAD</span>
+    <i class="fa-solid fa-arrow-right" style="color:#94a3b8;font-size:.7rem"></i>
+    <strong style="color:var(--teal)">${sellMad.toLocaleString('fr-MA')} MAD</strong>`;
+}
+
+/* Référence rapide pour les aperçus (rate USD/kg CDG +100) */
+const FCALC_RATES_PREVIEW = {
+  AF:3.50, EK:4.10, TK:3.35, LH:3.65, QR:3.65,
+  EY:3.50, MS:2.55, SV:3.80, KL:3.60, IB:3.45,
+  DL:3.55, AC:3.65, CX:4.20
+};
+
+function admPreviewAllCargoMargins() {
+  document.querySelectorAll('.cargo-margin-inp').forEach(inp => {
+    admPreviewCargoMargin(inp, inp.dataset.airline);
+  });
+}
+
+// ── Changer airline sélectionnée ──────────────────────────────
+function admSetCargoAirline(code, dir) {
+  admCollectCargoRates(dir);
+  _admCargoAirline = code;
+  const cards = document.getElementById('cargo-al-cards-' + dir);
+  if (cards) cards.querySelectorAll('.cargo-al-card').forEach(c => {
+    c.classList.toggle('active', c.getAttribute('onclick')?.includes(`'${code}'`));
+  });
+  _admCargoDir = dir;
+  const data = admLoad('cargo');
+  const wrap = document.getElementById('cargo-grid-wrap-' + dir);
+  if (wrap) wrap.innerHTML = admBuildCargoRatesTable(data, dir, _admCargoOrigin, code);
+}
+
+// ── Changer origine sélectionnée ──────────────────────────────
+function admSetCargoOrigin(code, dir) {
+  admCollectCargoRates(dir);
+  _admCargoOrigin = code;
+  const pills = document.getElementById('cargo-origin-pills-' + dir);
+  if (pills) pills.querySelectorAll('.adm-origin-pill').forEach(p => {
+    p.classList.toggle('active', p.getAttribute('onclick')?.includes(`'${code}'`));
+  });
+  _admCargoDir = dir;
+  const data = admLoad('cargo');
+  const wrap = document.getElementById('cargo-grid-wrap-' + dir);
+  if (wrap) wrap.innerHTML = admBuildCargoRatesTable(data, dir, code, _admCargoAirline);
+}
+
+// ── Render grille import quand l'onglet s'ouvre ───────────────
+function admRenderCargoGrid() {
+  const panel = document.getElementById('adm-sub-cargo-import');
+  if (!panel || panel.innerHTML.trim() === '' || panel.querySelector('.adm-inline-info')) {
+    const data = admLoad('cargo');
+    if (!data.airlines) data.airlines = JSON.parse(JSON.stringify(ADM_DEF.cargo.airlines));
+    if (!data.origins)  data.origins  = JSON.parse(JSON.stringify(ADM_DEF.cargo.origins));
+    if (panel) panel.innerHTML = admBuildCargoGridPanel(data, 'import');
+  }
+  _admCargoDir = 'import';
+}
+
+// ── Collecter les rates du DOM ────────────────────────────────
+function admCollectCargoRates(dir) {
+  const inputs = document.querySelectorAll(`[data-cg-rate^="${dir}|"]`);
+  if (!inputs.length) return;
+  const data = admLoad('cargo');
+  const store = dir==='export' ? 'exportRates' : 'importRates';
+  if (!data[store]) data[store] = {};
+
+  inputs.forEach(inp => {
+    const [d, orig, al, ap, wb] = inp.dataset.cgRate.split('|');
+    const val = inp.value.trim();
+    if (!data[store][orig]) data[store][orig] = {};
+    if (!data[store][orig][al]) data[store][orig][al] = {};
+    if (!data[store][orig][al][ap]) data[store][orig][al][ap] = {};
+    if (val===''||val==='0') delete data[store][orig][al][ap][wb];
+    else data[store][orig][al][ap][wb] = parseFloat(val)||0;
+  });
+
+  document.querySelectorAll(`[data-cg-min^="${dir}|"]`).forEach(inp => {
+    const [d, orig, al, ap] = inp.dataset.cgMin.split('|');
+    const val = inp.value.trim();
+    if (!data[store][orig]?.[al]?.[ap]) return;
+    if (val===''||val==='0') delete data[store][orig][al][ap]['MIN'];
+    else data[store][orig][al][ap]['MIN'] = parseFloat(val)||0;
+  });
+
+  admSave('cargo', data);
+  return data;
+}
+
+// ── Sauvegarder ──────────────────────────────────────────────
+function admSaveCargoRates(dir) {
+  admCollectCargoRates(dir || _admCargoDir);
+  admToast(`✅ Tarifs cargo ${dir==='export'?'export':'import'} enregistrés !`);
+}
+
+// ── Airlines ─────────────────────────────────────────────────
+function admPreviewCargoLogo(inp, idx) {
+  const row = document.getElementById('cargo-al-row-' + idx);
+  if (!row) return;
+  const preview = row.querySelector('.cargo-al-logo-preview');
+  const url = inp ? inp.value.trim() : '';
+  const codeEl = row.querySelector('[data-al-code]');
+  const colorEl = row.querySelector('[data-al-color]');
+  const code = codeEl ? codeEl.value.toUpperCase() : '??';
+  const color = colorEl ? colorEl.value : '#334155';
+  if (url) {
+    preview.innerHTML = `<img src="${url}" alt="${code}" style="height:36px;max-width:90px;object-fit:contain" onerror="this.parentElement.innerHTML='<span class=\\'cargo-airline-code-badge\\' style=\\'background:${color}\\'>${code}</span>'">`;
+  } else {
+    preview.innerHTML = `<span class="cargo-airline-code-badge" style="background:${color}">${code}</span>`;
+  }
+}
+
+function admSaveCargoAirlines() {
+  const data = admLoad('cargo');
+  if (!data.airlines) data.airlines = [];
+  document.querySelectorAll('[data-al-code]').forEach(inp => {
+    const i = parseInt(inp.dataset.alCode);
+    if (!data.airlines[i]) data.airlines[i] = {};
+    data.airlines[i].code = inp.value.toUpperCase().trim();
+  });
+  document.querySelectorAll('[data-al-name]').forEach(inp => {
+    const i = parseInt(inp.dataset.alName);
+    if (data.airlines[i]) data.airlines[i].name = inp.value;
+  });
+  document.querySelectorAll('[data-al-logo]').forEach(inp => {
+    const i = parseInt(inp.dataset.alLogo);
+    if (data.airlines[i]) data.airlines[i].logo = inp.value.trim();
+  });
+  document.querySelectorAll('[data-al-color]').forEach(inp => {
+    const i = parseInt(inp.dataset.alColor);
+    if (data.airlines[i]) data.airlines[i].color = inp.value;
+  });
+  document.querySelectorAll('[data-al-awb]').forEach(inp => {
+    const i = parseInt(inp.dataset.alAwb);
+    if (data.airlines[i]) data.airlines[i].awb = inp.value.trim();
+  });
+  admSave('cargo', data);
+  admToast('✅ Compagnies aériennes enregistrées !');
+}
+
+function admAddCargoAirline() {
+  const data = admLoad('cargo');
+  if (!data.airlines) data.airlines = [];
+  const newAl = { code:'NEW', name:'Nouvelle compagnie', logo:'', color:'#334155', awb:'' };
+  data.airlines.push(newAl);
+  admSave('cargo', data);
+  const list = document.getElementById('cargo-airlines-list');
+  if (list) list.innerHTML += admBuildAirlineRow(newAl, data.airlines.length-1);
+  admToast('✅ Compagnie ajoutée — remplissez les champs et enregistrez.');
+}
+
+function admDeleteCargoAirline(idx) {
+  if (!confirm('Supprimer cette compagnie ? Les tarifs associés seront conservés en mémoire.')) return;
+  const data = admLoad('cargo');
+  if (data.airlines && data.airlines[idx]) {
+    data.airlines.splice(idx, 1);
+    admSave('cargo', data);
+    admRenderCargo(); // re-render complet
+  }
+}
+
+function admSaveCargoOrigins() {
+  const data = admLoad('cargo');
+  if (!data.origins) data.origins = JSON.parse(JSON.stringify(ADM_DEF.cargo.origins));
+  document.querySelectorAll('[data-cg-or-code]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgOrCode);
+    if (data.origins[i]) data.origins[i].code = inp.value.toUpperCase().trim();
+  });
+  document.querySelectorAll('[data-cg-or-label]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgOrLabel);
+    if (data.origins[i]) data.origins[i].label = inp.value;
+  });
+  document.querySelectorAll('[data-cg-or-flag]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgOrFlag);
+    if (data.origins[i]) data.origins[i].flag = inp.value;
+  });
+  admSave('cargo', data);
+  admToast('✅ Aéroports d\'origine enregistrés !');
+}
+
+function admSaveCargoAirports() {
+  const data = admLoad('cargo');
+  if (!data.exportDests) data.exportDests = JSON.parse(JSON.stringify(ADM_DEF.cargo.exportDests));
+  document.querySelectorAll('[data-cg-ap-code]').forEach(inp => {
+    const [di,pi] = inp.dataset.cgApCode.split('-').map(Number);
+    if (data.exportDests[di]?.airports[pi]) data.exportDests[di].airports[pi].code = inp.value.toUpperCase().trim();
+  });
+  document.querySelectorAll('[data-cg-ap-label]').forEach(inp => {
+    const [di,pi] = inp.dataset.cgApLabel.split('-').map(Number);
+    if (data.exportDests[di]?.airports[pi]) data.exportDests[di].airports[pi].label = inp.value;
+  });
+  document.querySelectorAll('[data-cg-ap-transit]').forEach(inp => {
+    const [di,pi] = inp.dataset.cgApTransit.split('-').map(Number);
+    if (data.exportDests[di]?.airports[pi]) data.exportDests[di].airports[pi].transit = parseInt(inp.value)||1;
+  });
+  admSave('cargo', data);
+  admToast('✅ Aéroports de destination enregistrés !');
+}
+
+function admSaveCargoSurcharges() {
+  const data = admLoad('cargo');
+  if (!data.surcharges) data.surcharges = JSON.parse(JSON.stringify(ADM_DEF.cargo.surcharges));
+  document.querySelectorAll('[data-cg-surch-label]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgSurchLabel);
+    if (data.surcharges[i]) data.surcharges[i].label = inp.value;
+  });
+  document.querySelectorAll('[data-cg-surch-amt]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgSurchAmt);
+    if (data.surcharges[i]) data.surcharges[i].amount = parseFloat(inp.value)||0;
+  });
+  document.querySelectorAll('[data-cg-surch-unit]').forEach(inp => {
+    const i = parseInt(inp.dataset.cgSurchUnit);
+    if (data.surcharges[i]) data.surcharges[i].unit = inp.value;
+  });
+  admSave('cargo', data);
+  admToast('✅ Surcharges cargo enregistrées !');
+}
+
+/* ══════════════════════════════════════════════
    PANEL 4 — TARIFS ROUTIER & REMORQUES
 ══════════════════════════════════════════════ */
 function admRenderRoutier() {
   const data = admLoad('routier');
-  if (!data.routes)   data.routes   = JSON.parse(JSON.stringify(ADM_DEF.routier.routes));
-  if (!data.vehicles) data.vehicles = JSON.parse(JSON.stringify(ADM_DEF.routier.vehicles));
-  if (!data.routeRates) data.routeRates = {};
+  if (!data.routes)            data.routes            = JSON.parse(JSON.stringify(ADM_DEF.routier.routes));
+  if (!data.vehicles)          data.vehicles          = JSON.parse(JSON.stringify(ADM_DEF.routier.vehicles));
+  if (!data.routeRates)        data.routeRates        = {};
+  if (!data.importRoutes)      data.importRoutes      = JSON.parse(JSON.stringify(ADM_DEF.routier.importRoutes));
+  if (!data.importRouteRates)  data.importRouteRates  = {};
+
+  // ── helper : grille tarifaire par route ─────────────────────
+  function buildRoutesGrid(routes, ratesObj, transitAttr, rateAttr) {
+    return `
+    <div style="overflow-x:auto">
+    <table class="adm-table adm-routes-table">
+      <thead>
+        <tr>
+          <th>Route</th><th>Transit</th>
+          ${data.vehicles.map(v => `<th style="min-width:90px">${v.code}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${routes.map((r, ri) => {
+          const rates = ratesObj[r.id] || {};
+          return `<tr>
+            <td style="min-width:180px;font-weight:600;font-size:.85rem">${r.from} → ${r.to}</td>
+            <td>
+              <input type="number" class="adm-input adm-input-sm"
+                data-${transitAttr}="${ri}" value="${r.transit}" min="1" style="width:55px"/> j
+            </td>
+            ${data.vehicles.map(v => `
+              <td>
+                <input type="number" class="adm-input adm-input-sm"
+                  data-${rateAttr}="${r.id}" data-veh="${v.code}"
+                  value="${rates[v.code]||''}" min="0" step="50" placeholder="${v.rate}"/>
+              </td>`).join('')}
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div>`;
+  }
 
   let html = `
   <div class="adm-section-intro">
     <i class="fa-solid fa-truck-moving adm-intro-icon"></i>
     <div>
-      <strong>Tarifs fret routier et remorques</strong>
-      <span>Définissez les prix par type de véhicule/conteneur et par route de destination</span>
+      <strong>Tarifs fret routier & remorques — Export et Import</strong>
+      <span>Export (Maroc → Europe) · Import (Europe → Maroc) · Laisser vide = tarif de base du véhicule</span>
     </div>
   </div>
 
@@ -979,14 +2074,17 @@ function admRenderRoutier() {
     <button class="adm-stab active" onclick="admSubTab('routier','vehicles')" id="adm-stab-routier-vehicles">
       <i class="fa-solid fa-truck"></i> Types de véhicules
     </button>
-    <button class="adm-stab" onclick="admSubTab('routier','routes')" id="adm-stab-routier-routes">
-      <i class="fa-solid fa-route"></i> Tarifs par route
+    <button class="adm-stab" onclick="admSubTab('routier','export')" id="adm-stab-routier-export">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
+    </button>
+    <button class="adm-stab" onclick="admSubTab('routier','import')" id="adm-stab-routier-import">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
     </button>
   </div>
 
-  <!-- Vehicles panel -->
+  <!-- ═══ TYPES DE VÉHICULES (commun) ═══ -->
   <div class="adm-sub-panel active" id="adm-sub-routier-vehicles">
-    <h4 class="adm-sub-title">Types de véhicules/équipements — Tarif de base (EUR)</h4>
+    <h4 class="adm-sub-title">Types de véhicules/équipements — Tarif de base (EUR) — commun Export & Import</h4>
     <table class="adm-table">
       <thead><tr><th>Code</th><th>Libellé</th><th>Capacité (T)</th><th>Tarif de base (EUR)</th></tr></thead>
       <tbody>`;
@@ -1008,42 +2106,35 @@ function admRenderRoutier() {
   html += `</tbody></table>
     <div class="adm-actions">
       <button class="adm-btn adm-btn-primary" onclick="admSaveRoutierVehicles()">
-        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les types de véhicules
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les véhicules
       </button>
     </div>
   </div>
 
-  <!-- Routes panel -->
-  <div class="adm-sub-panel" id="adm-sub-routier-routes">
-    <h4 class="adm-sub-title">Tarifs par route et type de véhicule (EUR) — laisser vide pour utiliser le tarif de base</h4>
-    <div style="overflow-x:auto">
-    <table class="adm-table adm-routes-table">
-      <thead>
-        <tr>
-          <th>Route</th><th>Transit</th>
-          ${data.vehicles.map(v => `<th style="min-width:90px">${v.code}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>`;
-
-  data.routes.forEach((r, ri) => {
-    const rates = data.routeRates[r.id] || {};
-    html += `<tr>
-      <td style="min-width:160px;font-weight:600;font-size:.85rem">${r.from} → ${r.to}</td>
-      <td><input type="number" class="adm-input adm-input-sm" data-ro-transit="${ri}" value="${r.transit}" min="1" style="width:55px"/> j</td>
-      ${data.vehicles.map(v => `
-        <td>
-          <input type="number" class="adm-input adm-input-sm"
-            data-ro-rate="${r.id}" data-veh="${v.code}"
-            value="${rates[v.code]||''}" min="0" step="50" placeholder="${v.rate}"/>
-        </td>`).join('')}
-    </tr>`;
-  });
-
-  html += `</tbody></table></div>
+  <!-- ═══ EXPORT : Maroc → Monde ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-routier-export">
+    <div class="adm-maritime-dir-badge adm-badge-export">
+      <i class="fa-solid fa-arrow-up-from-bracket"></i>
+      EXPORT — Départ depuis le Maroc vers l'Europe et le reste du monde
+    </div>
+    ${buildRoutesGrid(data.routes, data.routeRates, 'ro-transit', 'ro-rate')}
     <div class="adm-actions">
       <button class="adm-btn adm-btn-primary" onclick="admSaveRoutierRoutes()">
-        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs par route
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs export
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ IMPORT : Monde → Maroc ═══ -->
+  <div class="adm-sub-panel" id="adm-sub-routier-import">
+    <div class="adm-maritime-dir-badge adm-badge-import">
+      <i class="fa-solid fa-arrow-down-to-bracket"></i>
+      IMPORT — Arrivée vers le Maroc depuis l'Europe et le reste du monde
+    </div>
+    ${buildRoutesGrid(data.importRoutes, data.importRouteRates, 'ri-transit', 'ri-rate')}
+    <div class="adm-actions">
+      <button class="adm-btn adm-btn-primary" onclick="admSaveRoutierImportRoutes()">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer les tarifs import
       </button>
     </div>
   </div>`;
@@ -1087,7 +2178,27 @@ function admSaveRoutierRoutes() {
     else data.routeRates[routeId][veh] = parseFloat(val) || 0;
   });
   admSave('routier', data);
-  admToast('✅ Tarifs par route enregistrés !');
+  admToast('✅ Tarifs export enregistrés !');
+}
+
+function admSaveRoutierImportRoutes() {
+  const data = admLoad('routier');
+  if (!data.importRouteRates) data.importRouteRates = {};
+  if (!data.importRoutes) data.importRoutes = JSON.parse(JSON.stringify(ADM_DEF.routier.importRoutes));
+  document.querySelectorAll('[data-ri-transit]').forEach(inp => {
+    const i = parseInt(inp.dataset.riTransit);
+    if (data.importRoutes[i]) data.importRoutes[i].transit = parseInt(inp.value) || 1;
+  });
+  document.querySelectorAll('[data-ri-rate]').forEach(inp => {
+    const routeId = inp.dataset.riRate;
+    const veh     = inp.dataset.veh;
+    const val     = inp.value.trim();
+    if (!data.importRouteRates[routeId]) data.importRouteRates[routeId] = {};
+    if (val === '') delete data.importRouteRates[routeId][veh];
+    else data.importRouteRates[routeId][veh] = parseFloat(val) || 0;
+  });
+  admSave('routier', data);
+  admToast('✅ Tarifs import enregistrés !');
 }
 
 /* ══════════════════════════════════════════════
