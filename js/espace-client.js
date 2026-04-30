@@ -223,7 +223,7 @@ async function ecLogin(){
   const btn      = document.querySelector('#ec-tab-login .btn-primary');
   err.classList.add('hidden');
 
-  // Validation basique
+  // Validation basique (avant désactivation du bouton)
   if(!emailRaw || !pass){ err.textContent='Veuillez remplir tous les champs.'; err.classList.remove('hidden'); return; }
   if(!isValidEmail(emailRaw)){ err.textContent='Format d\'email invalide.'; err.classList.remove('hidden'); return; }
 
@@ -239,69 +239,82 @@ async function ecLogin(){
 
   // Désactiver le bouton pendant la vérification
   if(btn){ btn.disabled = true; btn.textContent = '…'; }
-
   const restoreBtn = () => { if(btn){ btn.disabled=false; btn.innerHTML='<i class="fa-solid fa-right-to-bracket"></i> Se connecter'; }};
 
-  // ── Compte Admin ──
-  if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
-    resetRateLimit(email);
-    const user = {email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'};
-    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
-    restoreBtn(); return;
-  }
+  // ─── try-finally : restoreBtn() EST TOUJOURS APPELÉ quoi qu'il arrive ───
+  try {
 
-  // ── Compte Démo (Client) ──
-  if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
-    resetRateLimit(email);
-    const user = {email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'};
-    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
-    restoreBtn(); return;
-  }
+    console.log('[GPE-Login] Tentative pour :', email);
 
-  // ── Compte Commercial : Yassine Anaflous ──
-  if(email === 'yassine.anaflous@goplusexpress.com' && pass === 'Gpe@2026'){
-    resetRateLimit(email);
-    const user = {email, first:'Yassine', last:'Anaflous', company:'GO PLUS EXPRESS', role:'commercial'};
-    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
-    restoreBtn(); return;
-  }
-
-  // ── Utilisateurs enregistrés ──
-  let passHash, users, found;
-  try{
-    passHash = await hashPass(pass);
-    users = JSON.parse(localStorage.getItem('ec_users')||'[]');
-    found = users.find(u => u.email === email && u.passHash === passHash);
-  }catch(e){ console.error(e); restoreBtn(); return; }
-
-  restoreBtn();
-
-  if(found){
-    // Vérification statut
-    if(found.status === 'pending'){
-      err.textContent = '⏳ Votre compte est en attente de validation par un administrateur. Vous serez notifié par email.';
-      err.classList.remove('hidden'); incrementRateLimit(email); return;
+    // ── Compte Admin ──
+    if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
+      resetRateLimit(email);
+      ecSetUser({email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'});
+      ecShowDashboard(ecGetUser());
+      console.log('[GPE-Login] Connecté en tant qu\'admin');
+      return;
     }
-    if(found.status === 'inactive'){
-      err.textContent = '🚫 Votre compte a été désactivé. Contactez : contact@goplusexpress.ma';
-      err.classList.remove('hidden'); return;
-    }
-    resetRateLimit(email);
-    ecSetUser({email:found.email, first:found.first, last:found.last, company:found.company, role:found.role||'client'});
-    ecShowDashboard(ecGetUser());
-    return;
-  }
 
-  // Échec — incrémenter le compteur
-  incrementRateLimit(email);
-  const rlAfter = getRateLimit(email);
-  const remaining = MAX_LOGIN_ATTEMPTS - (rlAfter.count || 0);
-  if(rlAfter.locked){
-    err.textContent = 'Compte bloqué 5 minutes après trop de tentatives.';
-  } else {
-    err.textContent = `Email ou mot de passe incorrect. (${remaining > 0 ? remaining : MAX_LOGIN_ATTEMPTS} tentative(s) restante(s))`;
+    // ── Compte Démo (Client) ──
+    if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
+      resetRateLimit(email);
+      ecSetUser({email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'});
+      ecShowDashboard(ecGetUser());
+      console.log('[GPE-Login] Connecté en tant que démo');
+      return;
+    }
+
+    // ── Comptes Commerciaux ──
+    const commercial = EC_COMMERCIAUX.find(c => c.email === email && c.pass === pass);
+    if(commercial){
+      resetRateLimit(email);
+      ecSetUser({email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'});
+      ecShowDashboard(ecGetUser());
+      console.log('[GPE-Login] Connecté en tant que commercial :', email);
+      return;
+    }
+
+    // ── Utilisateurs enregistrés (hash) ──
+    console.log('[GPE-Login] Vérification hash pour utilisateur enregistré…');
+    const passHash = await hashPass(pass);
+    const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
+    const found = users.find(u => u.email === email && u.passHash === passHash);
+
+    if(found){
+      if(found.status === 'pending'){
+        err.textContent = '⏳ Votre compte est en attente de validation par un administrateur. Vous serez notifié par email.';
+        err.classList.remove('hidden'); incrementRateLimit(email); return;
+      }
+      if(found.status === 'inactive'){
+        err.textContent = '🚫 Votre compte a été désactivé. Contactez : contact@goplusexpress.ma';
+        err.classList.remove('hidden'); return;
+      }
+      resetRateLimit(email);
+      ecSetUser({email:found.email, first:found.first, last:found.last, company:found.company, role:found.role||'client'});
+      ecShowDashboard(ecGetUser());
+      return;
+    }
+
+    // ── Échec authentification ──
+    incrementRateLimit(email);
+    const rlAfter = getRateLimit(email);
+    const remaining = MAX_LOGIN_ATTEMPTS - (rlAfter.count || 0);
+    if(rlAfter.locked){
+      err.textContent = 'Compte bloqué 5 minutes après trop de tentatives.';
+    } else {
+      err.textContent = `Email ou mot de passe incorrect. (${remaining > 0 ? remaining : MAX_LOGIN_ATTEMPTS} tentative(s) restante(s))`;
+    }
+    err.classList.remove('hidden');
+    console.log('[GPE-Login] Échec auth pour :', email);
+
+  } catch(e) {
+    console.error('[GPE-Login] Erreur inattendue :', e);
+    err.textContent = 'Erreur de connexion. Veuillez réessayer.';
+    err.classList.remove('hidden');
+  } finally {
+    // TOUJOURS restaurer le bouton, même en cas d'erreur ou de return anticipé
+    restoreBtn();
   }
-  err.classList.remove('hidden');
 }
 
 async function ecRegister(){
