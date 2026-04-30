@@ -106,19 +106,23 @@ function resetRateLimit(email) {
 }
 
 /* ── Auth ──────────────────────────────────────────── */
+// NOTE: var (pas const) pour éviter l'erreur TDZ si un ancien Service Worker
+// sert une version mixte du fichier. var est hoisted+initialisé à undefined,
+// const est hoisted mais reste en TDZ jusqu'à la ligne de déclaration.
+
 // Compte Admin — accès total (tarifs, utilisateurs, ops)
-const EC_ADMIN = {
+var EC_ADMIN = {
   email: 'admin@goplusexpress.ma',
   pass:  'Admin#GPE2026!',
   first: 'Admin', last: 'GPE', company: 'GO PLUS EXPRESS', role: 'admin'
 };
 
 // Compte de démonstration Client — accès outils uniquement
-const EC_DEMO_EMAILS = ['demo@goplusexpress.ma','demo@goplusexpress.com'];
-const EC_DEMO = { email:'demo@goplusexpress.ma', first:'Demo', last:'Client', company:'GO PLUS EXPRESS', role:'client' };
+var EC_DEMO_EMAILS = ['demo@goplusexpress.ma','demo@goplusexpress.com'];
+var EC_DEMO = { email:'demo@goplusexpress.ma', first:'Demo', last:'Client', company:'GO PLUS EXPRESS', role:'client' };
 
 // Comptes commerciaux — accès CRM + outils logistiques
-const EC_COMMERCIAUX = [
+var EC_COMMERCIAUX = [
   { email:'yassine.anaflous@goplusexpress.com', pass:'Gpe@2026', first:'Yassine', last:'Anaflous', company:'GO PLUS EXPRESS', role:'commercial' },
 ];
 
@@ -260,21 +264,21 @@ async function ecLogin(){
     };
 
     // ── Compte Admin ──
-    if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
+    if(EC_ADMIN && email === EC_ADMIN.email && pass === EC_ADMIN.pass){
       loginSuccess({email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'});
       console.log('[GPE-Login] Connecté admin');
       return;
     }
 
     // ── Compte Démo (Client) ──
-    if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
+    if(EC_DEMO_EMAILS && EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
       loginSuccess({email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'});
       console.log('[GPE-Login] Connecté démo');
       return;
     }
 
     // ── Comptes Commerciaux ──
-    const commercial = EC_COMMERCIAUX.find(c => c.email === email && c.pass === pass);
+    const commercial = (EC_COMMERCIAUX||[]).find(c => c.email === email && c.pass === pass);
     if(commercial){
       loginSuccess({email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'});
       console.log('[GPE-Login] Connecté commercial :', email);

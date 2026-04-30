@@ -3185,13 +3185,34 @@
 <script src="js/crm.js?v=20260429a"></script>
 <script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/espace-client.js?v=20260430g"></script>
+<script src="js/espace-client.js?v=20260501a"></script>
 
-<!-- ═══ SERVICE WORKER ═══ -->
+<!-- ═══ SERVICE WORKER — enregistrement + force update ═══ -->
 <script>
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('/sw.js').catch(()=>{});
+    navigator.serviceWorker.register('/sw.js').then(reg => {
+      // Forcer la vérification d'une nouvelle version du SW à chaque chargement
+      reg.update().catch(()=>{});
+      // Si le nouveau SW attend d'être activé, lui dire de prendre le relais maintenant
+      if(reg.waiting){ reg.waiting.postMessage({ type:'SKIP_WAITING' }); }
+      reg.addEventListener('updatefound', ()=>{
+        const newSW = reg.installing;
+        if(newSW){
+          newSW.addEventListener('statechange', ()=>{
+            if(newSW.state === 'installed' && navigator.serviceWorker.controller){
+              // Nouveau SW installé → activer immédiatement
+              newSW.postMessage({ type:'SKIP_WAITING' });
+            }
+          });
+        }
+      });
+    }).catch(()=>{});
+    // Recharger la page si le SW change (pour servir les nouveaux assets)
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+      if(!refreshing){ refreshing = true; window.location.reload(); }
+    });
   });
 }
 </script>
