@@ -29,18 +29,19 @@ async function hashPass(password) {
   const SALT = 'GPE_$3cure_Salt_2025#!';
   const salted = SALT + password;
 
-  // crypto.subtle nécessite HTTPS — fallback pur JS pour HTTP
-  if (window.crypto && window.crypto.subtle) {
+  // crypto.subtle uniquement sur HTTPS (contexte sécurisé) + timeout 2s de sécurité
+  if (window.isSecureContext && window.crypto && window.crypto.subtle) {
     try {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(salted);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const encoder  = new TextEncoder();
+      const data     = encoder.encode(salted);
+      const timeout  = new Promise((_,rej) => setTimeout(()=>rej(new Error('crypto timeout')), 2000));
+      const hashBuffer = await Promise.race([crypto.subtle.digest('SHA-256', data), timeout]);
       return Array.from(new Uint8Array(hashBuffer))
         .map(b => b.toString(16).padStart(2, '0')).join('');
-    } catch(e) { /* fall through */ }
+    } catch(e) { /* fall through vers FNV-1a */ }
   }
 
-  // Fallback : hash pur JS (FNV-1a étendu → 64 hex chars, compatible SHA-256 length)
+  // Fallback synchrone FNV-1a — fonctionne sur HTTP et toujours disponible
   let h = 0x811c9dc5 >>> 0;
   for (let i = 0; i < salted.length; i++) {
     h ^= salted.charCodeAt(i);
