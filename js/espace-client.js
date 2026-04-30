@@ -13,12 +13,12 @@
 function escapeHTML(str) {
   if (str === null || str === undefined) return '';
   return String(str)
-    .replace(/&/g,  '&amp;')
-    .replace(/</g,  '&lt;')
-    .replace(/>/g,  '&gt;')
-    .replace(/"/g,  '&quot;')
-    .replace(/'/g,  '&#039;')
-    .replace(/\//g, '&#x2F;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+  // Note: '/' n'a pas besoin d'être échappé dans les nœuds texte HTML
 }
 
 /**
@@ -116,11 +116,17 @@ const EC_ADMIN = {
 const EC_DEMO_EMAILS = ['demo@goplusexpress.ma','demo@goplusexpress.com'];
 const EC_DEMO = { email:'demo@goplusexpress.ma', first:'Demo', last:'Client', company:'GO PLUS EXPRESS', role:'client' };
 
+// Comptes commerciaux — accès CRM + outils logistiques
+const EC_COMMERCIAUX = [
+  { email:'yassine.anaflous@goplusexpress.com', pass:'Gpe@2026', first:'Yassine', last:'Anaflous', company:'GO PLUS EXPRESS', role:'commercial' },
+];
+
 // Rôles disponibles
 const EC_ROLES = {
-  admin:   { label:'Administrateur', color:'#dc2626', desc:'Accès total — tarifs, utilisateurs, opérations' },
-  backend: { label:'Opérateur',      color:'#7c3aed', desc:'Visualisation expéditions & simulations' },
-  client:  { label:'Client',         color:'#0284c7', desc:'Outils logistiques uniquement' }
+  admin:      { label:'Administrateur', color:'#dc2626', desc:'Accès total — tarifs, utilisateurs, opérations' },
+  backend:    { label:'Opérateur',      color:'#7c3aed', desc:'Visualisation expéditions & simulations' },
+  commercial: { label:'Commercial',     color:'#f59e0b', desc:'CRM, prospects, devis & outils logistiques' },
+  client:     { label:'Client',         color:'#0284c7', desc:'Outils logistiques uniquement' }
 };
 
 // Vérifier si l'utilisateur courant a un rôle donné
@@ -249,6 +255,14 @@ async function ecLogin(){
     ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
   }
 
+  // ── Comptes Commerciaux ──
+  const commercial = EC_COMMERCIAUX.find(c => c.email === email && c.pass === pass);
+  if(commercial){
+    resetRateLimit(email);
+    const user = {email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'};
+    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
+  }
+
   // ── Utilisateurs enregistrés ──
   const passHash = await hashPass(pass);
   const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
@@ -372,6 +386,7 @@ function ecShowModule(name){
   if(name === 'trafic')  setTimeout(initRoadMap,    120);
   if(name === 'galerie') setTimeout(initGallery,    200);
   if(name === 'admin')   setTimeout(()=>admInit(ecGetUser()?.role), 50);
+  if(name === 'crm')     setTimeout(()=>{ if(typeof crmInit==='function') crmInit(); }, 50);
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
@@ -622,9 +637,9 @@ function simProCalc(){
 
   const transit = R.transit[from] || '—';
 
-  // Utiliser textContent pour les données variables (escapeHTML via DOM API)
-  const modeText = escapeHTML(document.getElementById('simpr-mode').options[document.getElementById('simpr-mode').selectedIndex].text);
-  const fromText = escapeHTML(document.getElementById('simpr-from').options[document.getElementById('simpr-from').selectedIndex].text);
+  // Texte brut des options (escapeHTML sera appliqué une seule fois dans le .map ci-dessous)
+  const modeText = document.getElementById('simpr-mode').options[document.getElementById('simpr-mode').selectedIndex].text;
+  const fromText = document.getElementById('simpr-from').options[document.getElementById('simpr-from').selectedIndex].text;
 
   const lines = document.getElementById('simpr-lines');
   lines.innerHTML = [

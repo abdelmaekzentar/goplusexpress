@@ -15,8 +15,9 @@
 <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png"/>
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
-<link rel="stylesheet" href="css/style.css?v=20260423b"/>
+<link rel="stylesheet" href="css/style.css?v=20260429a"/>
 <link rel="stylesheet" href="css/espace-client.css?v=20260429a"/>
+<link rel="stylesheet" href="css/crm.css?v=20260429a"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -151,8 +152,14 @@
       <button class="ec-nav-item" onclick="ecShowModule('hscode')" id="ecnav-hscode">
         <i class="fa-solid fa-barcode"></i> Codes SH / HS
       </button>
+      <button class="ec-nav-item" onclick="ecShowModule('fret')" id="ecnav-fret">
+        <i class="fa-solid fa-plane-departure"></i> Fret Cargo Aérien
+      </button>
       <button class="ec-nav-item" onclick="ecShowModule('express')" id="ecnav-express">
         <i class="fa-solid fa-bolt"></i> Tarifs Express
+      </button>
+      <button class="ec-nav-item" onclick="ecShowModule('crm')" id="ecnav-crm">
+        <i class="fa-solid fa-users"></i> Prospects & CRM
       </button>
       <button class="ec-nav-item" onclick="ecShowModule('expedition')" id="ecnav-expedition">
         <i class="fa-solid fa-tag"></i> Nouvelle Expédition
@@ -2145,6 +2152,202 @@
       </div><!-- /#ec-hs-panel -->
     </div>
 
+    <!-- ══════════════ MODULE : FRET CARGO AÉRIEN ══════════════ -->
+    <div class="ec-module" id="ecmod-fret">
+      <div class="ec-module-header">
+        <h1><i class="fa-solid fa-plane-departure"></i> Calculateur Fret Cargo Aérien</h1>
+        <p>Estimez le coût de votre envoi (colis ou palette) en fret aérien vers les principales destinations — comparaison instantanée par compagnie avec surcharge fuel incluse.</p>
+      </div>
+
+      <div class="fret-calc-wrap">
+
+        <!-- ══ FORMULAIRE ══ -->
+        <div class="fret-calc-form">
+
+          <!-- Type -->
+          <div class="fret-section-label"><i class="fa-solid fa-box"></i> Type de cargaison</div>
+          <div class="fret-type-group">
+            <button class="fret-toggle-btn active" onclick="fcalcSetType('box',this,'-ec')">
+              <i class="fa-solid fa-box"></i> Colis / Box
+            </button>
+            <button class="fret-toggle-btn" onclick="fcalcSetType('palette',this,'-ec')">
+              <i class="fa-solid fa-pallet"></i> Palette / ULD
+            </button>
+          </div>
+
+          <!-- Direction -->
+          <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-arrows-left-right"></i> Direction</div>
+          <div class="fret-dir-group">
+            <button class="fret-toggle-btn active" onclick="fcalcSetDir('export',this)">
+              <i class="fa-solid fa-arrow-up-from-bracket"></i> Export (Maroc → Monde)
+            </button>
+            <button class="fret-toggle-btn" onclick="fcalcSetDir('import',this)">
+              <i class="fa-solid fa-arrow-down-to-bracket"></i> Import (Monde → Maroc)
+            </button>
+          </div>
+
+          <!-- Itinéraire -->
+          <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-route"></i> Itinéraire</div>
+          <div class="fret-form-row">
+            <div class="fret-field">
+              <label>Aéroport d'origine (Maroc)</label>
+              <select id="fcalc-origin-ec" class="fret-select">
+                <option value="CMN">🇲🇦 Casablanca CMN</option>
+                <option value="RAK">🇲🇦 Marrakech RAK</option>
+                <option value="AGA">🇲🇦 Agadir AGA</option>
+                <option value="TNG">🇲🇦 Tanger TNG</option>
+                <option value="FEZ">🇲🇦 Fès FEZ</option>
+              </select>
+            </div>
+            <div class="fret-field">
+              <label>Destination</label>
+              <select id="fcalc-dest-ec" class="fret-select">
+                <optgroup label="🇫🇷 France">
+                  <option value="CDG">Paris Charles de Gaulle</option>
+                  <option value="LYS">Lyon Saint-Exupéry</option>
+                  <option value="MRS">Marseille Provence</option>
+                </optgroup>
+                <optgroup label="🇪🇸 Espagne">
+                  <option value="MAD">Madrid Barajas</option>
+                  <option value="BCN">Barcelone El Prat</option>
+                </optgroup>
+                <optgroup label="🇩🇪 Allemagne">
+                  <option value="FRA">Frankfurt am Main</option>
+                  <option value="MUC">Munich</option>
+                </optgroup>
+                <optgroup label="🇬🇧 Royaume-Uni">
+                  <option value="LHR">Londres Heathrow</option>
+                </optgroup>
+                <optgroup label="🇳🇱 Pays-Bas / 🇧🇪 Belgique">
+                  <option value="AMS">Amsterdam Schiphol</option>
+                  <option value="LGG">Liège (Cargo Hub)</option>
+                  <option value="BRU">Bruxelles Zaventem</option>
+                </optgroup>
+                <optgroup label="🇮🇹 Italie">
+                  <option value="FCO">Rome Fiumicino</option>
+                  <option value="MXP">Milan Malpensa</option>
+                </optgroup>
+                <optgroup label="🇵🇹 Portugal / 🇹🇷 Turquie">
+                  <option value="LIS">Lisbonne</option>
+                  <option value="IST">Istanbul</option>
+                </optgroup>
+                <optgroup label="🇦🇪 Émirats Arabes Unis">
+                  <option value="DXB">Dubaï International</option>
+                  <option value="AUH">Abu Dhabi</option>
+                  <option value="SHJ">Sharjah (Cargo)</option>
+                </optgroup>
+                <optgroup label="🇶🇦 Qatar / 🇸🇦 Arabie Saoudite">
+                  <option value="DOH">Doha Hamad</option>
+                  <option value="RUH">Riyad</option>
+                  <option value="JED">Jeddah</option>
+                </optgroup>
+                <optgroup label="🇨🇳 Chine / 🇭🇰 Hong Kong">
+                  <option value="PVG">Shanghai Pudong</option>
+                  <option value="PEK">Pékin Capital</option>
+                  <option value="HKG">Hong Kong International</option>
+                </optgroup>
+                <optgroup label="🇸🇬 Asie du Sud-Est / 🇮🇳 Inde">
+                  <option value="SIN">Singapour Changi</option>
+                  <option value="BOM">Mumbai</option>
+                  <option value="DEL">Delhi</option>
+                </optgroup>
+                <optgroup label="🇺🇸 États-Unis / 🇨🇦 Canada">
+                  <option value="JFK">New York JFK</option>
+                  <option value="LAX">Los Angeles</option>
+                  <option value="MIA">Miami</option>
+                  <option value="YUL">Montréal Trudeau</option>
+                </optgroup>
+                <optgroup label="🌍 Afrique">
+                  <option value="CAI">Le Caire</option>
+                  <option value="ABJ">Abidjan</option>
+                  <option value="LOS">Lagos</option>
+                </optgroup>
+              </select>
+            </div>
+          </div>
+
+          <!-- ── INPUTS COLIS ── -->
+          <div id="fcalc-box-inputs-ec" class="fret-cargo-inputs">
+            <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-ruler-combined"></i> Dimensions par colis (cm)</div>
+            <div class="fret-dims-row">
+              <div class="fret-field">
+                <label>Longueur</label>
+                <input type="number" id="fcalc-L-ec" class="fret-input" placeholder="100" min="1" step="1" oninput="fcalcUpdateVolWEc()"/>
+              </div>
+              <div class="fret-field">
+                <label>Largeur</label>
+                <input type="number" id="fcalc-W-ec" class="fret-input" placeholder="80" min="1" step="1" oninput="fcalcUpdateVolWEc()"/>
+              </div>
+              <div class="fret-field">
+                <label>Hauteur</label>
+                <input type="number" id="fcalc-H-ec" class="fret-input" placeholder="60" min="1" step="1" oninput="fcalcUpdateVolWEc()"/>
+              </div>
+            </div>
+            <div class="fret-dims-row">
+              <div class="fret-field">
+                <label>Poids réel (kg/colis)</label>
+                <input type="number" id="fcalc-weight-ec" class="fret-input" placeholder="50" min="0.1" step="0.1" oninput="fcalcUpdateVolWEc()"/>
+              </div>
+              <div class="fret-field">
+                <label>Quantité (nb colis)</label>
+                <input type="number" id="fcalc-qty-ec" class="fret-input" value="1" min="1" step="1" oninput="fcalcUpdateVolWEc()"/>
+              </div>
+              <div class="fret-field">
+                <label>Poids facturable estimé</label>
+                <div class="fret-chargeW-badge" id="fcalc-chargeW-preview-ec">—</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── INPUTS PALETTE ── -->
+          <div id="fcalc-pal-inputs-ec" class="fret-cargo-inputs" style="display:none">
+            <div class="fret-section-label" style="margin-top:14px"><i class="fa-solid fa-pallet"></i> Détails palette / ULD</div>
+            <div class="fret-form-row" style="grid-template-columns:1fr 1fr">
+              <div class="fret-field">
+                <label>Type de palette</label>
+                <select id="fcalc-pal-type-ec" class="fret-select">
+                  <option value="PMC">PMC / 96" — 317×244 cm (max 6 804 kg)</option>
+                  <option value="PAG">PAG / 88" — 317×224 cm (max 6 804 kg)</option>
+                  <option value="AKE">AKE / LD-3 — 153×162 cm (max 1 588 kg)</option>
+                  <option value="AAP">AAP / LD-2 — 119×153 cm (max 1 225 kg)</option>
+                  <option value="AMA">AMA / LD-1 — 198×244 cm (max 3 175 kg)</option>
+                </select>
+              </div>
+              <div class="fret-field" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div class="fret-field">
+                  <label>Poids / palette (kg)</label>
+                  <input type="number" id="fcalc-pal-weight-ec" class="fret-input" placeholder="500" min="1" step="1"/>
+                </div>
+                <div class="fret-field">
+                  <label>Nombre de palettes</label>
+                  <input type="number" id="fcalc-pal-qty-ec" class="fret-input" value="1" min="1" step="1"/>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bouton -->
+          <button class="fret-calc-btn" onclick="calcFreightEc()">
+            <i class="fa-solid fa-calculator"></i> Calculer &amp; Comparer les compagnies
+          </button>
+
+          <p class="fret-disclaimer">
+            <i class="fa-solid fa-circle-info"></i>
+            Poids facturable = max(poids réel, poids volumétrique). Diviseur IATA aérien : 6 000 cm³/kg. Surcharge fuel incluse.
+          </p>
+        </div>
+
+        <!-- ══ RÉSULTATS ══ -->
+        <div class="fret-results-col" id="fcalc-results-ec">
+          <div class="fret-results-placeholder">
+            <i class="fa-solid fa-plane-departure fret-placeholder-icon"></i>
+            <p>Renseignez votre fret et cliquez sur <strong>Calculer</strong> pour comparer les tarifs de 12 compagnies aériennes cargo.</p>
+          </div>
+        </div>
+
+      </div><!-- /.fret-calc-wrap -->
+    </div><!-- /#ecmod-fret -->
+
     <!-- ══════════════ MODULE : TARIFS EXPRESS ══════════════ -->
     <div class="ec-module" id="ecmod-express">
       <div class="ec-module-header">
@@ -2202,6 +2405,11 @@
       <!-- Résultats -->
       <div id="exp-result-wrap" style="display:none"></div>
     </div><!-- /#ecmod-express -->
+
+    <!-- ══════════════ MODULE : CRM PROSPECTS ══════════════ -->
+    <div class="ec-module" id="ecmod-crm">
+      <!-- Contenu généré par crm.js → crmInit() -->
+    </div><!-- /#ecmod-crm -->
 
     <!-- ══════════════════════════════════════════════════════
          Module: Nouvelle Expédition — Génération étiquette
@@ -2972,9 +3180,12 @@
 <script src="js/postal-lookup.js?v=20260423c"></script>
 <script src="js/airports-ports-data.js?v=20260423c"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="js/simulators.js?v=20260429c"></script>
+<script src="js/crm.js?v=20260429a"></script>
 <script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/espace-client.js?v=20260425k"></script>
+<script src="js/espace-client.js?v=20260430a"></script>
 
 <!-- ═══ SERVICE WORKER ═══ -->
 <script>

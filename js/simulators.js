@@ -788,32 +788,35 @@ const FCALC_RATES = {
   LOS:{AF:{N:6.00,'+45':5.20,'+100':4.40,'+250':3.75,'+500':3.40,'+1000':3.15},EK:{N:6.80,'+45':5.90,'+100':4.95,'+250':4.25,'+500':3.85,'+1000':3.55},TK:{N:6.20,'+45':5.40,'+100':4.55,'+250':3.85,'+500':3.50,'+1000':3.25}},
 };
 
-/* ── Bascule type cargo ── */
-function fcalcSetType(type, btn) {
+/* ── Bascule type cargo (sfx = '' pour index.html, '-ec' pour espace-client) ── */
+function fcalcSetType(type, btn, sfx) {
+  sfx = sfx || '';
   _fcalcType = type;
-  document.querySelectorAll('.fret-type-group .fret-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.closest('.fret-type-group').querySelectorAll('.fret-toggle-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const boxEl = el('fcalc-box-inputs'), palEl = el('fcalc-pal-inputs');
+  const boxEl = el('fcalc-box-inputs' + sfx), palEl = el('fcalc-pal-inputs' + sfx);
   if (boxEl) boxEl.style.display = type === 'box' ? '' : 'none';
   if (palEl) palEl.style.display = type === 'palette' ? '' : 'none';
-  el('fcalc-results').innerHTML = _fcalcPlaceholder();
+  const res = el('fcalc-results' + sfx);
+  if (res) res.innerHTML = _fcalcPlaceholder();
 }
 
 /* ── Bascule direction ── */
 function fcalcSetDir(dir, btn) {
   _fcalcDir = dir;
-  document.querySelectorAll('.fret-dir-group .fret-toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.closest('.fret-dir-group').querySelectorAll('.fret-toggle-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 }
 
 /* ── Mise à jour en temps réel du poids facturable ── */
-function fcalcUpdateVolW() {
-  const L  = parseFloat(el('fcalc-L')?.value)  || 0;
-  const W  = parseFloat(el('fcalc-W')?.value)  || 0;
-  const H  = parseFloat(el('fcalc-H')?.value)  || 0;
-  const kg = parseFloat(el('fcalc-weight')?.value) || 0;
-  const qty = parseInt(el('fcalc-qty')?.value) || 1;
-  const prev = el('fcalc-chargeW-preview');
+function fcalcUpdateVolW(sfx) {
+  sfx = sfx || '';
+  const L  = parseFloat(el('fcalc-L' + sfx)?.value)  || 0;
+  const W  = parseFloat(el('fcalc-W' + sfx)?.value)  || 0;
+  const H  = parseFloat(el('fcalc-H' + sfx)?.value)  || 0;
+  const kg = parseFloat(el('fcalc-weight' + sfx)?.value) || 0;
+  const qty = parseInt(el('fcalc-qty' + sfx)?.value) || 1;
+  const prev = el('fcalc-chargeW-preview' + sfx);
   if (!prev) return;
   if (!kg) { prev.textContent = '—'; prev.className = 'fret-chargeW-badge'; return; }
   const act = kg * qty;
@@ -822,6 +825,7 @@ function fcalcUpdateVolW() {
   prev.textContent = cw.toFixed(1) + ' kg';
   prev.className   = 'fret-chargeW-badge ' + (vol > act ? 'fret-cw-vol' : 'fret-cw-act');
 }
+function fcalcUpdateVolWEc() { fcalcUpdateVolW('-ec'); }
 
 /* ── Détermination de la tranche IATA ── */
 function fcalcGetWB(cw) {
@@ -850,33 +854,34 @@ function _fcalcPlaceholder() {
 }
 
 /* ── CALCUL PRINCIPAL ── */
-function calcFreight() {
+function calcFreight(sfx) {
+  sfx = sfx || '';
   let chargeableW = 0, actualW = 0, volW = 0, qty = 1, qtyLabel = '';
 
   if (_fcalcType === 'box') {
-    const L  = parseFloat(el('fcalc-L')?.value)  || 0;
-    const W  = parseFloat(el('fcalc-W')?.value)  || 0;
-    const H  = parseFloat(el('fcalc-H')?.value)  || 0;
-    const kg = parseFloat(el('fcalc-weight')?.value) || 0;
-    qty = parseInt(el('fcalc-qty')?.value) || 1;
-    if (!kg) { fcalcShowError('Renseignez le poids du colis.'); return; }
+    const L  = parseFloat(el('fcalc-L' + sfx)?.value)  || 0;
+    const W  = parseFloat(el('fcalc-W' + sfx)?.value)  || 0;
+    const H  = parseFloat(el('fcalc-H' + sfx)?.value)  || 0;
+    const kg = parseFloat(el('fcalc-weight' + sfx)?.value) || 0;
+    qty = parseInt(el('fcalc-qty' + sfx)?.value) || 1;
+    if (!kg) { fcalcShowError('Renseignez le poids du colis.', sfx); return; }
     actualW     = kg * qty;
     volW        = (L && W && H) ? (L * W * H / 6000) * qty : 0;
     chargeableW = Math.max(actualW, volW || actualW);
     qtyLabel    = qty + ' colis';
   } else {
-    const kg      = parseFloat(el('fcalc-pal-weight')?.value) || 0;
-    const palType = el('fcalc-pal-type')?.value || 'PMC';
-    qty = parseInt(el('fcalc-pal-qty')?.value) || 1;
-    if (!kg) { fcalcShowError('Renseignez le poids par palette.'); return; }
+    const kg      = parseFloat(el('fcalc-pal-weight' + sfx)?.value) || 0;
+    const palType = el('fcalc-pal-type' + sfx)?.value || 'PMC';
+    qty = parseInt(el('fcalc-pal-qty' + sfx)?.value) || 1;
+    if (!kg) { fcalcShowError('Renseignez le poids par palette.', sfx); return; }
     actualW     = kg * qty;
     chargeableW = actualW;
     volW        = 0;
     qtyLabel    = qty + ' palette(s) ' + palType;
   }
 
-  const destSel   = el('fcalc-dest');
-  const originSel = el('fcalc-origin');
+  const destSel   = el('fcalc-dest' + sfx);
+  const originSel = el('fcalc-origin' + sfx);
   const dest      = destSel?.value   || 'CDG';
   const origin    = originSel?.value || 'CMN';
   const destLabel = destSel?.options[destSel.selectedIndex]?.text    || dest;
@@ -931,7 +936,7 @@ function calcFreight() {
   });
 
   if (!results.length) {
-    fcalcShowError(`Aucune compagnie desservant <strong>${dest}</strong> depuis <strong>${origin}</strong> dans notre base de données. Contactez-nous pour un devis personnalisé.`);
+    fcalcShowError(`Aucune compagnie desservant <strong>${dest}</strong> depuis <strong>${origin}</strong> dans notre base de données. Contactez-nous pour un devis personnalisé.`, sfx);
     return;
   }
   results.sort((a, b) => a.sellMad - b.sellMad);
@@ -994,11 +999,13 @@ function calcFreight() {
     <i class="fa-solid fa-envelope"></i> Demander un devis précis
   </a>`;
 
-  el('fcalc-results').innerHTML = html;
+  el('fcalc-results' + sfx).innerHTML = html;
 }
+function calcFreightEc() { calcFreight('-ec'); }
 
-function fcalcShowError(msg) {
-  el('fcalc-results').innerHTML = `
+function fcalcShowError(msg, sfx) {
+  sfx = sfx || '';
+  el('fcalc-results' + sfx).innerHTML = `
     <div class="fret-res-error">
       <i class="fa-solid fa-triangle-exclamation"></i>
       <p>${msg}</p>
