@@ -178,9 +178,12 @@ function ecShowLogin(){
 }
 
 function ecShowDashboard(user){
-  document.getElementById('ec-login-overlay').classList.add('hidden');
-  document.getElementById('ec-dashboard').classList.remove('hidden');
-  const initials = (user.first[0]||'U') + (user.last[0]||'');
+  if(!user){ console.error('[GPE] ecShowDashboard appelé sans user'); return; }
+  const overlay = document.getElementById('ec-login-overlay');
+  const dash    = document.getElementById('ec-dashboard');
+  if(overlay) overlay.classList.add('hidden'); else console.warn('[GPE] ec-login-overlay introuvable');
+  if(dash)    dash.classList.remove('hidden'); else console.warn('[GPE] ec-dashboard introuvable');
+  const initials = ((user.first||'U')[0]||'U') + ((user.last||'')[0]||'');
   const full = user.first + ' ' + user.last;
   ['ec-avatar-nav','ec-avatar-side'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=initials; });
   const un = document.getElementById('ec-username-nav'); if(un) un.textContent = full;
@@ -246,39 +249,44 @@ async function ecLogin(){
 
     console.log('[GPE-Login] Tentative pour :', email);
 
+    // Fonction utilitaire locale : enregistre la session et affiche le dashboard
+    const loginSuccess = (userData) => {
+      resetRateLimit(email);
+      ecSetUser(userData);
+      // On utilise userData directement (pas ecGetUser) pour éviter un crash
+      // si localStorage est indisponible et retourne null
+      const stored = ecGetUser();
+      ecShowDashboard(stored || userData);
+    };
+
     // ── Compte Admin ──
     if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
-      resetRateLimit(email);
-      ecSetUser({email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'});
-      ecShowDashboard(ecGetUser());
-      console.log('[GPE-Login] Connecté en tant qu\'admin');
+      loginSuccess({email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'});
+      console.log('[GPE-Login] Connecté admin');
       return;
     }
 
     // ── Compte Démo (Client) ──
     if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
-      resetRateLimit(email);
-      ecSetUser({email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'});
-      ecShowDashboard(ecGetUser());
-      console.log('[GPE-Login] Connecté en tant que démo');
+      loginSuccess({email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'});
+      console.log('[GPE-Login] Connecté démo');
       return;
     }
 
     // ── Comptes Commerciaux ──
     const commercial = EC_COMMERCIAUX.find(c => c.email === email && c.pass === pass);
     if(commercial){
-      resetRateLimit(email);
-      ecSetUser({email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'});
-      ecShowDashboard(ecGetUser());
-      console.log('[GPE-Login] Connecté en tant que commercial :', email);
+      loginSuccess({email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'});
+      console.log('[GPE-Login] Connecté commercial :', email);
       return;
     }
 
     // ── Utilisateurs enregistrés (hash) ──
     console.log('[GPE-Login] Vérification hash pour utilisateur enregistré…');
     const passHash = await hashPass(pass);
-    const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
-    const found = users.find(u => u.email === email && u.passHash === passHash);
+    let users = [];
+    try { users = JSON.parse(localStorage.getItem('ec_users')||'[]'); } catch(_){ users = []; }
+    const found = Array.isArray(users) ? users.find(u => u.email === email && u.passHash === passHash) : null;
 
     if(found){
       if(found.status === 'pending'){
@@ -289,9 +297,7 @@ async function ecLogin(){
         err.textContent = '🚫 Votre compte a été désactivé. Contactez : contact@goplusexpress.ma';
         err.classList.remove('hidden'); return;
       }
-      resetRateLimit(email);
-      ecSetUser({email:found.email, first:found.first, last:found.last, company:found.company, role:found.role||'client'});
-      ecShowDashboard(ecGetUser());
+      loginSuccess({email:found.email, first:found.first, last:found.last, company:found.company, role:found.role||'client'});
       return;
     }
 
