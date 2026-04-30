@@ -1,19 +1,18 @@
 /* ═══════════════════════════════════════════════════════════════
-   GO PLUS EXPRESS — Service Worker v20260425i
-   Cache-first pour assets statiques, Network-first pour HTML
+   GO PLUS EXPRESS — Service Worker v20260430g
+   Cache-first pour assets statiques, Network-first pour HTML/JS
    ═══════════════════════════════════════════════════════════════ */
 
-const CACHE_NAME   = 'gpe-v20260425i';
-const STATIC_CACHE = 'gpe-static-v20260425i';
+const CACHE_NAME   = 'gpe-v20260430g';
+const STATIC_CACHE = 'gpe-static-v20260430g';
 
-/* Assets à pré-cacher à l'installation */
+/* Assets à pré-cacher à l'installation
+   IMPORTANT : ne pas pré-cacher les fichiers JS/CSS versionnés ici —
+   ils sont gérés par le cache HTTP normal via les query strings ?v=... */
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/espace-client.html',
-  '/css/style.css',
-  '/css/espace-client.css',
-  '/js/espace-client.js',
   '/assets/logo.png',
   '/assets/icons/icon-192.png',
   '/assets/icons/icon-512.png',
@@ -78,11 +77,21 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  /* ── Assets statiques propres (images, css, js) : cache-first ── */
-  if (isOwn && (
-    request.url.match(/\.(png|jpg|jpeg|webp|svg|ico|gif|woff2?|ttf)(\?.*)?$/) ||
-    request.url.match(/\.(css|js)(\?v=\w+)?$/)
-  )) {
+  /* ── Fichiers JS/CSS versionnés (?v=...) : TOUJOURS network-first ──
+     Ces fichiers ont des query strings de version (?v=20260430g) qui
+     garantissent l'unicité. On ne les met PAS en cache pour éviter de
+     servir d'anciennes versions. */
+  if (isOwn && url.search && url.search.includes('v=')) {
+    event.respondWith(
+      fetch(request).then(response => {
+        return response;
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  /* ── Assets statiques propres (images, woff) : cache-first ── */
+  if (isOwn && request.url.match(/\.(png|jpg|jpeg|webp|svg|ico|gif|woff2?|ttf)(\?.*)?$/)) {
     event.respondWith(
       caches.match(request).then(cached => {
         if (cached) return cached;

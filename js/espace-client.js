@@ -315,8 +315,7 @@ async function ecLogin(){
 
   } catch(e) {
     console.error('[GPE-Login] Erreur inattendue :', e);
-    // Afficher le message d'erreur RÉEL pour diagnostic (à supprimer après correction)
-    err.textContent = '⚠️ DEBUG: ' + (e && e.message ? e.message : String(e));
+    err.textContent = 'Erreur de connexion. Veuillez réessayer.';
     err.classList.remove('hidden');
   } finally {
     // TOUJOURS restaurer le bouton, même en cas d'erreur ou de return anticipé
