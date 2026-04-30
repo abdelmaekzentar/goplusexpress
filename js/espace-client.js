@@ -245,28 +245,33 @@ async function ecLogin(){
   if(email === EC_ADMIN.email && pass === EC_ADMIN.pass){
     resetRateLimit(email);
     const user = {email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'};
-    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
+    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
+    restoreBtn(); return;
   }
 
   // ── Compte Démo (Client) ──
   if(EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
     resetRateLimit(email);
     const user = {email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'};
-    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
+    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
+    restoreBtn(); return;
   }
 
-  // ── Comptes Commerciaux ──
-  const commercial = EC_COMMERCIAUX.find(c => c.email === email && c.pass === pass);
-  if(commercial){
+  // ── Compte Commercial : Yassine Anaflous ──
+  if(email === 'yassine.anaflous@goplusexpress.com' && pass === 'Gpe@2026'){
     resetRateLimit(email);
-    const user = {email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'};
-    ecSetUser(user); ecShowDashboard(user); restoreBtn(); return;
+    const user = {email, first:'Yassine', last:'Anaflous', company:'GO PLUS EXPRESS', role:'commercial'};
+    try{ ecSetUser(user); ecShowDashboard(user); }catch(e){ console.error(e); }
+    restoreBtn(); return;
   }
 
   // ── Utilisateurs enregistrés ──
-  const passHash = await hashPass(pass);
-  const users = JSON.parse(localStorage.getItem('ec_users')||'[]');
-  const found = users.find(u => u.email === email && u.passHash === passHash);
+  let passHash, users, found;
+  try{
+    passHash = await hashPass(pass);
+    users = JSON.parse(localStorage.getItem('ec_users')||'[]');
+    found = users.find(u => u.email === email && u.passHash === passHash);
+  }catch(e){ console.error(e); restoreBtn(); return; }
 
   restoreBtn();
 
