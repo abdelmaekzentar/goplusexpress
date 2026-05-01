@@ -198,7 +198,14 @@ function ecShowDashboard(user){
 
   // Afficher le badge de rôle
   const role = user.role || 'client';
-  const roleInfo = EC_ROLES[role] || EC_ROLES.client;
+  // Fallback inline de EC_ROLES si la variable globale est indisponible
+  var _roles = (typeof EC_ROLES !== 'undefined' && EC_ROLES) ? EC_ROLES : {
+    admin:      { label:'Administrateur', color:'#dc2626' },
+    backend:    { label:'Opérateur',      color:'#7c3aed' },
+    commercial: { label:'Commercial',     color:'#f59e0b' },
+    client:     { label:'Client',         color:'#0284c7' }
+  };
+  var roleInfo = _roles[role] || _roles['client'];
   const wm = document.getElementById('ec-welcome-msg');
   if(wm) wm.innerHTML = `Bienvenue, <strong>${escapeHTML(user.first)}</strong> !
     <span style="display:inline-flex;align-items:center;gap:5px;background:${roleInfo.color}18;border:1px solid ${roleInfo.color}40;
