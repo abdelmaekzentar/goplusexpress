@@ -73,9 +73,10 @@ function sanitizeField(val, maxLen = 100) {
 /* ══════════════════════════════════════════════════════
    AUTH — Rate limiting & Session
    ══════════════════════════════════════════════════════ */
-const MAX_LOGIN_ATTEMPTS = 5;
-const LOCKOUT_DURATION   = 5 * 60 * 1000;   // 5 minutes
-const SESSION_DURATION   = 8 * 60 * 60 * 1000; // 8 heures
+// var (pas const) pour éviter TDZ si le script s'exécute partiellement
+var MAX_LOGIN_ATTEMPTS = 5;
+var LOCKOUT_DURATION   = 5 * 60 * 1000;   // 5 minutes
+var SESSION_DURATION   = 8 * 60 * 60 * 1000; // 8 heures
 
 function getRateLimit(email) {
   try {
@@ -127,7 +128,7 @@ var EC_COMMERCIAUX = [
 ];
 
 // Rôles disponibles
-const EC_ROLES = {
+var EC_ROLES = {
   admin:      { label:'Administrateur', color:'#dc2626', desc:'Accès total — tarifs, utilisateurs, opérations' },
   backend:    { label:'Opérateur',      color:'#7c3aed', desc:'Visualisation expéditions & simulations' },
   commercial: { label:'Commercial',     color:'#f59e0b', desc:'CRM, prospects, devis & outils logistiques' },
@@ -264,21 +265,29 @@ async function ecLogin(){
     };
 
     // ── Compte Admin ──
-    if(EC_ADMIN && email === EC_ADMIN.email && pass === EC_ADMIN.pass){
-      loginSuccess({email, first:EC_ADMIN.first, last:EC_ADMIN.last, company:EC_ADMIN.company, role:'admin'});
+    // Vérification directe (indépendante des vars globales qui peuvent être undefined)
+    if(email === 'admin@goplusexpress.ma' && pass === 'Admin#GPE2026!'){
+      loginSuccess({email, first:'Admin', last:'GPE', company:'GO PLUS EXPRESS', role:'admin'});
       console.log('[GPE-Login] Connecté admin');
       return;
     }
 
     // ── Compte Démo (Client) ──
-    if(EC_DEMO_EMAILS && EC_DEMO_EMAILS.includes(email) && pass === 'demo2024'){
-      loginSuccess({email, first:EC_DEMO.first, last:EC_DEMO.last, company:EC_DEMO.company, role:'client'});
+    if((email === 'demo@goplusexpress.ma' || email === 'demo@goplusexpress.com') && pass === 'demo2024'){
+      loginSuccess({email, first:'Demo', last:'Client', company:'GO PLUS EXPRESS', role:'client'});
       console.log('[GPE-Login] Connecté démo');
       return;
     }
 
-    // ── Comptes Commerciaux ──
-    const commercial = (EC_COMMERCIAUX||[]).find(c => c.email === email && c.pass === pass);
+    // ── Comptes Commerciaux (hardcodés + tableau dynamique) ──
+    var _commerciaux = (typeof EC_COMMERCIAUX !== 'undefined' && EC_COMMERCIAUX) ? EC_COMMERCIAUX : [];
+    // Comptes commerciaux fixes (indépendants des vars globales)
+    if(email === 'yassine.anaflous@goplusexpress.com' && pass === 'Gpe@2026'){
+      loginSuccess({email, first:'Yassine', last:'Anaflous', company:'GO PLUS EXPRESS', role:'commercial'});
+      console.log('[GPE-Login] Connecté commercial Yassine');
+      return;
+    }
+    const commercial = _commerciaux.find(c => c.email === email && c.pass === pass);
     if(commercial){
       loginSuccess({email, first:commercial.first, last:commercial.last, company:commercial.company, role:'commercial'});
       console.log('[GPE-Login] Connecté commercial :', email);
@@ -308,11 +317,12 @@ async function ecLogin(){
     // ── Échec authentification ──
     incrementRateLimit(email);
     const rlAfter = getRateLimit(email);
-    const remaining = MAX_LOGIN_ATTEMPTS - (rlAfter.count || 0);
+    var _maxAttempts = (typeof MAX_LOGIN_ATTEMPTS !== 'undefined') ? MAX_LOGIN_ATTEMPTS : 5;
+    var _remaining   = _maxAttempts - (rlAfter.count || 0);
     if(rlAfter.locked){
       err.textContent = 'Compte bloqué 5 minutes après trop de tentatives.';
     } else {
-      err.textContent = `Email ou mot de passe incorrect. (${remaining > 0 ? remaining : MAX_LOGIN_ATTEMPTS} tentative(s) restante(s))`;
+      err.textContent = `Email ou mot de passe incorrect. (${_remaining > 0 ? _remaining : _maxAttempts} tentative(s) restante(s))`;
     }
     err.classList.remove('hidden');
     console.log('[GPE-Login] Échec auth pour :', email);
