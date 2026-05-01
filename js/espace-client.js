@@ -215,6 +215,16 @@ function ecShowDashboard(user){
   // Card admin dans le dashboard
   const adminCard = document.getElementById('ec-dashcard-admin');
   if(adminCard) adminCard.style.display = hasBackend ? '' : 'none';
+
+  // CRM réservé aux commerciaux et admins uniquement
+  const hasCRM = ['admin','commercial'].includes(role);
+  const crmBtn = document.getElementById('ecnav-crm');
+  if(crmBtn) crmBtn.style.display = hasCRM ? '' : 'none';
+  // Si le client est sur le module CRM (cas improbable), le renvoyer au tableau de bord
+  if(!hasCRM){
+    const crmMod = document.getElementById('ecmod-crm');
+    if(crmMod && crmMod.classList.contains('active')) ecShowModule('dashboard');
+  }
 }
 
 function ecShowTab(tab){
