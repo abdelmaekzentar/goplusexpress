@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260429a"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260502c"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260502d"/>
 <link rel="stylesheet" href="css/crm.css?v=20260429a"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -2670,6 +2670,56 @@
                     <option value="Dakhla">Dakhla</option>
                   </select>
                 </div>
+
+                <!-- ═══ Localisateur d'agences CashPlus ═══ -->
+                <div class="shp-cp-locator" id="shp-cp-locator">
+                  <!-- Barre de titre + onglets -->
+                  <div class="shp-cp-locator-head">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    <strong>Localiser une agence CashPlus</strong>
+                    <div class="shp-cp-loc-tabs">
+                      <button type="button" class="shp-cp-loc-tab active" id="shp-tab-tawssil" onclick="shpCpTab('tawssil')">
+                        <img src="assets/logos/logo%20cashplus.jpg" alt="CashPlus" style="height:16px;vertical-align:middle;border-radius:2px"> Tawssil
+                      </button>
+                      <button type="button" class="shp-cp-loc-tab" id="shp-tab-osm" onclick="shpCpTab('osm')">
+                        <i class="fa-solid fa-map"></i> OpenStreetMap
+                      </button>
+                    </div>
+                    <a href="https://www.tawssil.ma/" target="_blank" rel="noopener" class="shp-cp-loc-extlink" title="Ouvrir Tawssil.ma dans un nouvel onglet">
+                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                    </a>
+                  </div>
+
+                  <!-- Onglet 1 : iframe Tawssil.ma -->
+                  <div id="shp-cp-pane-tawssil" class="shp-cp-pane">
+                    <iframe id="shp-cashplus-iframe"
+                      src="about:blank"
+                      data-src="https://www.tawssil.ma/"
+                      title="Localiser une agence CashPlus – Tawssil"
+                      class="shp-cp-iframe"
+                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation">
+                    </iframe>
+                    <!-- Affiché si iframe bloqué par X-Frame-Options -->
+                    <div class="shp-cp-iframe-blocked" id="shp-cp-iframe-blocked" style="display:none">
+                      <i class="fa-solid fa-shield-halved fa-2x" style="color:#94a3b8"></i>
+                      <p>Le site Tawssil.ma bloque l'intégration dans une iframe<br>(politique de sécurité du site tiers).</p>
+                      <a href="https://www.tawssil.ma/" target="_blank" rel="noopener" class="shp-cp-open-btn">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Tawssil.ma
+                      </a>
+                      <button type="button" class="shp-cp-osm-fallback-btn" onclick="shpCpTab('osm')">
+                        <i class="fa-solid fa-map"></i> Utiliser OpenStreetMap
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Onglet 2 : Leaflet + Overpass API -->
+                  <div id="shp-cp-pane-osm" class="shp-cp-pane" style="display:none">
+                    <div id="shp-cashplus-map" class="shp-cp-map"></div>
+                    <div class="shp-cp-agency-list" id="shp-cp-agency-list">
+                      <p class="shp-cp-list-hint"><i class="fa-solid fa-hand-pointer"></i> Sélectionnez une ville ci-dessus pour afficher les agences CashPlus.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="shp-nav-btns">
@@ -3245,7 +3295,7 @@
 <script src="js/crm.js?v=20260429a"></script>
 <script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/espace-client.js?v=20260502b"></script>
+<script src="js/espace-client.js?v=20260502d"></script>
 
 <!-- ═══ SERVICE WORKER — enregistrement + force update ═══ -->
 <script>

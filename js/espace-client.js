@@ -3116,8 +3116,153 @@ function shpInit(){
       } else {
         if(pickup)   pickup.style.display   = 'none';
         if(cashplus) cashplus.style.display = '';
+        // Lazy-load iframe Tawssil.ma
+        const iframe = document.getElementById('shp-cashplus-iframe');
+        if(iframe && (iframe.src === 'about:blank' || iframe.src === '')){
+          iframe.src = iframe.dataset.src;
+          shpCpCheckIframe(iframe);
+        }
       }
     });
+  });
+
+  // Surveiller le sélecteur de ville CashPlus → mettre à jour la carte OSM
+  const cpCitySel = document.getElementById('shp-cashplus-city');
+  if(cpCitySel){
+    cpCitySel.addEventListener('change', function(){
+      if(shpCpLeaflet) shpCpLoadCity(this.value);
+    });
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   LOCALISATEUR CASHPLUS — Fonctions
+   ═══════════════════════════════════════════════════ */
+var SHP_CP_CITIES = {
+  'Casablanca':[33.5731,-7.5898],'Rabat':[34.0209,-6.8416],'Salé':[34.0531,-6.8085],
+  'Kénitra':[34.2610,-6.5802],'Fès':[34.0181,-5.0078],'Meknès':[33.8935,-5.5473],
+  'Marrakech':[31.6295,-7.9811],'Tanger':[35.7595,-5.8340],'Agadir':[30.4278,-9.5981],
+  'Oujda':[34.6814,-1.9086],'Tétouan':[35.5785,-5.3684],'Laâyoune':[27.1253,-13.1625],
+  'Béni Mellal':[32.3372,-6.3498],'El Jadida':[33.2316,-8.5007],'Nador':[35.1740,-2.9287],
+  'Settat':[33.0014,-7.6186],'Khouribga':[32.8813,-6.9063],'Safi':[32.2994,-9.2372],
+  'Essaouira':[31.5085,-9.7595],'Dakhla':[23.6847,-15.9572]
+};
+var shpCpLeaflet = null;
+var shpCpMarkers = [];
+
+/* Vérifie si l'iframe tawssil.ma a été bloquée (X-Frame-Options) */
+function shpCpCheckIframe(iframe){
+  setTimeout(function(){
+    try {
+      // Si l'accès est cross-origin refusé → le site s'est chargé normalement
+      var doc = iframe.contentDocument || iframe.contentWindow.document;
+      // Accessible = page vide ou erreur (X-Frame-Options bloque)
+      if(!doc || !doc.body || doc.body.innerHTML.trim().length < 50){
+        iframe.style.display = 'none';
+        var blocked = document.getElementById('shp-cp-iframe-blocked');
+        if(blocked) blocked.style.display = 'flex';
+      }
+    } catch(e){
+      // SecurityError = cross-origin = le site s'est bien chargé → tout va bien
+    }
+  }, 5000);
+}
+
+/* Bascule entre les onglets Tawssil / OpenStreetMap */
+function shpCpTab(tab){
+  ['tawssil','osm'].forEach(function(t){
+    var pane = document.getElementById('shp-cp-pane-'+t);
+    var btn  = document.getElementById('shp-tab-'+t);
+    if(pane) pane.style.display = t===tab ? '' : 'none';
+    if(btn)  btn.classList.toggle('active', t===tab);
+  });
+  if(tab === 'osm') shpCpInitLeaflet();
+}
+
+/* Initialise la carte Leaflet (exécuté une seule fois) */
+function shpCpInitLeaflet(){
+  if(shpCpLeaflet) return;
+  var container = document.getElementById('shp-cashplus-map');
+  if(!container || !window.L) return;
+  shpCpLeaflet = L.map('shp-cashplus-map', {zoomControl:true}).setView([31.7917,-7.0926], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom:19
+  }).addTo(shpCpLeaflet);
+  // Charger la ville déjà sélectionnée
+  var city = (document.getElementById('shp-cashplus-city')||{}).value;
+  if(city) shpCpLoadCity(city);
+  // Fix Leaflet tile bug après affichage
+  setTimeout(function(){ shpCpLeaflet.invalidateSize(); }, 200);
+}
+
+/* Centre la carte sur une ville et charge ses agences via Overpass API */
+function shpCpLoadCity(city){
+  if(!shpCpLeaflet || !city) return;
+  var coords = SHP_CP_CITIES[city];
+  if(!coords) return;
+  shpCpLeaflet.setView(coords, 13);
+  // Vider les anciens marqueurs
+  shpCpMarkers.forEach(function(m){ m.remove(); });
+  shpCpMarkers = [];
+  var list = document.getElementById('shp-cp-agency-list');
+  if(list) list.innerHTML = '<p class="shp-cp-list-hint"><i class="fa-solid fa-spinner fa-spin"></i> Recherche des agences CashPlus…</p>';
+  // Requête Overpass API
+  var q = '[out:json][timeout:12];(node["name"~"(?i)cashplus"]["country"!~"."](around:25000,'+coords[0]+','+coords[1]+');node["brand"~"(?i)cashplus"](around:25000,'+coords[0]+','+coords[1]+');node["operator"~"(?i)cashplus"](around:25000,'+coords[0]+','+coords[1]+'););out body;';
+  fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q))
+    .then(function(r){ return r.json(); })
+    .then(function(d){ shpCpRenderAgencies(d.elements || [], city, coords); })
+    .catch(function(){ shpCpRenderAgencies([], city, coords); });
+}
+
+/* Affiche les agences sur la carte et dans la liste */
+function shpCpRenderAgencies(elements, city, coords){
+  var list = document.getElementById('shp-cp-agency-list');
+  // Icône marqueur CashPlus personnalisée
+  var cpIcon = L.divIcon({
+    className:'',
+    html:'<div style="background:#00a99d;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);letter-spacing:-.5px">C+</div>',
+    iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-16]
+  });
+  if(!elements || elements.length === 0){
+    // Pas de données OSM → marqueur de ville + lien Tawssil
+    L.marker(coords).addTo(shpCpLeaflet)
+      .bindPopup('<strong>'+city+'</strong><br><small>Aucune agence référencée dans OpenStreetMap</small>')
+      .openPopup();
+    shpCpMarkers.push(shpCpLeaflet._layers[Object.keys(shpCpLeaflet._layers).pop()]);
+    if(list) list.innerHTML = '<div class="shp-cp-no-data">Aucune agence CashPlus trouvée dans OpenStreetMap pour <strong>'+city+'</strong>.<br>Consultez <a href="https://www.tawssil.ma/" target="_blank" rel="noopener">Tawssil.ma</a> pour la liste complète.</div>';
+    return;
+  }
+  var listHTML = '';
+  elements.forEach(function(el){
+    var name = (el.tags && el.tags.name) || 'Agence CashPlus';
+    var street = (el.tags && el.tags['addr:street']) || '';
+    var num    = (el.tags && el.tags['addr:housenumber']) || '';
+    var addr   = [num, street].filter(Boolean).join(' ');
+    var marker = L.marker([el.lat, el.lon],{icon:cpIcon}).addTo(shpCpLeaflet);
+    marker.bindPopup('<strong>'+name+'</strong>'+(addr?'<br><small>'+addr+'</small>':''));
+    shpCpMarkers.push(marker);
+    var idx = shpCpMarkers.length-1;
+    listHTML += '<div class="shp-cp-agency-item" onclick="shpCpSelectAgency('+el.lat+','+el.lon+','+idx+')">'
+      +'<i class="fa-solid fa-location-dot"></i>'
+      +'<div><div class="shp-cp-agency-name">'+name+'</div>'
+      +(addr?'<div class="shp-cp-agency-addr">'+addr+'</div>':'')
+      +'</div></div>';
+  });
+  if(list) list.innerHTML = listHTML;
+  // Adapter le zoom à tous les marqueurs
+  if(shpCpMarkers.length > 1){
+    shpCpLeaflet.fitBounds(L.featureGroup(shpCpMarkers).getBounds().pad(0.25));
+  }
+}
+
+/* Sélectionne une agence dans la liste → zoom carte */
+function shpCpSelectAgency(lat, lng, idx){
+  if(!shpCpLeaflet) return;
+  shpCpLeaflet.setView([lat,lng], 17);
+  if(shpCpMarkers[idx]) shpCpMarkers[idx].openPopup();
+  document.querySelectorAll('.shp-cp-agency-item').forEach(function(el,i){
+    el.classList.toggle('selected', i===idx);
   });
 }
 

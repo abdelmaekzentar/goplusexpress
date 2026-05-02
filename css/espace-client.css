@@ -951,6 +951,35 @@
 .shp-cashplus-info i{color:var(--teal);font-size:1.1rem;margin-top:2px;flex-shrink:0}
 .shp-cashplus-info strong{display:block;margin-bottom:4px;color:var(--dark)}
 .shp-cashplus-logo{height:32px;width:auto;object-fit:contain;display:block;margin-bottom:8px}
+/* ── Localisateur d'agences CashPlus ── */
+.shp-cp-locator{margin-top:18px;border:1px solid #a5f3ee;border-radius:12px;overflow:hidden;background:#fff}
+.shp-cp-locator-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border-bottom:1px solid #a5f3ee;flex-wrap:wrap}
+.shp-cp-locator-head>i{color:var(--teal);font-size:1rem}
+.shp-cp-locator-head>strong{font-size:.85rem;color:var(--dark)}
+.shp-cp-loc-tabs{display:flex;gap:4px;margin-left:auto}
+.shp-cp-loc-tab{padding:5px 12px;border-radius:20px;border:1.5px solid #6ee7dc;background:#fff;font-size:.76rem;font-weight:600;cursor:pointer;color:var(--teal);transition:var(--transition);line-height:1.4}
+.shp-cp-loc-tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.shp-cp-loc-tab:hover:not(.active){background:rgba(0,169,157,.08)}
+.shp-cp-loc-extlink{color:var(--teal);font-size:.8rem;text-decoration:none;padding:5px 8px;border-radius:6px;transition:var(--transition);white-space:nowrap}
+.shp-cp-loc-extlink:hover{background:rgba(0,169,157,.12)}
+.shp-cp-pane{position:relative}
+.shp-cp-iframe{width:100%;height:440px;border:none;display:block}
+.shp-cp-iframe-blocked{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:200px;padding:28px 20px;text-align:center;background:#f8fafc}
+.shp-cp-iframe-blocked p{font-size:.84rem;color:#64748b;margin:0;line-height:1.6}
+.shp-cp-open-btn{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:9px 18px;border-radius:8px;text-decoration:none;font-size:.84rem;font-weight:600;transition:var(--transition)}
+.shp-cp-open-btn:hover{background:var(--teal-dark,#008f87)}
+.shp-cp-osm-fallback-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1.5px solid var(--teal);background:#fff;color:var(--teal);font-size:.82rem;font-weight:600;cursor:pointer;transition:var(--transition)}
+.shp-cp-osm-fallback-btn:hover{background:rgba(0,169,157,.08)}
+.shp-cp-map{width:100%;height:340px}
+.shp-cp-agency-list{max-height:180px;overflow-y:auto;border-top:1px solid #e2e8f0;padding:6px 8px}
+.shp-cp-list-hint{text-align:center;color:#94a3b8;font-size:.82rem;padding:14px;margin:0;display:flex;align-items:center;justify-content:center;gap:6px}
+.shp-cp-agency-item{display:flex;align-items:flex-start;gap:10px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:var(--transition)}
+.shp-cp-agency-item:hover,.shp-cp-agency-item.selected{background:rgba(0,169,157,.09)}
+.shp-cp-agency-item>i{color:var(--teal);margin-top:2px;flex-shrink:0;font-size:.9rem}
+.shp-cp-agency-name{font-weight:600;font-size:.83rem;color:var(--dark)}
+.shp-cp-agency-addr{font-size:.76rem;color:#64748b;margin-top:1px}
+.shp-cp-no-data{text-align:center;padding:14px;font-size:.82rem;color:#64748b}
+.shp-cp-no-data a{color:var(--teal)}
 
 /* Payment */
 .shp-payment-modes{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
