@@ -3116,6 +3116,12 @@ function shpInit(){
       } else {
         if(pickup)   pickup.style.display   = 'none';
         if(cashplus) cashplus.style.display = '';
+        // Init carte immédiatement
+        setTimeout(function(){
+          shpCpInitLeaflet();
+          var city = (document.getElementById('shp-cashplus-city')||{}).value;
+          if(city) shpCpLoadCity(city);
+        }, 100);
       }
     });
   });
@@ -3161,17 +3167,6 @@ function shpCpOpenPopup(){
   }
 }
 
-/* Bascule entre les onglets Tawssil / OpenStreetMap */
-function shpCpTab(tab){
-  ['tawssil','osm'].forEach(function(t){
-    var pane = document.getElementById('shp-cp-pane-'+t);
-    var btn  = document.getElementById('shp-tab-'+t);
-    if(pane) pane.style.display = t===tab ? '' : 'none';
-    if(btn)  btn.classList.toggle('active', t===tab);
-  });
-  if(tab === 'osm') shpCpInitLeaflet();
-}
-
 /* Initialise la carte Leaflet (exécuté une seule fois) */
 function shpCpInitLeaflet(){
   if(shpCpLeaflet) return;
@@ -3179,73 +3174,62 @@ function shpCpInitLeaflet(){
   if(!container || !window.L) return;
   shpCpLeaflet = L.map('shp-cashplus-map', {zoomControl:true}).setView([31.7917,-7.0926], 6);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-    attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    attribution:'© OpenStreetMap',
     maxZoom:19
   }).addTo(shpCpLeaflet);
-  // Charger la ville déjà sélectionnée
-  var city = (document.getElementById('shp-cashplus-city')||{}).value;
-  if(city) shpCpLoadCity(city);
-  // Fix Leaflet tile bug après affichage
   setTimeout(function(){ shpCpLeaflet.invalidateSize(); }, 200);
 }
 
-/* Centre la carte sur une ville et charge ses agences via Overpass API */
+/* Centre la carte sur une ville et charge ses agences depuis la base locale */
 function shpCpLoadCity(city){
   if(!shpCpLeaflet || !city) return;
   var coords = SHP_CP_CITIES[city];
   if(!coords) return;
-  shpCpLeaflet.setView(coords, 13);
   // Vider les anciens marqueurs
   shpCpMarkers.forEach(function(m){ m.remove(); });
   shpCpMarkers = [];
-  var list = document.getElementById('shp-cp-agency-list');
-  if(list) list.innerHTML = '<p class="shp-cp-list-hint"><i class="fa-solid fa-spinner fa-spin"></i> Recherche des agences CashPlus…</p>';
-  // Requête Overpass API
-  var q = '[out:json][timeout:12];(node["name"~"(?i)cashplus"]["country"!~"."](around:25000,'+coords[0]+','+coords[1]+');node["brand"~"(?i)cashplus"](around:25000,'+coords[0]+','+coords[1]+');node["operator"~"(?i)cashplus"](around:25000,'+coords[0]+','+coords[1]+'););out body;';
-  fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q))
-    .then(function(r){ return r.json(); })
-    .then(function(d){ shpCpRenderAgencies(d.elements || [], city, coords); })
-    .catch(function(){ shpCpRenderAgencies([], city, coords); });
+  // Charger depuis la base locale CASHPLUS_AGENCIES
+  var agencies = (typeof CASHPLUS_AGENCIES !== 'undefined' && CASHPLUS_AGENCIES[city]) || [];
+  shpCpRenderAgencies(agencies, city, coords);
 }
 
 /* Affiche les agences sur la carte et dans la liste */
-function shpCpRenderAgencies(elements, city, coords){
+function shpCpRenderAgencies(agencies, city, coords){
   var list = document.getElementById('shp-cp-agency-list');
-  // Icône marqueur CashPlus personnalisée
+  // Icône marqueur CashPlus
   var cpIcon = L.divIcon({
     className:'',
     html:'<div style="background:#00a99d;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);letter-spacing:-.5px">C+</div>',
     iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-16]
   });
-  if(!elements || elements.length === 0){
-    // Pas de données OSM → marqueur de ville + lien Tawssil
-    L.marker(coords).addTo(shpCpLeaflet)
-      .bindPopup('<strong>'+city+'</strong><br><small>Aucune agence référencée dans OpenStreetMap</small>')
-      .openPopup();
-    shpCpMarkers.push(shpCpLeaflet._layers[Object.keys(shpCpLeaflet._layers).pop()]);
-    if(list) list.innerHTML = '<div class="shp-cp-no-data">Aucune agence CashPlus trouvée dans OpenStreetMap pour <strong>'+city+'</strong>.<br>Consultez <a href="https://www.tawssil.ma/" target="_blank" rel="noopener">Tawssil.ma</a> pour la liste complète.</div>';
+  var count = document.getElementById('shp-cp-count');
+  if(count) count.textContent = agencies.length ? agencies.length+' agence'+(agencies.length>1?'s':'') : '';
+  if(!agencies || agencies.length === 0){
+    shpCpLeaflet.setView(coords, 13);
+    if(list) list.innerHTML = '<p class="shp-cp-list-hint">Aucune agence disponible pour <strong>'+city+'</strong>.</p>';
     return;
   }
   var listHTML = '';
-  elements.forEach(function(el){
-    var name = (el.tags && el.tags.name) || 'Agence CashPlus';
-    var street = (el.tags && el.tags['addr:street']) || '';
-    var num    = (el.tags && el.tags['addr:housenumber']) || '';
-    var addr   = [num, street].filter(Boolean).join(' ');
-    var marker = L.marker([el.lat, el.lon],{icon:cpIcon}).addTo(shpCpLeaflet);
-    marker.bindPopup('<strong>'+name+'</strong>'+(addr?'<br><small>'+addr+'</small>':''));
+  agencies.forEach(function(ag, idx){
+    var marker = L.marker([ag.lat, ag.lng], {icon:cpIcon}).addTo(shpCpLeaflet);
+    marker.bindPopup(
+      '<div style="min-width:160px"><strong style="color:#00a99d">'+ag.name+'</strong>'
+      +'<br><small style="color:#64748b"><i class="fa-solid fa-location-dot"></i> '+ag.addr+'</small></div>'
+    );
     shpCpMarkers.push(marker);
-    var idx = shpCpMarkers.length-1;
-    listHTML += '<div class="shp-cp-agency-item" onclick="shpCpSelectAgency('+el.lat+','+el.lon+','+idx+')">'
+    listHTML += '<div class="shp-cp-agency-item" onclick="shpCpSelectAgency('+ag.lat+','+ag.lng+','+idx+')">'
       +'<i class="fa-solid fa-location-dot"></i>'
-      +'<div><div class="shp-cp-agency-name">'+name+'</div>'
-      +(addr?'<div class="shp-cp-agency-addr">'+addr+'</div>':'')
+      +'<div><div class="shp-cp-agency-name">'+ag.name+'</div>'
+      +'<div class="shp-cp-agency-addr"><i class="fa-solid fa-road fa-xs"></i> '+ag.addr+'</div>'
       +'</div></div>';
   });
   if(list) list.innerHTML = listHTML;
-  // Adapter le zoom à tous les marqueurs
-  if(shpCpMarkers.length > 1){
-    shpCpLeaflet.fitBounds(L.featureGroup(shpCpMarkers).getBounds().pad(0.25));
+  // Adapter le zoom pour englober tous les marqueurs
+  if(shpCpMarkers.length === 1){
+    shpCpLeaflet.setView([agencies[0].lat, agencies[0].lng], 15);
+    shpCpMarkers[0].openPopup();
+  } else {
+    shpCpLeaflet.fitBounds(L.featureGroup(shpCpMarkers).getBounds().pad(0.2));
   }
 }
 
