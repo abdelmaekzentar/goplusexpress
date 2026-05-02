@@ -943,10 +943,14 @@
 .shp-mode-title{font-weight:700;font-size:.9rem;color:var(--dark)}
 .shp-mode-desc{font-size:.78rem;color:var(--text-light);line-height:1.4}
 .shp-mode-sub{margin:0 0 12px;font-size:.85rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
+/* Logo CashPlus dans la carte de choix */
+.shp-mode-logo{height:46px;width:auto;object-fit:contain;transition:var(--transition)}
+.shp-mode-card:has(input:checked) .shp-mode-logo{filter:drop-shadow(0 0 4px rgba(0,169,157,.35))}
 /* Section CashPlus */
 .shp-cashplus-info{display:flex;gap:12px;align-items:flex-start;background:#f0fdf9;border:1px solid #6ee7dc;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.5}
 .shp-cashplus-info i{color:var(--teal);font-size:1.1rem;margin-top:2px;flex-shrink:0}
 .shp-cashplus-info strong{display:block;margin-bottom:4px;color:var(--dark)}
+.shp-cashplus-logo{height:32px;width:auto;object-fit:contain;display:block;margin-bottom:8px}
 
 /* Payment */
 .shp-payment-modes{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
