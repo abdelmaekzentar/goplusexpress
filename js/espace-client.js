@@ -3259,11 +3259,116 @@ function shpCpSelectAgency(lat, lng, idx){
   });
 }
 
+/* ══════════════════════════════════════════════════════════
+   SIMULATION TARIFAIRE — Étape 1
+   ══════════════════════════════════════════════════════════ */
+
+/* Calcule et affiche les tarifs selon les paramètres */
+function shpSimCalc(){
+  var country  = (document.getElementById('shp-sim-country')||{}).value   || '';
+  var weight   = parseFloat((document.getElementById('shp-sim-weight')||{}).value) || 0;
+  var type     = (document.getElementById('shp-sim-type')||{}).value      || 'colis';
+  var resultsEl = document.getElementById('shp-sim-results');
+  if(!resultsEl) return;
+
+  if(!country || weight <= 0){
+    resultsEl.innerHTML = '<div class="shp-sim-placeholder"><i class="fa-solid fa-magnifying-glass-dollar fa-2x" style="color:#cbd5e1"></i><p>Renseignez le pays de destination et le poids<br>pour voir les tarifs en temps réel.</p></div>';
+    return;
+  }
+
+  /* Prix depuis les tables express-tarifs.js (direction export par défaut) */
+  var dhl    = typeof getDHLPrice   === 'function' ? getDHLPrice('export',   country, weight) : null;
+  var fedex  = typeof getFedExPrice === 'function' ? getFedExPrice('export',  country, type, weight) : null;
+  var aramex = typeof getAramexPrice=== 'function' ? getAramexPrice('export', country, type, weight) : null;
+
+  /* Appliquer surcharges carburant */
+  var dhlTtc    = dhl    ? Math.round(dhl    * 1.46) : null;
+  var fedexTtc  = fedex  ? Math.round(fedex  * 1.48) : null;
+  var aramexTtc = aramex ? Math.round(aramex * 1.47) : null;
+
+  /* Délais depuis TRANSIT_TIMES */
+  var transit = (typeof TRANSIT_TIMES !== 'undefined') ? (TRANSIT_TIMES[shpCountryName(country)] || '—') : '—';
+
+  resultsEl.innerHTML =
+    '<div class="shp-sim-cards">'
+    + shpSimCard('DHL',    dhlTtc,    transit, 'DHL Express Worldwide',        'assets/logos/dhl.svg',    'EXPRESS_WORLDWIDE',        '24–72h')
+    + shpSimCard('FEDEX',  fedexTtc,  transit, 'FedEx International Priority', 'assets/logos/fedex.svg',  'INTERNATIONAL_PRIORITY',   '24–72h')
+    + shpSimCard('ARAMEX', aramexTtc, transit, 'Aramex Priority Parcel',       'assets/logos/aramex.svg', 'PPX',                       '48–96h')
+    + '</div>'
+    + '<p class="shp-sim-note"><i class="fa-solid fa-circle-info"></i> Prix en MAD · Fuel inclus · Tarifs B2B · Export depuis Maroc</p>';
+}
+
+/* Retourne le nom pays pour TRANSIT_TIMES */
+function shpCountryName(code){
+  var map = {
+    DZ:'Algeria',SA:'Saudi Arabia',AU:'Australia',AT:'Austria',BE:'Belgium',BR:'Brazil',
+    CA:'Canada',CN:'China',KR:'South Korea',CI:'Ivory Coast',HR:'Croatia',DK:'Denmark',
+    EG:'Egypt',AE:'UAE',ES:'Spain',US:'USA',FI:'Finland',FR:'France',GH:'Ghana',GR:'Greece',
+    HK:'Hong Kong',HU:'Hungary',IN:'India',ID:'Indonesia',IQ:'Iraq',IE:'Ireland',IL:'Israel',
+    IT:'Italy',JP:'Japan',JO:'Jordan',KE:'Kenya',KW:'Kuwait',LB:'Lebanon',LY:'Libya',
+    LU:'Luxembourg',MY:'Malaysia',ML:'Mali',MT:'Malta',MU:'Mauritius',MX:'Mexico',
+    NG:'Nigeria',NO:'Norway',NZ:'New Zealand',OM:'Oman',UG:'Uganda',PK:'Pakistan',
+    NL:'Netherlands',PH:'Philippines',PL:'Poland',PT:'Portugal',QA:'Qatar',GB:'United Kingdom',
+    RU:'Russia',SN:'Senegal',SG:'Singapore',SE:'Sweden',CH:'Switzerland',TZ:'Tanzania',
+    TH:'Thailand',TN:'Tunisia',TR:'Turkey',UA:'Ukraine',ZA:'South Africa',DE:'Germany'
+  };
+  return map[code] || code;
+}
+
+/* Génère le HTML d'une carte transporteur */
+function shpSimCard(carrier, price, transit, label, logo, service, defaultTransit){
+  var selected = shpSelectedCarrier === carrier;
+  var priceHtml = price
+    ? '<div class="shp-sim-card-price"><strong>'+price.toLocaleString('fr-FR')+' MAD</strong><small>TTC fuel inclus</small></div>'
+    : '<div class="shp-sim-card-price na">Non disponible</div>';
+  var btnHtml = price
+    ? (selected
+        ? '<div class="shp-sim-card-btn selected"><i class="fa-solid fa-circle-check"></i> Sélectionné</div>'
+        : '<div class="shp-sim-card-btn" onclick="shpSelectCarrierFromSim(\''+carrier+'\',\''+service+'\','+price+')">Choisir ce transporteur <i class="fa-solid fa-arrow-right"></i></div>')
+    : '<div class="shp-sim-card-btn disabled">Non disponible</div>';
+  return '<div class="shp-sim-card'+(selected?' selected':'')+(price?'':' unavailable')+'" id="shp-simcard-'+carrier+'">'
+    +'<div class="shp-sim-card-header">'
+    +'<img src="'+logo+'" alt="'+carrier+'" class="shp-sim-card-logo">'
+    +'<div class="shp-sim-card-meta"><div class="shp-sim-card-name">'+label+'</div>'
+    +'<div class="shp-sim-card-transit"><i class="fa-solid fa-clock"></i> '+defaultTransit+' · <i class="fa-solid fa-plane-departure"></i> '+transit+' j ouvrés</div></div>'
+    +'</div>'
+    +priceHtml
+    +btnHtml
+    +'</div>';
+}
+
+/* Sélectionne un transporteur depuis la simulation */
+function shpSelectCarrierFromSim(carrier, service, price){
+  shpSelectedCarrier = carrier;
+  /* Mettre à jour le service dans les anciens selects (pour la confirmation) */
+  var svcMap = {DHL:'shp-dhl-service', FEDEX:'shp-fedex-service', ARAMEX:'shp-aramex-service'};
+  var sel = document.getElementById(svcMap[carrier]);
+  if(sel) sel.value = service;
+  /* Barre de sélection */
+  var bar = document.getElementById('shp-sim-selection-bar');
+  var nameEl = document.getElementById('shp-sim-sel-name');
+  var priceEl = document.getElementById('shp-sim-sel-price');
+  var names = {DHL:'DHL Express Worldwide', FEDEX:'FedEx International Priority', ARAMEX:'Aramex Priority Parcel'};
+  if(nameEl) nameEl.textContent = names[carrier] || carrier;
+  if(priceEl) priceEl.textContent = price ? price.toLocaleString('fr-FR')+' MAD' : '';
+  if(bar) bar.style.display = 'flex';
+  /* Pré-remplir country dans le select Destinataire */
+  var simCountry = (document.getElementById('shp-sim-country')||{}).value;
+  var toCountry = document.getElementById('shp-to-country');
+  if(toCountry && simCountry && toCountry.querySelector('option[value="'+simCountry+'"]')){
+    toCountry.value = simCountry;
+  }
+  /* Rafraîchir l'affichage des cartes */
+  shpSimCalc();
+  /* Sélectionner aussi le carrier dans l'ancien panel (cohérence confirmation) */
+  if(typeof shpSelectCarrier === 'function') shpSelectCarrier(carrier);
+}
+
 /* Navigation */
 function shpNext(from){
   if(!shpValidate(from)) return;
   shpSetStep(from + 1);
-  if(from + 1 === 4) shpRenderCustomsArticles();
+  if(from + 1 === 5) shpRenderCustomsArticles();
   if(from + 1 === 7) shpBuildConfirm();
 }
 function shpPrev(from){ shpSetStep(from - 1); }
@@ -3289,16 +3394,24 @@ function shpValidate(step){
     return ok;
   };
   if(step === 1){
+    const country = (document.getElementById('shp-sim-country')||{}).value;
+    const weight  = parseFloat((document.getElementById('shp-sim-weight')||{}).value)||0;
+    if(!country){ alert('Veuillez sélectionner un pays de destination.'); return false; }
+    if(weight <= 0){ alert('Veuillez saisir un poids valide (> 0 kg).'); return false; }
+    if(!shpSelectedCarrier){ alert('Veuillez sélectionner un transporteur pour continuer.'); return false; }
+    return true;
+  }
+  if(step === 2){
     return req('shp-from-firstname') & req('shp-from-lastname') &
            req('shp-from-addr1') & req('shp-from-zip') &
            req('shp-from-city') & req('shp-from-email') & req('shp-from-phone');
   }
-  if(step === 2){
+  if(step === 3){
     return req('shp-to-firstname') & req('shp-to-lastname') &
            req('shp-to-addr1') & req('shp-to-zip') &
            req('shp-to-city') & req('shp-to-email') & req('shp-to-phone');
   }
-  if(step === 3){
+  if(step === 4){
     let ok = true;
     shpPackages.forEach((p,i)=>{
       if(!p.weight||p.weight<=0){ alert(`Colis ${i+1} : poids invalide`); ok=false; }
@@ -3311,15 +3424,11 @@ function shpValidate(step){
     }
     return ok;
   }
-  if(step === 4){
+  if(step === 5){
     if(!req('shp-cust-from-id')){ alert('Veuillez saisir votre CIN/Passeport ou N° SIRET.'); return false; }
     const d1 = document.getElementById('shp-cust-decl1');
     const d2 = document.getElementById('shp-cust-decl2');
     if(!d1?.checked || !d2?.checked){ alert('Veuillez accepter les déclarations douanières.'); return false; }
-    return true;
-  }
-  if(step === 5){
-    if(!shpSelectedCarrier){ alert('Veuillez sélectionner un transporteur.'); return false; }
     return true;
   }
   if(step === 6){

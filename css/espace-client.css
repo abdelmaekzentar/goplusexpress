@@ -970,6 +970,35 @@
 .shp-cp-dir-btn:hover{background:#2b6bd4;transform:scale(1.08)}
 .shp-cp-no-data{text-align:center;padding:14px;font-size:.82rem;color:#64748b}
 
+/* ── Simulation tarifaire étape 1 ── */
+.shp-sim-intro{font-size:.9rem;color:#64748b;margin:0 0 20px;line-height:1.6}
+.shp-sim-params{background:#f8fafc;border:1px solid var(--ec-border);border-radius:12px;padding:18px;margin-bottom:20px}
+.shp-sim-results{min-height:80px}
+.shp-sim-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:30px;text-align:center;color:#94a3b8;font-size:.85rem;border:2px dashed #e2e8f0;border-radius:12px}
+.shp-sim-cards{display:flex;flex-direction:column;gap:12px}
+.shp-sim-card{border:2px solid var(--ec-border);border-radius:14px;padding:16px 20px;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:16px;transition:var(--transition);cursor:default;background:#fff}
+.shp-sim-card.selected{border-color:var(--teal);background:rgba(0,169,157,.04);box-shadow:0 0 0 4px rgba(0,169,157,.12)}
+.shp-sim-card.unavailable{opacity:.55}
+.shp-sim-card-header{display:flex;align-items:center;gap:14px}
+.shp-sim-card-logo{height:36px;width:auto;object-fit:contain;flex-shrink:0}
+.shp-sim-card-name{font-weight:700;font-size:.9rem;color:var(--dark)}
+.shp-sim-card-transit{font-size:.75rem;color:#64748b;margin-top:3px;display:flex;align-items:center;gap:4px}
+.shp-sim-card-price{text-align:right}
+.shp-sim-card-price strong{display:block;font-size:1.25rem;color:var(--teal);font-weight:800}
+.shp-sim-card-price small{font-size:.7rem;color:#94a3b8}
+.shp-sim-card-price.na{color:#94a3b8;font-size:.82rem}
+.shp-sim-card-btn{padding:9px 18px;border-radius:9px;background:var(--teal);color:#fff;font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:var(--transition);text-align:center}
+.shp-sim-card-btn:hover:not(.selected):not(.disabled){background:#008f87;transform:translateX(2px)}
+.shp-sim-card-btn.selected{background:#059669;cursor:default}
+.shp-sim-card-btn.disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed}
+.shp-sim-note{font-size:.74rem;color:#94a3b8;margin-top:12px;display:flex;align-items:center;gap:5px}
+.shp-sim-selection-bar{display:flex;align-items:center;gap:10px;background:#f0fdf9;border:1px solid #6ee7dc;border-radius:10px;padding:12px 16px;margin-top:16px;flex-wrap:wrap}
+.shp-sim-selection-bar>i{color:var(--teal);font-size:1.1rem}
+.shp-sim-sel-price{margin-left:4px;color:var(--teal);font-weight:800;font-size:1rem}
+.shp-sim-change-btn{margin-left:auto;padding:5px 12px;border-radius:7px;border:1px solid var(--teal);background:#fff;color:var(--teal);font-size:.78rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px;transition:var(--transition)}
+.shp-sim-change-btn:hover{background:rgba(0,169,157,.08)}
+@media(max-width:600px){.shp-sim-card{grid-template-columns:1fr;gap:10px}.shp-sim-card-price{text-align:left}}
+
 /* Payment */
 .shp-payment-modes{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}
 .shp-pay-option{display:grid;grid-template-columns:36px 1fr auto auto;align-items:center;gap:12px;background:#f7f9fc;border:2px solid var(--ec-border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:var(--transition)}
