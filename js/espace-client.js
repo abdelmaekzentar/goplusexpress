@@ -3196,11 +3196,13 @@ function shpCpLoadCity(city){
 /* Affiche les agences sur la carte et dans la liste */
 function shpCpRenderAgencies(agencies, city, coords){
   var list = document.getElementById('shp-cp-agency-list');
-  // Icône marqueur CashPlus
+  // Icône marqueur : logo CashPlus
+  var logoPath = 'assets/logos/logo%20cashplus.jpg';
   var cpIcon = L.divIcon({
     className:'',
-    html:'<div style="background:#00a99d;color:#fff;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);letter-spacing:-.5px">C+</div>',
-    iconSize:[30,30], iconAnchor:[15,15], popupAnchor:[0,-16]
+    html:'<div style="width:38px;height:38px;border-radius:50%;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);overflow:hidden;background:#fff">'
+        +'<img src="'+logoPath+'" style="width:100%;height:100%;object-fit:cover" alt="CashPlus"></div>',
+    iconSize:[38,38], iconAnchor:[19,19], popupAnchor:[0,-20]
   });
   var count = document.getElementById('shp-cp-count');
   if(count) count.textContent = agencies.length ? agencies.length+' agence'+(agencies.length>1?'s':'') : '';
@@ -3211,17 +3213,31 @@ function shpCpRenderAgencies(agencies, city, coords){
   }
   var listHTML = '';
   agencies.forEach(function(ag, idx){
+    var gmUrl = 'https://www.google.com/maps/dir/?api=1&destination='+ag.lat+','+ag.lng+'&travelmode=driving';
     var marker = L.marker([ag.lat, ag.lng], {icon:cpIcon}).addTo(shpCpLeaflet);
     marker.bindPopup(
-      '<div style="min-width:160px"><strong style="color:#00a99d">'+ag.name+'</strong>'
-      +'<br><small style="color:#64748b"><i class="fa-solid fa-location-dot"></i> '+ag.addr+'</small></div>'
+      '<div style="min-width:190px;font-family:inherit">'
+      +'<div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">'
+      +'<img src="'+logoPath+'" style="height:22px;border-radius:3px" alt="CashPlus">'
+      +'<strong style="color:#00a99d;font-size:.88rem">'+ag.name+'</strong></div>'
+      +'<div style="font-size:.78rem;color:#64748b;margin-bottom:10px">'
+      +'<i class="fa-solid fa-location-dot" style="color:#00a99d"></i> '+ag.addr+'</div>'
+      +'<a href="'+gmUrl+'" target="_blank" rel="noopener" '
+      +'style="display:inline-flex;align-items:center;gap:6px;background:#4285F4;color:#fff;'
+      +'padding:7px 13px;border-radius:7px;text-decoration:none;font-size:.8rem;font-weight:700">'
+      +'<img src="https://www.google.com/favicon.ico" style="width:14px;height:14px"> Obtenir des directions</a>'
+      +'</div>'
     );
     shpCpMarkers.push(marker);
     listHTML += '<div class="shp-cp-agency-item" onclick="shpCpSelectAgency('+ag.lat+','+ag.lng+','+idx+')">'
-      +'<i class="fa-solid fa-location-dot"></i>'
-      +'<div><div class="shp-cp-agency-name">'+ag.name+'</div>'
+      +'<img src="'+logoPath+'" class="shp-cp-item-logo" alt="C+">'
+      +'<div style="flex:1">'
+      +'<div class="shp-cp-agency-name">'+ag.name+'</div>'
       +'<div class="shp-cp-agency-addr"><i class="fa-solid fa-road fa-xs"></i> '+ag.addr+'</div>'
-      +'</div></div>';
+      +'</div>'
+      +'<a href="'+gmUrl+'" target="_blank" rel="noopener" class="shp-cp-dir-btn" onclick="event.stopPropagation()" title="Obtenir des directions">'
+      +'<i class="fa-solid fa-diamond-turn-right"></i></a>'
+      +'</div>';
   });
   if(list) list.innerHTML = listHTML;
   // Adapter le zoom pour englober tous les marqueurs

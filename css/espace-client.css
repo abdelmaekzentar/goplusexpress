@@ -965,6 +965,9 @@
 .shp-cp-agency-item>i{color:var(--teal);margin-top:3px;flex-shrink:0;font-size:.9rem}
 .shp-cp-agency-name{font-weight:600;font-size:.83rem;color:var(--dark)}
 .shp-cp-agency-addr{font-size:.76rem;color:#64748b;margin-top:2px;display:flex;align-items:center;gap:4px}
+.shp-cp-item-logo{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1.5px solid #e2e8f0;flex-shrink:0}
+.shp-cp-dir-btn{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:8px;background:#4285F4;color:#fff;text-decoration:none;font-size:.85rem;flex-shrink:0;transition:var(--transition)}
+.shp-cp-dir-btn:hover{background:#2b6bd4;transform:scale(1.08)}
 .shp-cp-no-data{text-align:center;padding:14px;font-size:.82rem;color:#64748b}
 
 /* Payment */
