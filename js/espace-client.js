@@ -446,7 +446,7 @@ function ecShowModule(name){
 }
 
 /* ── Invoice Calculator ──────────────────────────────── */
-function fmt(n){ return n.toLocaleString('fr-MA',{minimumFractionDigits:2,maximumFractionDigits:2})+' MAD'; }
+function invFmt(n){ return n.toLocaleString('fr-MA',{minimumFractionDigits:2,maximumFractionDigits:2})+' MAD'; }
 
 function invCalc(){
   const w     = parseFloat(document.getElementById('inv-weight').value)||0;
@@ -463,9 +463,9 @@ function invCalc(){
   const tvaAmt = ht * tva/100;
   const ttc = ht + tvaAmt;
 
-  document.getElementById('inv-ht').textContent   = fmt(ht);
-  document.getElementById('inv-tva-amt').textContent = fmt(tvaAmt);
-  document.getElementById('inv-ttc').textContent  = fmt(ttc);
+  document.getElementById('inv-ht').textContent   = invFmt(ht);
+  document.getElementById('inv-tva-amt').textContent = invFmt(tvaAmt);
+  document.getElementById('inv-ttc').textContent  = invFmt(ttc);
 
   // Preview update
   document.getElementById('idoc-num').textContent  = num;
@@ -476,14 +476,14 @@ function invCalc(){
   document.getElementById('idoc-to-name').textContent   = document.getElementById('inv-to-name').value||'—';
   document.getElementById('idoc-to-addr').textContent   = document.getElementById('inv-to-addr').value||'';
   document.getElementById('idoc-qty').textContent  = w+' kg';
-  document.getElementById('idoc-pu').textContent   = fmt(rate);
-  document.getElementById('idoc-line1').textContent= fmt(lineAmt);
-  document.getElementById('idoc-extra').textContent= fmt(extra);
-  document.getElementById('idoc-extra2').textContent= fmt(extra);
-  document.getElementById('idoc-ht').textContent   = fmt(ht);
+  document.getElementById('idoc-pu').textContent   = invFmt(rate);
+  document.getElementById('idoc-line1').textContent= invFmt(lineAmt);
+  document.getElementById('idoc-extra').textContent= invFmt(extra);
+  document.getElementById('idoc-extra2').textContent= invFmt(extra);
+  document.getElementById('idoc-ht').textContent   = invFmt(ht);
   document.getElementById('idoc-tva-lbl').textContent= 'TVA '+tva+'%';
-  document.getElementById('idoc-tva').textContent  = fmt(tvaAmt);
-  document.getElementById('idoc-ttc').textContent  = fmt(ttc);
+  document.getElementById('idoc-tva').textContent  = invFmt(tvaAmt);
+  document.getElementById('idoc-ttc').textContent  = invFmt(ttc);
   // Update lines table mode label
   const lines = document.getElementById('idoc-lines');
   if(lines) lines.querySelector('td:first-child').textContent = 'Frais de transport ('+mode+')';
