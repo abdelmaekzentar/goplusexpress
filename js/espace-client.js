@@ -3105,6 +3105,20 @@ function shpInit(){
     if(wrap) wrap.style.display = this.value === 'OTHER' ? '' : 'none';
     shpUpdateSummary();
   });
+  // Surveiller le mode de remise (Enlèvement / CashPlus)
+  document.querySelectorAll('input[name="shp-handover-mode"]').forEach(radio => {
+    radio.addEventListener('change', function(){
+      const pickup   = document.getElementById('shp-section-pickup');
+      const cashplus = document.getElementById('shp-section-cashplus');
+      if(this.value === 'pickup'){
+        if(pickup)   pickup.style.display   = '';
+        if(cashplus) cashplus.style.display = 'none';
+      } else {
+        if(pickup)   pickup.style.display   = 'none';
+        if(cashplus) cashplus.style.display = '';
+      }
+    });
+  });
 }
 
 /* Navigation */
@@ -3151,7 +3165,12 @@ function shpValidate(step){
     shpPackages.forEach((p,i)=>{
       if(!p.weight||p.weight<=0){ alert(`Colis ${i+1} : poids invalide`); ok=false; }
     });
-    if(!v('shp-pickup-date')){ alert('Veuillez sélectionner une date d\'enlèvement.'); return false; }
+    const handoverMode = (document.querySelector('input[name="shp-handover-mode"]:checked') || {}).value || 'pickup';
+    if(handoverMode === 'pickup'){
+      if(!v('shp-pickup-date')){ alert('Veuillez sélectionner une date d\'enlèvement.'); return false; }
+    } else {
+      if(!v('shp-cashplus-city')){ alert('Veuillez sélectionner la ville de l\'agence CashPlus.'); return false; }
+    }
     return ok;
   }
   if(step === 4){
@@ -3660,6 +3679,24 @@ function shpBuildConfirm(){
           ${insurance ? '<i class="fa-solid fa-shield-check" style="color:green"></i> Assurance incluse · ' : ''}
           ${signature ? '<i class="fa-solid fa-pen-to-square" style="color:var(--teal)"></i> Signature requise' : ''}
         </div>
+      </div>
+      <div class="shp-confirm-block">
+        ${(()=>{
+          const hMode = (document.querySelector('input[name="shp-handover-mode"]:checked')||{}).value||'pickup';
+          if(hMode === 'cashplus'){
+            const city = v('shp-cashplus-city');
+            return `<div class="shp-confirm-label"><i class="fa-solid fa-store"></i> Mode de remise</div>
+              <div style="font-weight:700;color:var(--teal)">Dépôt en agence CashPlus</div>
+              <div style="margin-top:4px">Ville : <strong>${city}</strong></div>
+              <div style="font-size:.82rem;color:#64748b;margin-top:6px">Apportez votre colis + bordereau à l'agence CashPlus de ${city}</div>`;
+          } else {
+            const date = v('shp-pickup-date');
+            const time = v('shp-pickup-time') || '09:00-18:00';
+            return `<div class="shp-confirm-label"><i class="fa-solid fa-truck-pickup"></i> Mode de remise</div>
+              <div style="font-weight:700;color:var(--teal)">Enlèvement à domicile</div>
+              <div style="margin-top:4px">Date : <strong>${date}</strong> · Créneau : <strong>${time}</strong></div>`;
+          }
+        })()}
       </div>
     </div>
       <div class="shp-confirm-block">

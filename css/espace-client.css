@@ -933,6 +933,20 @@
 .shp-article-card{background:#f7f9fc;border:1px solid var(--ec-border);border-radius:12px;padding:16px;margin-bottom:12px}
 .shp-pickup-section{margin-top:20px;padding-top:20px;border-top:1px solid var(--ec-border)}
 .shp-pickup-title{margin:0 0 14px;font-size:.9rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
+/* Mode de remise — cartes de sélection */
+.shp-mode-cards{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.shp-mode-card{flex:1;min-width:200px;border:2px solid var(--ec-border);border-radius:12px;padding:16px 14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;transition:var(--transition);user-select:none}
+.shp-mode-card input[type="radio"]{display:none}
+.shp-mode-card i{font-size:1.7rem;color:var(--text-light);transition:var(--transition)}
+.shp-mode-card:has(input:checked){border-color:var(--teal);background:rgba(0,169,157,.07);box-shadow:0 0 0 3px rgba(0,169,157,.1)}
+.shp-mode-card:has(input:checked) i{color:var(--teal)}
+.shp-mode-title{font-weight:700;font-size:.9rem;color:var(--dark)}
+.shp-mode-desc{font-size:.78rem;color:var(--text-light);line-height:1.4}
+.shp-mode-sub{margin:0 0 12px;font-size:.85rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:6px}
+/* Section CashPlus */
+.shp-cashplus-info{display:flex;gap:12px;align-items:flex-start;background:#f0fdf9;border:1px solid #6ee7dc;border-radius:10px;padding:14px;font-size:.85rem;line-height:1.5}
+.shp-cashplus-info i{color:var(--teal);font-size:1.1rem;margin-top:2px;flex-shrink:0}
+.shp-cashplus-info strong{display:block;margin-bottom:4px;color:var(--dark)}
 
 /* Payment */
 .shp-payment-modes{display:flex;flex-direction:column;gap:12px;margin-bottom:16px}

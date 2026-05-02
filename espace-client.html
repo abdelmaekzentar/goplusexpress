@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260429a"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260429a"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260502b"/>
 <link rel="stylesheet" href="css/crm.css?v=20260429a"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -2593,21 +2593,80 @@
             <button class="shp-add-pkg-btn" onclick="shpAddPackage()">
               <i class="fa-solid fa-plus-circle"></i> Ajouter un colis
             </button>
-            <!-- Date & heure d'enlèvement -->
+            <!-- Mode de remise -->
             <div class="shp-pickup-section">
-              <h4 class="shp-pickup-title"><i class="fa-solid fa-calendar-check"></i> Date &amp; heure d'enlèvement</h4>
-              <div class="shp-grid-2" style="max-width:560px">
-                <div class="shp-field">
-                  <label>Date d'enlèvement *</label>
-                  <input type="date" id="shp-pickup-date">
+              <h4 class="shp-pickup-title"><i class="fa-solid fa-handshake"></i> Mode de remise</h4>
+
+              <!-- Cartes de choix -->
+              <div class="shp-mode-cards">
+                <label class="shp-mode-card" id="shp-mode-card-pickup">
+                  <input type="radio" name="shp-handover-mode" value="pickup" id="shp-mode-pickup" checked>
+                  <i class="fa-solid fa-truck-pickup"></i>
+                  <span class="shp-mode-title">Enlèvement à domicile</span>
+                  <span class="shp-mode-desc">Un livreur vient récupérer votre colis à l'adresse expéditeur</span>
+                </label>
+                <label class="shp-mode-card" id="shp-mode-card-cashplus">
+                  <input type="radio" name="shp-handover-mode" value="cashplus" id="shp-mode-cashplus">
+                  <i class="fa-solid fa-store"></i>
+                  <span class="shp-mode-title">Dépôt en agence CashPlus</span>
+                  <span class="shp-mode-desc">Déposez votre colis dans l'agence CashPlus la plus proche</span>
+                </label>
+              </div>
+
+              <!-- Section Enlèvement (affichée par défaut) -->
+              <div id="shp-section-pickup">
+                <h5 class="shp-mode-sub"><i class="fa-solid fa-calendar-check"></i> Date &amp; heure d'enlèvement</h5>
+                <div class="shp-grid-2" style="max-width:560px">
+                  <div class="shp-field">
+                    <label>Date d'enlèvement *</label>
+                    <input type="date" id="shp-pickup-date">
+                  </div>
+                  <div class="shp-field">
+                    <label>Créneau horaire</label>
+                    <select id="shp-pickup-time">
+                      <option value="09:00-18:00">09:00 – 18:00 (standard)</option>
+                      <option value="09:00-12:00">09:00 – 12:00 (matin)</option>
+                      <option value="14:00-18:00">14:00 – 18:00 (après-midi)</option>
+                      <option value="18:00-21:00">18:00 – 21:00 (soir, DHL only)</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="shp-field">
-                  <label>Créneau horaire</label>
-                  <select id="shp-pickup-time">
-                    <option value="09:00-18:00">09:00 – 18:00 (standard)</option>
-                    <option value="09:00-12:00">09:00 – 12:00 (matin)</option>
-                    <option value="14:00-18:00">14:00 – 18:00 (après-midi)</option>
-                    <option value="18:00-21:00">18:00 – 21:00 (soir, DHL only)</option>
+              </div>
+
+              <!-- Section CashPlus (masquée par défaut) -->
+              <div id="shp-section-cashplus" style="display:none">
+                <div class="shp-cashplus-info">
+                  <i class="fa-solid fa-circle-info"></i>
+                  <div>
+                    <strong>Comment déposer votre colis ?</strong><br>
+                    Rendez-vous dans l'agence CashPlus de votre ville avec votre colis emballé et le bordereau
+                    généré à l'étape de confirmation. Nos équipes prendront en charge l'expédition.
+                  </div>
+                </div>
+                <div class="shp-field" style="max-width:340px;margin-top:14px">
+                  <label>Ville de l'agence CashPlus *</label>
+                  <select id="shp-cashplus-city">
+                    <option value="">— Sélectionnez une ville —</option>
+                    <option value="Casablanca">Casablanca</option>
+                    <option value="Rabat">Rabat</option>
+                    <option value="Salé">Salé</option>
+                    <option value="Kénitra">Kénitra</option>
+                    <option value="Fès">Fès</option>
+                    <option value="Meknès">Meknès</option>
+                    <option value="Marrakech">Marrakech</option>
+                    <option value="Tanger">Tanger</option>
+                    <option value="Agadir">Agadir</option>
+                    <option value="Oujda">Oujda</option>
+                    <option value="Tétouan">Tétouan</option>
+                    <option value="Laâyoune">Laâyoune</option>
+                    <option value="Béni Mellal">Béni Mellal</option>
+                    <option value="El Jadida">El Jadida</option>
+                    <option value="Nador">Nador</option>
+                    <option value="Settat">Settat</option>
+                    <option value="Khouribga">Khouribga</option>
+                    <option value="Safi">Safi</option>
+                    <option value="Essaouira">Essaouira</option>
+                    <option value="Dakhla">Dakhla</option>
                   </select>
                 </div>
               </div>
@@ -3185,7 +3244,7 @@
 <script src="js/crm.js?v=20260429a"></script>
 <script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/espace-client.js?v=20260502a"></script>
+<script src="js/espace-client.js?v=20260502b"></script>
 
 <!-- ═══ SERVICE WORKER — enregistrement + force update ═══ -->
 <script>
