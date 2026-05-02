@@ -16,7 +16,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/assets/icons/icon-192.png"/>
 <link rel="shortcut icon" href="/assets/logo.png"/>
 <link rel="stylesheet" href="css/style.css?v=20260429a"/>
-<link rel="stylesheet" href="css/espace-client.css?v=20260502d"/>
+<link rel="stylesheet" href="css/espace-client.css?v=20260502e"/>
 <link rel="stylesheet" href="css/crm.css?v=20260429a"/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -2673,7 +2673,6 @@
 
                 <!-- ═══ Localisateur d'agences CashPlus ═══ -->
                 <div class="shp-cp-locator" id="shp-cp-locator">
-                  <!-- Barre de titre + onglets -->
                   <div class="shp-cp-locator-head">
                     <i class="fa-solid fa-map-location-dot"></i>
                     <strong>Localiser une agence CashPlus</strong>
@@ -2685,30 +2684,41 @@
                         <i class="fa-solid fa-map"></i> OpenStreetMap
                       </button>
                     </div>
-                    <a href="https://www.tawssil.ma/" target="_blank" rel="noopener" class="shp-cp-loc-extlink" title="Ouvrir Tawssil.ma dans un nouvel onglet">
-                      <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                    </a>
                   </div>
 
-                  <!-- Onglet 1 : iframe Tawssil.ma -->
+                  <!-- Onglet 1 : Popup Tawssil.ma (bypass X-Frame-Options) -->
                   <div id="shp-cp-pane-tawssil" class="shp-cp-pane">
-                    <iframe id="shp-cashplus-iframe"
-                      src="about:blank"
-                      data-src="https://www.tawssil.ma/"
-                      title="Localiser une agence CashPlus – Tawssil"
-                      class="shp-cp-iframe"
-                      sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation-by-user-activation">
-                    </iframe>
-                    <!-- Affiché si iframe bloqué par X-Frame-Options -->
-                    <div class="shp-cp-iframe-blocked" id="shp-cp-iframe-blocked" style="display:none">
-                      <i class="fa-solid fa-shield-halved fa-2x" style="color:#94a3b8"></i>
-                      <p>Le site Tawssil.ma bloque l'intégration dans une iframe<br>(politique de sécurité du site tiers).</p>
-                      <a href="https://www.tawssil.ma/" target="_blank" rel="noopener" class="shp-cp-open-btn">
-                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Tawssil.ma
-                      </a>
-                      <button type="button" class="shp-cp-osm-fallback-btn" onclick="shpCpTab('osm')">
-                        <i class="fa-solid fa-map"></i> Utiliser OpenStreetMap
-                      </button>
+                    <div class="shp-cp-popup-zone">
+                      <!-- Prévisualisation décorative -->
+                      <div class="shp-cp-map-preview" aria-hidden="true">
+                        <div class="shp-cp-preview-dots">
+                          <span style="left:22%;top:38%"></span>
+                          <span style="left:38%;top:55%"></span>
+                          <span style="left:51%;top:40%"></span>
+                          <span style="left:67%;top:62%"></span>
+                          <span style="left:72%;top:35%"></span>
+                          <span style="left:30%;top:68%"></span>
+                          <span style="left:58%;top:25%"></span>
+                          <span style="left:45%;top:72%"></span>
+                        </div>
+                        <div class="shp-cp-preview-watermark">
+                          <img src="assets/logos/logo%20cashplus.jpg" alt="CashPlus" style="height:28px;opacity:.6">
+                        </div>
+                      </div>
+                      <!-- CTA principal -->
+                      <div class="shp-cp-popup-cta">
+                        <img src="assets/logos/logo%20cashplus.jpg" alt="CashPlus" style="height:40px;margin-bottom:10px">
+                        <p class="shp-cp-popup-title">Carte officielle des agences CashPlus</p>
+                        <p class="shp-cp-popup-sub">Plus de 3 000 agences partout au Maroc</p>
+                        <button type="button" class="shp-cp-open-popup-btn" onclick="shpCpOpenPopup()">
+                          <i class="fa-solid fa-map-location-dot"></i>
+                          Trouver l'agence la plus proche
+                        </button>
+                        <span class="shp-cp-popup-note">
+                          <i class="fa-solid fa-up-right-from-square fa-xs"></i>
+                          S'ouvre dans une fenêtre séparée — votre formulaire reste intact
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -2716,7 +2726,7 @@
                   <div id="shp-cp-pane-osm" class="shp-cp-pane" style="display:none">
                     <div id="shp-cashplus-map" class="shp-cp-map"></div>
                     <div class="shp-cp-agency-list" id="shp-cp-agency-list">
-                      <p class="shp-cp-list-hint"><i class="fa-solid fa-hand-pointer"></i> Sélectionnez une ville ci-dessus pour afficher les agences CashPlus.</p>
+                      <p class="shp-cp-list-hint"><i class="fa-solid fa-hand-pointer"></i> Sélectionnez une ville ci-dessus pour afficher les agences référencées.</p>
                     </div>
                   </div>
                 </div>
@@ -3295,7 +3305,7 @@
 <script src="js/crm.js?v=20260429a"></script>
 <script src="js/admin.js?v=20260429a"></script>
 <script src="js/cms-loader.js"></script>
-<script src="js/espace-client.js?v=20260502d"></script>
+<script src="js/espace-client.js?v=20260502e"></script>
 
 <!-- ═══ SERVICE WORKER — enregistrement + force update ═══ -->
 <script>

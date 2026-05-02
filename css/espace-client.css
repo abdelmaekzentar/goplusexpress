@@ -952,6 +952,7 @@
 .shp-cashplus-info strong{display:block;margin-bottom:4px;color:var(--dark)}
 .shp-cashplus-logo{height:32px;width:auto;object-fit:contain;display:block;margin-bottom:8px}
 /* ── Localisateur d'agences CashPlus ── */
+/* ── Localisateur CashPlus — structure ── */
 .shp-cp-locator{margin-top:18px;border:1px solid #a5f3ee;border-radius:12px;overflow:hidden;background:#fff}
 .shp-cp-locator-head{display:flex;align-items:center;gap:8px;padding:10px 14px;background:linear-gradient(135deg,#e6faf8,#f0fdfc);border-bottom:1px solid #a5f3ee;flex-wrap:wrap}
 .shp-cp-locator-head>i{color:var(--teal);font-size:1rem}
@@ -960,16 +961,24 @@
 .shp-cp-loc-tab{padding:5px 12px;border-radius:20px;border:1.5px solid #6ee7dc;background:#fff;font-size:.76rem;font-weight:600;cursor:pointer;color:var(--teal);transition:var(--transition);line-height:1.4}
 .shp-cp-loc-tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
 .shp-cp-loc-tab:hover:not(.active){background:rgba(0,169,157,.08)}
-.shp-cp-loc-extlink{color:var(--teal);font-size:.8rem;text-decoration:none;padding:5px 8px;border-radius:6px;transition:var(--transition);white-space:nowrap}
-.shp-cp-loc-extlink:hover{background:rgba(0,169,157,.12)}
 .shp-cp-pane{position:relative}
-.shp-cp-iframe{width:100%;height:440px;border:none;display:block}
-.shp-cp-iframe-blocked{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:200px;padding:28px 20px;text-align:center;background:#f8fafc}
-.shp-cp-iframe-blocked p{font-size:.84rem;color:#64748b;margin:0;line-height:1.6}
-.shp-cp-open-btn{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;padding:9px 18px;border-radius:8px;text-decoration:none;font-size:.84rem;font-weight:600;transition:var(--transition)}
-.shp-cp-open-btn:hover{background:var(--teal-dark,#008f87)}
-.shp-cp-osm-fallback-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:8px;border:1.5px solid var(--teal);background:#fff;color:var(--teal);font-size:.82rem;font-weight:600;cursor:pointer;transition:var(--transition)}
-.shp-cp-osm-fallback-btn:hover{background:rgba(0,169,157,.08)}
+/* ── Onglet Tawssil : zone popup ── */
+.shp-cp-popup-zone{display:grid;grid-template-columns:1fr 1fr;min-height:220px}
+@media(max-width:640px){.shp-cp-popup-zone{grid-template-columns:1fr}}
+/* Prévisualisation carte décorative */
+.shp-cp-map-preview{position:relative;background:linear-gradient(135deg,#e0f7f5 0%,#b2ece7 50%,#7dd9d2 100%);overflow:hidden}
+.shp-cp-preview-dots{position:absolute;inset:0}
+.shp-cp-preview-dots span{position:absolute;width:22px;height:22px;background:#00a99d;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+.shp-cp-preview-dots span::after{content:'';position:absolute;width:8px;height:8px;background:#fff;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.shp-cp-preview-watermark{position:absolute;bottom:10px;right:10px;background:rgba(255,255,255,.7);border-radius:6px;padding:4px 8px}
+/* Zone CTA */
+.shp-cp-popup-cta{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:24px 20px;text-align:center;background:#fff}
+.shp-cp-popup-title{font-weight:700;font-size:.9rem;color:var(--dark);margin:0}
+.shp-cp-popup-sub{font-size:.8rem;color:#64748b;margin:0}
+.shp-cp-open-popup-btn{display:inline-flex;align-items:center;gap:8px;background:var(--teal);color:#fff;padding:12px 22px;border-radius:10px;border:none;font-size:.9rem;font-weight:700;cursor:pointer;transition:var(--transition);margin-top:6px;box-shadow:0 4px 14px rgba(0,169,157,.3)}
+.shp-cp-open-popup-btn:hover{background:#008f87;box-shadow:0 6px 18px rgba(0,169,157,.4);transform:translateY(-1px)}
+.shp-cp-popup-note{font-size:.74rem;color:#94a3b8;margin-top:4px;display:flex;align-items:center;gap:4px;justify-content:center}
+/* ── Onglet OSM ── */
 .shp-cp-map{width:100%;height:340px}
 .shp-cp-agency-list{max-height:180px;overflow-y:auto;border-top:1px solid #e2e8f0;padding:6px 8px}
 .shp-cp-list-hint{text-align:center;color:#94a3b8;font-size:.82rem;padding:14px;margin:0;display:flex;align-items:center;justify-content:center;gap:6px}

@@ -3116,12 +3116,6 @@ function shpInit(){
       } else {
         if(pickup)   pickup.style.display   = 'none';
         if(cashplus) cashplus.style.display = '';
-        // Lazy-load iframe Tawssil.ma
-        const iframe = document.getElementById('shp-cashplus-iframe');
-        if(iframe && (iframe.src === 'about:blank' || iframe.src === '')){
-          iframe.src = iframe.dataset.src;
-          shpCpCheckIframe(iframe);
-        }
       }
     });
   });
@@ -3150,22 +3144,21 @@ var SHP_CP_CITIES = {
 var shpCpLeaflet = null;
 var shpCpMarkers = [];
 
-/* Vérifie si l'iframe tawssil.ma a été bloquée (X-Frame-Options) */
-function shpCpCheckIframe(iframe){
-  setTimeout(function(){
-    try {
-      // Si l'accès est cross-origin refusé → le site s'est chargé normalement
-      var doc = iframe.contentDocument || iframe.contentWindow.document;
-      // Accessible = page vide ou erreur (X-Frame-Options bloque)
-      if(!doc || !doc.body || doc.body.innerHTML.trim().length < 50){
-        iframe.style.display = 'none';
-        var blocked = document.getElementById('shp-cp-iframe-blocked');
-        if(blocked) blocked.style.display = 'flex';
-      }
-    } catch(e){
-      // SecurityError = cross-origin = le site s'est bien chargé → tout va bien
-    }
-  }, 5000);
+/* Ouvre Tawssil.ma dans un popup centré (bypass X-Frame-Options) */
+function shpCpOpenPopup(){
+  var w = Math.min(1050, Math.round(window.screen.width * 0.85));
+  var h = Math.min(750, Math.round(window.screen.height * 0.82));
+  var l = Math.round((window.screen.width  - w) / 2);
+  var t = Math.round((window.screen.height - h) / 2);
+  var win = window.open(
+    'https://www.tawssil.ma/',
+    'tawssil-locator',
+    'width='+w+',height='+h+',left='+l+',top='+t+',scrollbars=yes,resizable=yes,status=no,toolbar=no'
+  );
+  if(!win) {
+    // Popup bloqué par le navigateur → fallback onglet
+    window.open('https://www.tawssil.ma/', '_blank', 'noopener');
+  }
 }
 
 /* Bascule entre les onglets Tawssil / OpenStreetMap */
